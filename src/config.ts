@@ -1,5 +1,5 @@
 // TODOS los números del juego. Ver GDD.md.
-import type { EnemyId, PassiveId, WeaponId } from './types';
+import type { EnemyId, PassiveId, PromiseId, WeaponId } from './types';
 
 export const GAME_WIDTH = 960;
 export const GAME_HEIGHT = 540;
@@ -233,6 +233,44 @@ export const SPAWN_TABLE: readonly SpawnRow[] = [
   { interval: 0.35, count: 8, weights: { ipc: 25, casero: 25, agencia: 30, fondo: 20 } },
 ];
 
+// Sección 10 — Promesa electoral
+/** Multiplicadores temporales de una promesa (los ausentes valen 1). */
+export interface PromiseEffect {
+  damage?: number;
+  enemySpeed?: number;
+  pickupRadius?: number;
+  xpGain?: number;
+  cooldown?: number;
+  playerSpeed?: number;
+  invulnerable?: boolean;
+}
+
+export const PROMESA = {
+  /** Minutos en los que aparece el pickup. */
+  spawnMinutes: [2, 4, 6, 8] as readonly number[],
+  spawnMinDistance: 250,
+  spawnMaxDistance: 400,
+  /** Segundos en el suelo antes de desaparecer si no se coge. */
+  lifetime: 30,
+  hitboxRadius: 16,
+  buffSeconds: 20,
+  debuffSeconds: 15,
+  /** Probabilidad de que se cumpla al terminar el buff. */
+  fulfilledChance: 0.5,
+  /** Segundos que se muestra el banner "¡Promesa cumplida!". */
+  fulfilledBannerSeconds: 3,
+} as const;
+
+export const PROMISES: Record<PromiseId, { buff: PromiseEffect; debuff: PromiseEffect }> = {
+  viviendas: { buff: { damage: 2 }, debuff: { damage: 0.6 } },
+  alquiler: { buff: { enemySpeed: 0.5 }, debuff: { enemySpeed: 1.3 } },
+  ayudas: { buff: { pickupRadius: 4, xpGain: 2 }, debuff: { xpGain: 0.5 } },
+  especulacion: { buff: { cooldown: 0.5 }, debuff: { cooldown: 1.5 } },
+  digna: { buff: { invulnerable: true }, debuff: { playerSpeed: 0.6 } },
+};
+
+export const PROMISE_IDS: readonly PromiseId[] = ['viviendas', 'alquiler', 'ayudas', 'especulacion', 'digna'];
+
 // Sección 2 — Joystick virtual (táctil)
 export const JOYSTICK = {
   radius: 60,
@@ -290,6 +328,24 @@ export const UI = {
     levelOffsetX: 12,
     levelOffsetY: 10,
     levelSize: 13,
+  },
+  promise: {
+    bannerY: 62,
+    bannerSize: 18,
+    bannerLineSpacing: 2,
+    bannerPadX: 14,
+    bannerPadY: 6,
+    bannerBg: '#000000aa',
+    buffColor: '#ffd447',
+    fulfilledColor: '#7CFC00',
+    brokenColor: '#ff5555',
+    arrowMargin: 28,
+    arrowSize: 14,
+    /** Ángulo (rad) entre la punta y cada ala del triángulo. */
+    arrowWingAngle: 2.5,
+    arrowColor: 0xffd447,
+    arrowStroke: 0x000000,
+    arrowStrokeWidth: 2,
   },
   levelUp: {
     overlayColor: 0x000000,

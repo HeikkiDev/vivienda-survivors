@@ -34,6 +34,18 @@ export const TEXTS = {
   grito: {
     shout: '¡ESO ES UN TRASTERO!',
   },
+  promises: {
+    viviendas: '¡Un millón de viviendas públicas!',
+    alquiler: '¡Bajaremos el alquiler por decreto!',
+    ayudas: '¡Ayudas directas a la juventud!',
+    especulacion: '¡Acabaremos con la especulación!',
+    digna: '¡Vivienda digna para todos!',
+  },
+  promise: {
+    fulfilled: '✅ ¡Promesa cumplida! (milagro)',
+    broken: '❌ PROMESA INCUMPLIDA',
+    countdown: (seconds: number) => `${seconds} s`,
+  },
   gameOver: {
     defeatTitle: 'Has vuelto a casa de tus padres.',
     defeatSubtitle: 'Tu habitación sigue igual que a los 15.',

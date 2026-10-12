@@ -62,3 +62,13 @@
 - Sindicato: hitbox de cada puño r=12; cooldown de 0,5 s por enemigo guardado en el propio enemigo.
 - Descripciones de armas (salvo la del escudo, que da el GDD) inventadas, en texts.ts.
 - Post-H5: el casero pasa de 🧔 a 🤑 (a petición del usuario; 🧔 se confundía con el jugador 🧑). GDD actualizado.
+
+## H6 — Promesas electorales
+- Con `?min=N` se omiten las apariciones de minutos anteriores; la del minuto N (si es 2/4/6/8) sale al instante.
+- Solo hay una urna a la vez (no se pueden solapar con los tiempos del GDD); es una entidad simple sin pool ni cuerpo físico: recogida por distancia ≤ radio urna (16) + hitbox jugador.
+- La promesa se elige al azar uniforme entre las 5. Los multiplicadores de la promesa se multiplican sobre los de las pasivas en `Modifiers`.
+- "Imán ×4" = radio de recogida ×4; "Cooldowns" afecta a los mismos cooldowns que Piso compartido.
+- Invulnerable: se ignora el daño por contacto mientras dura el buff.
+- Banner: buff = texto de la promesa + cuenta atrás; incumplida = "❌ PROMESA INCUMPLIDA" + cuenta atrás del debuff (15 s); cumplida = "✅ ¡Promesa cumplida! (milagro)" durante 3 s (duración no fijada en el GDD).
+- La flecha indicadora es un triángulo `Graphics` en UIScene (indicador de HUD, no entidad), en el borde de pantalla en la dirección de la urna.
+- "Promesas incumplidas" cuenta las tiradas fallidas.

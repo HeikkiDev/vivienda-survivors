@@ -15,6 +15,7 @@ import {
 import type { Enemy } from '../entities/Enemy';
 import { Player } from '../entities/Player';
 import { XpGemPool } from '../entities/XpGem';
+import { Elections, type PromiseStatus } from '../systems/Elections';
 import { InputSystem } from '../systems/Input';
 import { Modifiers } from '../systems/Modifiers';
 import { Spawner } from '../systems/Spawner';
@@ -36,6 +37,9 @@ export interface HudState {
   xp: number;
   xpToNext: number;
   inventory: Array<{ icon: IconId; level: number }>;
+  promise: PromiseStatus | null;
+  /** Posición en pantalla del pickup de promesa, si existe. */
+  promisePickup: { x: number; y: number } | null;
 }
 
 export class GameScene extends Phaser.Scene {
@@ -46,6 +50,7 @@ export class GameScene extends Phaser.Scene {
   private weapons: Weapon[] = [];
   private weaponCtx!: WeaponContext;
   private modifiers!: Modifiers;
+  private elections!: Elections;
   private levelUpOpen = false;
   private elapsed = 0;
   private kills = 0;
@@ -65,7 +70,17 @@ export class GameScene extends Phaser.Scene {
     for (const [id, level] of Object.entries(this.modifiers.passiveLevels)) {
       if (level > 0) inventory.push({ icon: `icon_${id}` as IconId, level });
     }
-    return { elapsed: this.elapsed, level: this.level, xp: this.xp, xpToNext: xpToNext(this.level), inventory };
+    const pickup = this.elections.pickup;
+    const cam = this.cameras.main;
+    return {
+      elapsed: this.elapsed,
+      level: this.level,
+      xp: this.xp,
+      xpToNext: xpToNext(this.level),
+      inventory,
+      promise: this.elections.current,
+      promisePickup: pickup.active ? { x: pickup.x - cam.scrollX, y: pickup.y - cam.scrollY } : null,
+    };
   }
 
   create(): void {
@@ -92,6 +107,7 @@ export class GameScene extends Phaser.Scene {
     this.inputSystem = new InputSystem(this);
     this.spawner = new Spawner(this);
     this.gems = new XpGemPool(this);
+    this.elections = new Elections(this, this.modifiers, this.elapsed, () => this.brokenPromises++);
 
     this.weaponCtx = {
       scene: this,
@@ -134,6 +150,7 @@ export class GameScene extends Phaser.Scene {
     this.spawner.update(dt, this.elapsed, this.player.x, this.player.y);
     this.spawner.updateEnemies(this.player.x, this.player.y, this.modifiers.enemySpeed, dt);
     for (const w of this.weapons) w.update(dt);
+    this.elections.update(dt, this.elapsed, this.player.x, this.player.y, PLAYER.hitboxRadius);
 
     const collected = this.gems.update(
       this.player.x,
@@ -220,7 +237,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private onEnemyContact(enemy: Enemy): void {
-    if (this.ended || !enemy.active) return;
+    if (this.ended || !enemy.active || this.modifiers.invulnerable) return;
     if (this.player.takeHit(enemy.stats.damage) && this.player.isDead) this.endGame(false);
   }
 
