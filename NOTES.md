@@ -15,3 +15,13 @@
 - Los textos de UI (menú) usan `this.add.text`; la regla de `createVisual` aplica solo a entidades.
 - `GameScene` en H1 solo muestra fondo + jugador estático para validar `createBackground`/`createVisual`.
 - Récord del menú: se lee `localStorage['viviendaSurvivors.best']` como segundos; si no existe, `--:--`.
+
+## H2 — Jugador y mapa
+- `?debug=1` en la URL activa `physics.arcade.debug` (o `PHYSICS_DEBUG` en `config.ts`).
+- El jugador es una `Zone` con cuerpo Arcade circular (r de `PLAYER.hitboxRadius`); el visual se
+  reposiciona en `POST_UPDATE` (tras el paso de física) y la cámara sigue a la `Zone`.
+- La tabla completa del jugador (sección 4) ya está en `config.ts`; en H2 solo se usan hitbox y velocidad.
+- Joystick: analógico (desplazamiento/radio, máx. 1). Se dibuja con `Graphics` en `Input.ts` porque es
+  UI de control, no una entidad. Cualquier puntero (táctil o ratón) en la mitad inferior lo crea;
+  mientras está activo, tiene prioridad sobre el teclado.
+- El joystick vive en `GameScene` (con `setScrollFactor(0)`) hasta que exista `UIScene`.

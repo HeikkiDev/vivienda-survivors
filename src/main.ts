@@ -1,8 +1,10 @@
 import Phaser from 'phaser';
-import { CANVAS_BG_COLOR, GAME_HEIGHT, GAME_WIDTH, PHYSICS_DEBUG } from './config';
+import { CANVAS_BG_COLOR, DEBUG_URL_PARAM, GAME_HEIGHT, GAME_WIDTH, PHYSICS_DEBUG } from './config';
 import { BootScene } from './scenes/BootScene';
 import { GameScene } from './scenes/GameScene';
 import { MenuScene } from './scenes/MenuScene';
+
+const debug = PHYSICS_DEBUG || new URLSearchParams(window.location.search).has(DEBUG_URL_PARAM);
 
 new Phaser.Game({
   type: Phaser.AUTO,
@@ -16,7 +18,7 @@ new Phaser.Game({
   },
   physics: {
     default: 'arcade',
-    arcade: { gravity: { x: 0, y: 0 }, debug: PHYSICS_DEBUG },
+    arcade: { gravity: { x: 0, y: 0 }, debug },
   },
   input: { activePointers: 3 },
   scene: [BootScene, MenuScene, GameScene],

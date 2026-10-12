@@ -9,6 +9,8 @@ export const WORLD_HEIGHT = 3000;
 export const CAMERA_LERP = 0.1;
 
 export const PHYSICS_DEBUG = false;
+/** Parámetro de URL para activar el debug físico: `?debug=1`. */
+export const DEBUG_URL_PARAM = 'debug';
 
 export const CANVAS_BG_COLOR = '#000000';
 
@@ -17,6 +19,34 @@ export const BEST_TIME_STORAGE_KEY = 'viviendaSurvivors.best';
 export const DEPTH = {
   background: -1000,
   entities: 0,
+  player: 10,
+  joystick: 1000,
+} as const;
+
+// Sección 4 — Jugador
+export const PLAYER = {
+  hitboxRadius: 14,
+  maxHp: 100,
+  speed: 200,
+  invulnerabilitySeconds: 0.5,
+  invulnerabilityAlpha: 0.5,
+  pickupRadius: 60,
+  euroAttractSpeed: 400,
+  regenPerSecond: 0,
+} as const;
+
+// Sección 2 — Joystick virtual (táctil)
+export const JOYSTICK = {
+  radius: 60,
+  /** Fracción de la altura de pantalla a partir de la cual se puede crear (mitad inferior). */
+  activationYRatio: 0.5,
+  baseColor: 0xffffff,
+  baseAlpha: 0.15,
+  baseLineWidth: 2,
+  baseLineAlpha: 0.4,
+  knobRadius: 24,
+  knobColor: 0xffffff,
+  knobAlpha: 0.4,
 } as const;
 
 export const UI = {
