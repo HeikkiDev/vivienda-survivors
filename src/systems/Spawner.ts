@@ -64,7 +64,7 @@ export class Spawner {
   }
 
   /** Persigue al jugador y reposiciona en el anillo a los que se alejan demasiado. */
-  updateEnemies(px: number, py: number, speedMultiplier: number): void {
+  updateEnemies(px: number, py: number, speedMultiplier: number, dt: number): void {
     const maxDistSq = SPAWN.repositionDistance * SPAWN.repositionDistance;
     for (const group of this.groupList) {
       const children = group.getChildren() as Enemy[];
@@ -76,8 +76,15 @@ export class Spawner {
           const p = this.ringPoint(px, py);
           e.relocate(p.x, p.y);
         }
-        e.chase(px, py, speedMultiplier);
+        e.chase(px, py, speedMultiplier, dt);
       }
+    }
+  }
+
+  forEachActive(cb: (e: Enemy) => void): void {
+    for (const group of this.groupList) {
+      const children = group.getChildren() as Enemy[];
+      for (const e of children) if (e.active) cb(e);
     }
   }
 

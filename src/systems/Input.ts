@@ -31,6 +31,7 @@ export class InputSystem {
     scene.input.on(Phaser.Input.Events.POINTER_MOVE, this.onMove, this);
     scene.input.on(Phaser.Input.Events.POINTER_UP, this.onUp, this);
     scene.input.on(Phaser.Input.Events.POINTER_UP_OUTSIDE, this.onUp, this);
+    scene.events.on(Phaser.Scenes.Events.RESUME, this.reset, this);
     scene.events.once(Phaser.Scenes.Events.SHUTDOWN, this.destroy, this);
   }
 
@@ -88,7 +89,15 @@ export class InputSystem {
     g.fillCircle(this.knob.x, this.knob.y, JOYSTICK.knobRadius);
   }
 
+  /** Tras una pausa, suelta el joystick y las teclas (los "up" se pierden mientras está pausada). */
+  private reset(): void {
+    this.pointerId = null;
+    this.graphics.clear().setVisible(false);
+    this.scene.input.keyboard?.resetKeys();
+  }
+
   private destroy(): void {
+    this.scene.events.off(Phaser.Scenes.Events.RESUME, this.reset, this);
     this.scene.input.off(Phaser.Input.Events.POINTER_DOWN, this.onDown, this);
     this.scene.input.off(Phaser.Input.Events.POINTER_MOVE, this.onMove, this);
     this.scene.input.off(Phaser.Input.Events.POINTER_UP, this.onUp, this);

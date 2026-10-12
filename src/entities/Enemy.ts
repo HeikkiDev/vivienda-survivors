@@ -11,6 +11,11 @@ export class Enemy extends Phaser.GameObjects.Zone {
   readonly visual: Phaser.GameObjects.Text | Phaser.GameObjects.Sprite;
   hp = 0;
   maxHp = 0;
+  /** Momento (reloj del Sindicato) a partir del cual una órbita puede volver a dañarle. */
+  orbitHitReadyAt = -Infinity;
+  private knockbackLeft = 0;
+  private knockbackVx = 0;
+  private knockbackVy = 0;
 
   constructor(scene: Phaser.Scene, enemyId: EnemyId) {
     const stats = ENEMIES[enemyId];
@@ -32,6 +37,8 @@ export class Enemy extends Phaser.GameObjects.Zone {
   spawn(x: number, y: number, hpMultiplier: number): void {
     this.maxHp = this.stats.hp * hpMultiplier;
     this.hp = this.maxHp;
+    this.orbitHitReadyAt = -Infinity;
+    this.knockbackLeft = 0;
     this.setActive(true);
     this.body.enable = true;
     this.body.reset(x, y);
@@ -43,7 +50,20 @@ export class Enemy extends Phaser.GameObjects.Zone {
     this.visual.setPosition(x, y);
   }
 
-  chase(tx: number, ty: number, speedMultiplier: number): void {
+  /** Empuja en la dirección (dx, dy) a `speed` px/s durante `seconds`. */
+  applyKnockback(dx: number, dy: number, speed: number, seconds: number): void {
+    const len = Math.hypot(dx, dy) || 1;
+    this.knockbackVx = (dx / len) * speed;
+    this.knockbackVy = (dy / len) * speed;
+    this.knockbackLeft = seconds;
+  }
+
+  chase(tx: number, ty: number, speedMultiplier: number, dt: number): void {
+    if (this.knockbackLeft > 0) {
+      this.knockbackLeft -= dt;
+      this.body.setVelocity(this.knockbackVx, this.knockbackVy);
+      return;
+    }
     const dx = tx - this.x;
     const dy = ty - this.y;
     const len = Math.hypot(dx, dy);

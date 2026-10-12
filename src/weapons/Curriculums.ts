@@ -83,9 +83,9 @@ export class Curriculums extends Weapon {
     const spread = Phaser.Math.DegToRad(CURRICULUM.spreadDegrees);
     for (let i = 0; i < s.projectiles; i++) {
       const offset = s.projectiles === 1 ? 0 : -spread + (2 * spread * i) / (s.projectiles - 1);
-      this.spawnProjectile(player.x, player.y, baseAngle + offset, s.speed, s.damage, s.pierce);
+      this.spawnProjectile(player.x, player.y, baseAngle + offset, s.speed, this.scaledDamage(s.damage), s.pierce);
     }
-    this.cooldownTimer = s.cooldown;
+    this.cooldownTimer = this.scaledCooldown(s.cooldown);
   }
 
   syncVisuals(): void {

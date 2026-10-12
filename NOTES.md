@@ -51,3 +51,13 @@
 - HUD (`UIScene`) lee el estado de `GameScene` cada frame (`GameScene.hud`); se lanza/para con `GameScene`.
 - Subida de nivel en H4: se registra con `console.log` y se acumula en `pendingLevelUps` para el menú de H5.
 - El destello de daño (80 ms, `flashVisual`) se aplica ya al herir enemigos (sección 7).
+
+## H5 — Level-up y mejoras
+- La pausa usa `scene.pause('GameScene')` (detiene update, física y reloj de partida); al reanudar se sueltan joystick y teclas.
+- Niveles encolados: los menús se encadenan uno tras otro, regenerando opciones cada vez.
+- Si hay menos de 3 opciones válidas se añade **una sola** carta "Caña con los colegas" (el menú puede mostrar menos de 3 cartas). Icono 🍺 (`icon_cana` en visuals.ts).
+- Piso compartido reduce también el tick del escudo; no afecta al cooldown por enemigo del sindicato.
+- Escudo y grito golpean si distancia ≤ radio + hitbox del enemigo.
+- Grito: círculo crece 0,2 s y se desvanece 0,3 s (el GDD no fija el fade); emoji + texto sobre el jugador 0,6 s. Dispara nada más adquirirse.
+- Sindicato: hitbox de cada puño r=12; cooldown de 0,5 s por enemigo guardado en el propio enemigo.
+- Descripciones de armas (salvo la del escudo, que da el GDD) inventadas, en texts.ts.

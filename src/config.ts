@@ -1,5 +1,5 @@
 // TODOS los números del juego. Ver GDD.md.
-import type { EnemyId } from './types';
+import type { EnemyId, PassiveId, WeaponId } from './types';
 
 export const GAME_WIDTH = 960;
 export const GAME_HEIGHT = 540;
@@ -22,11 +22,14 @@ export const BEST_TIME_STORAGE_KEY = 'viviendaSurvivors.best';
 export const DEPTH = {
   background: -1000,
   entities: 0,
+  aura: 1,
   euros: 2,
   enemies: 5,
   projectiles: 8,
+  effects: 9,
   player: 10,
   healthBar: 11,
+  floatingText: 12,
   joystick: 1000,
 } as const;
 
@@ -69,6 +72,8 @@ export const ENEMIES: Record<EnemyId, EnemyStats> = {
 };
 
 export const ENEMY_IDS: readonly EnemyId[] = ['ipc', 'casero', 'agencia', 'fondo'];
+export const WEAPON_IDS: readonly WeaponId[] = ['curriculum', 'escudo', 'grito', 'sindicato'];
+export const PASSIVE_IDS: readonly PassiveId[] = ['aval', 'piso', 'bono', 'trabajo'];
 
 /** HP × (1 + hpScalePerMinute × minuto actual). */
 export const ENEMY_HP_SCALE_PER_MINUTE = 0.1;
@@ -103,6 +108,90 @@ export const CURRICULUM = {
   hitboxRadius: 8,
   poolSize: 100,
 } as const;
+
+// Sección 5.2 — Escudo Ley de Vivienda
+export interface EscudoLevel {
+  damage: number;
+  tick: number;
+  radius: number;
+}
+
+export const ESCUDO = {
+  levels: [
+    { damage: 4, tick: 0.5, radius: 70 },
+    { damage: 5, tick: 0.5, radius: 80 },
+    { damage: 6, tick: 0.45, radius: 90 },
+    { damage: 8, tick: 0.4, radius: 100 },
+    { damage: 10, tick: 0.35, radius: 115 },
+  ] as readonly EscudoLevel[],
+  auraColor: 0x3a7bff,
+  auraAlpha: 0.25,
+} as const;
+
+// Sección 5.3 — Grito "¡Eso es un trastero!"
+export interface GritoLevel {
+  damage: number;
+  cooldown: number;
+  radius: number;
+}
+
+export const GRITO = {
+  levels: [
+    { damage: 25, cooldown: 4.0, radius: 140 },
+    { damage: 30, cooldown: 3.6, radius: 150 },
+    { damage: 38, cooldown: 3.3, radius: 165 },
+    { damage: 46, cooldown: 3.0, radius: 180 },
+    { damage: 60, cooldown: 2.5, radius: 200 },
+  ] as readonly GritoLevel[],
+  circleColor: 0xffffff,
+  circleAlpha: 0.5,
+  growSeconds: 0.2,
+  fadeSeconds: 0.3,
+  floatingTextSeconds: 0.6,
+  floatingTextRise: 20,
+  /** Distancia vertical sobre el jugador del icono y del texto flotante. */
+  iconOffsetY: 34,
+  textOffsetY: 60,
+  knockbackSpeed: 150,
+  knockbackSeconds: 0.15,
+  textSize: 22,
+  textColor: '#ffffff',
+  textStroke: '#000000',
+  textStrokeThickness: 4,
+} as const;
+
+// Sección 5.4 — Sindicato de inquilinos
+export interface SindicatoLevel {
+  damage: number;
+  orbs: number;
+  orbitRadius: number;
+  angularSpeed: number;
+}
+
+export const SINDICATO = {
+  levels: [
+    { damage: 8, orbs: 2, orbitRadius: 90, angularSpeed: 3.0 },
+    { damage: 10, orbs: 2, orbitRadius: 95, angularSpeed: 3.3 },
+    { damage: 12, orbs: 3, orbitRadius: 100, angularSpeed: 3.6 },
+    { damage: 14, orbs: 4, orbitRadius: 105, angularSpeed: 3.9 },
+    { damage: 18, orbs: 5, orbitRadius: 110, angularSpeed: 4.2 },
+  ] as readonly SindicatoLevel[],
+  /** Cada enemigo solo recibe daño de una órbita cada X s. */
+  hitCooldown: 0.5,
+  hitboxRadius: 12,
+} as const;
+
+// Sección 6 — Pasivas (se acumulan aditivamente por nivel)
+export const PASSIVES = {
+  aval: { maxHpPerLevel: 20, healPerLevel: 20 },
+  piso: { cooldownReductionPerLevel: 0.08 },
+  bono: { pickupRadiusPerLevel: 0.15, speedPerLevel: 0.05 },
+  trabajo: { damagePerLevel: 0.1 },
+} as const;
+
+// Sección 9.1 — Menú de subida de nivel
+export const LEVEL_UP_OPTIONS = 3;
+export const CANA_HEAL = 30;
 
 // Sección 9 — Euros (XP)
 export const EURO = {
@@ -193,6 +282,45 @@ export const UI = {
     textColor: '#ffffff',
     textStroke: '#000000',
     textStrokeThickness: 4,
+  },
+  hudIcons: {
+    marginX: 12,
+    marginBottom: 22,
+    spacing: 40,
+    levelOffsetX: 12,
+    levelOffsetY: 10,
+    levelSize: 13,
+  },
+  levelUp: {
+    overlayColor: 0x000000,
+    overlayAlpha: 0.7,
+    titleY: 80,
+    titleSize: 34,
+    titleColor: '#ffd447',
+    cardY: 290,
+    cardWidth: 240,
+    cardHeight: 280,
+    cardGap: 30,
+    cardColor: 0x2a2a3a,
+    cardHoverColor: 0x3a3a55,
+    cardStrokeColor: 0xffd447,
+    cardStrokeWidth: 2,
+    cardPadding: 16,
+    keyY: 18,
+    keySize: 16,
+    keyColor: '#888888',
+    iconY: 60,
+    iconScale: 2,
+    nameY: 115,
+    nameSize: 20,
+    nameColor: '#ffffff',
+    levelY: 160,
+    levelSize: 16,
+    levelColor: '#ffd447',
+    newColor: '#7CFC00',
+    descY: 190,
+    descSize: 15,
+    descColor: '#cccccc',
   },
   gameOver: {
     overlayColor: 0x000000,

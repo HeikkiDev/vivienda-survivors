@@ -20,7 +20,7 @@ export type WeaponId = 'curriculum' | 'escudo' | 'grito' | 'sindicato';
 export type PassiveId = 'aval' | 'piso' | 'bono' | 'trabajo';
 export type EnemyId = 'ipc' | 'casero' | 'agencia' | 'fondo';
 
-export type IconId = `icon_${WeaponId | PassiveId}`;
+export type IconId = `icon_${WeaponId | PassiveId}` | 'icon_cana';
 
 export type EntityVisualId =
   | 'player'

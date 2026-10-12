@@ -3,6 +3,7 @@ import { CANVAS_BG_COLOR, DEBUG_URL_PARAM, GAME_HEIGHT, GAME_WIDTH, PHYSICS_DEBU
 import { BootScene } from './scenes/BootScene';
 import { GameOverScene } from './scenes/GameOverScene';
 import { GameScene } from './scenes/GameScene';
+import { LevelUpScene } from './scenes/LevelUpScene';
 import { MenuScene } from './scenes/MenuScene';
 import { UIScene } from './scenes/UIScene';
 
@@ -23,5 +24,5 @@ new Phaser.Game({
     arcade: { gravity: { x: 0, y: 0 }, debug },
   },
   input: { activePointers: 3 },
-  scene: [BootScene, MenuScene, GameScene, UIScene, GameOverScene],
+  scene: [BootScene, MenuScene, GameScene, UIScene, LevelUpScene, GameOverScene],
 });

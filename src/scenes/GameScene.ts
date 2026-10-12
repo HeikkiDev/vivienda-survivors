@@ -16,18 +16,26 @@ import type { Enemy } from '../entities/Enemy';
 import { Player } from '../entities/Player';
 import { XpGemPool } from '../entities/XpGem';
 import { InputSystem } from '../systems/Input';
+import { Modifiers } from '../systems/Modifiers';
 import { Spawner } from '../systems/Spawner';
+import { applyNonWeaponUpgrade, generateUpgradeOptions, type UpgradeOption } from '../systems/Upgrades';
+import type { IconId, WeaponId } from '../types';
 import { xpToNext } from '../utils/math';
 import { createBackground, flashVisual } from '../visuals';
 import { Curriculums } from '../weapons/Curriculums';
+import { EscudoLey } from '../weapons/EscudoLey';
+import { GritoTrastero } from '../weapons/GritoTrastero';
+import { Sindicato } from '../weapons/Sindicato';
 import type { Weapon, WeaponContext } from '../weapons/Weapon';
 import type { GameOverData } from './GameOverScene';
+import type { LevelUpData } from './LevelUpScene';
 
 export interface HudState {
   elapsed: number;
   level: number;
   xp: number;
   xpToNext: number;
+  inventory: Array<{ icon: IconId; level: number }>;
 }
 
 export class GameScene extends Phaser.Scene {
@@ -36,6 +44,9 @@ export class GameScene extends Phaser.Scene {
   private spawner!: Spawner;
   private gems!: XpGemPool;
   private weapons: Weapon[] = [];
+  private weaponCtx!: WeaponContext;
+  private modifiers!: Modifiers;
+  private levelUpOpen = false;
   private elapsed = 0;
   private kills = 0;
   private level = 1;
@@ -50,7 +61,11 @@ export class GameScene extends Phaser.Scene {
   }
 
   get hud(): HudState {
-    return { elapsed: this.elapsed, level: this.level, xp: this.xp, xpToNext: xpToNext(this.level) };
+    const inventory: HudState['inventory'] = this.weapons.map((w) => ({ icon: `icon_${w.id}` as IconId, level: w.level }));
+    for (const [id, level] of Object.entries(this.modifiers.passiveLevels)) {
+      if (level > 0) inventory.push({ icon: `icon_${id}` as IconId, level });
+    }
+    return { elapsed: this.elapsed, level: this.level, xp: this.xp, xpToNext: xpToNext(this.level), inventory };
   }
 
   create(): void {
@@ -61,8 +76,10 @@ export class GameScene extends Phaser.Scene {
     this.level = 1;
     this.xp = 0;
     this.pendingLevelUps = 0;
+    this.levelUpOpen = false;
     this.brokenPromises = 0;
     this.ended = false;
+    this.modifiers = new Modifiers();
 
     this.physics.world.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
     this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
@@ -76,14 +93,16 @@ export class GameScene extends Phaser.Scene {
     this.spawner = new Spawner(this);
     this.gems = new XpGemPool(this);
 
-    const ctx: WeaponContext = {
+    this.weaponCtx = {
       scene: this,
       player: this.player,
+      modifiers: this.modifiers,
       enemyGroups: this.spawner.groupList,
       findNearestEnemy: (x, y) => this.spawner.findNearest(x, y),
+      forEachEnemy: (cb) => this.spawner.forEachActive(cb),
       damageEnemy: (e, amount) => this.damageEnemy(e, amount),
     };
-    this.weapons = [new Curriculums(ctx)];
+    this.weapons = [this.createWeapon('curriculum')];
 
     this.physics.add.overlap(this.player, this.spawner.groupList, (_p, e) => this.onEnemyContact(e as Enemy));
 
@@ -94,6 +113,7 @@ export class GameScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.events.off(Phaser.Scenes.Events.POST_UPDATE, this.lateUpdate, this);
       this.scene.stop('UIScene');
+      this.scene.stop('LevelUpScene');
     });
   }
 
@@ -110,19 +130,66 @@ export class GameScene extends Phaser.Scene {
     this.elapsed += dt;
 
     this.player.tick(dt);
-    this.player.move(this.inputSystem.getDirection());
+    this.player.move(this.inputSystem.getDirection(), this.modifiers.playerSpeed);
     this.spawner.update(dt, this.elapsed, this.player.x, this.player.y);
-    this.spawner.updateEnemies(this.player.x, this.player.y, 1);
+    this.spawner.updateEnemies(this.player.x, this.player.y, this.modifiers.enemySpeed, dt);
     for (const w of this.weapons) w.update(dt);
 
     const collected = this.gems.update(
       this.player.x,
       this.player.y,
-      PLAYER.pickupRadius,
+      PLAYER.pickupRadius * this.modifiers.pickupRadius,
       PLAYER.euroAttractSpeed,
       PLAYER.hitboxRadius + EURO.hitboxRadius,
     );
-    if (collected > 0) this.addXp(collected);
+    if (collected > 0) this.addXp(collected * this.modifiers.xpGain);
+    if (this.pendingLevelUps > 0 && !this.levelUpOpen) this.openLevelUp();
+  }
+
+  private createWeapon(id: WeaponId): Weapon {
+    switch (id) {
+      case 'curriculum':
+        return new Curriculums(this.weaponCtx);
+      case 'escudo':
+        return new EscudoLey(this.weaponCtx);
+      case 'grito':
+        return new GritoTrastero(this.weaponCtx);
+      case 'sindicato':
+        return new Sindicato(this.weaponCtx);
+    }
+  }
+
+  private weaponLevels(): Partial<Record<WeaponId, number>> {
+    const levels: Partial<Record<WeaponId, number>> = {};
+    for (const w of this.weapons) levels[w.id] = w.level;
+    return levels;
+  }
+
+  private openLevelUp(): void {
+    this.levelUpOpen = true;
+    const data: LevelUpData = { options: generateUpgradeOptions(this.weaponLevels(), this.modifiers) };
+    // scene.pause detiene update, física (physics.pause) y reloj/timers de la escena.
+    this.scene.pause();
+    this.scene.launch('LevelUpScene', data);
+  }
+
+  applyUpgrade(option: UpgradeOption): void {
+    if (option.kind === 'weapon') {
+      const owned = this.weapons.find((w) => w.id === option.id);
+      if (owned) owned.levelUp();
+      else this.weapons.push(this.createWeapon(option.id));
+      return;
+    }
+    applyNonWeaponUpgrade(option, this.player, this.modifiers);
+  }
+
+  /** Cierra un menú de nivel; devuelve las opciones del siguiente si hay más encolados. */
+  finishLevelUp(): UpgradeOption[] | null {
+    this.pendingLevelUps = Math.max(0, this.pendingLevelUps - 1);
+    if (this.pendingLevelUps > 0) return generateUpgradeOptions(this.weaponLevels(), this.modifiers);
+    this.levelUpOpen = false;
+    this.scene.resume();
+    return null;
   }
 
   private lateUpdate(): void {
@@ -149,8 +216,6 @@ export class GameScene extends Phaser.Scene {
       this.xp -= xpToNext(this.level);
       this.level++;
       this.pendingLevelUps++;
-      // H4: el menú de mejoras llega en H5; de momento solo se registra.
-      console.log(`[level-up] Nivel ${this.level} (pendientes: ${this.pendingLevelUps})`);
     }
   }
 

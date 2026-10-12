@@ -32,8 +32,19 @@ export class Player extends Phaser.GameObjects.Zone {
     return this.invulnerableTime > 0;
   }
 
-  move(direction: Phaser.Math.Vector2): void {
-    this.body.setVelocity(direction.x * PLAYER.speed, direction.y * PLAYER.speed);
+  move(direction: Phaser.Math.Vector2, speedMultiplier: number): void {
+    const v = PLAYER.speed * speedMultiplier;
+    this.body.setVelocity(direction.x * v, direction.y * v);
+  }
+
+  heal(amount: number): void {
+    this.hp = Math.min(this.maxHp, this.hp + amount);
+    this.drawHealthBar();
+  }
+
+  increaseMaxHp(amount: number): void {
+    this.maxHp += amount;
+    this.drawHealthBar();
   }
 
   tick(dt: number): void {
