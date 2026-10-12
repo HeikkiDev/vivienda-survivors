@@ -335,6 +335,15 @@ Pools: usa `Phaser.Physics.Arcade.Group` con `maxSize` y reutilización (`get()`
 - ✅ Si se borra el PNG (o la ruta es incorrecta), el juego arranca igual usando el emoji de fallback y la rejilla, con un `console.warn` y sin errores.
 - ✅ `npm run build` y la versión de itch.io cargan los assets (rutas relativas, `base: './'`).
 
+**H10 — Multi-idioma (inglés y español)**
+- `src/texts.ts` tiene un diccionario completo por idioma (inglés y español, mismo tipo `Texts`). `TEXTS` apunta siempre al idioma activo y se cambia con `setLanguage()`.
+- Idiomas disponibles, idioma por defecto (`en`) y clave de localStorage en `src/config.ts`.
+- Selector "Language: English | Español" en el menú de inicio, bajo el récord; el idioma activo aparece resaltado.
+- ✅ Primera visita (sin localStorage): todo el juego sale en inglés.
+- ✅ Al pulsar otro idioma en el menú, el menú se redibuja al instante en ese idioma y la partida (HUD, level-up, promesas, boss, pausa, fin de partida) sale en ese idioma.
+- ✅ El idioma elegido se guarda en localStorage y se mantiene al recargar; si localStorage no está disponible, se usa inglés sin errores.
+- ✅ `<html lang>` refleja el idioma activo. Ningún texto visible fuera de `texts.ts`.
+
 ---
 
 ## 16. Fuera de alcance (NO hacer)
@@ -361,7 +370,7 @@ Reglas:
 - Todos los números en src/config.ts y todos los textos en src/texts.ts,
   copiados exactamente de las tablas del GDD.
 - Respeta la estructura de archivos de la sección 14.
-- Trabaja hito a hito (sección 15, H1 a H9). Empieza por H1. Al terminar cada hito:
+- Trabaja hito a hito (sección 15, H1 a H10). Empieza por H1. Al terminar cada hito:
   1) ejecuta `npm run build` y corrige todos los errores,
   2) comprueba cada criterio de aceptación,
   3) haz commit con el mensaje "H<n>: <título>",
