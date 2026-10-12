@@ -1,5 +1,7 @@
 # 🏠 Vivienda Survivors
 
+[![▶ Jugar ahora](https://img.shields.io/badge/%E2%96%B6%20Jugar%20ahora-heikkidev.github.io-ffd447?style=for-the-badge&labelColor=2a2a3a)](https://heikkidev.github.io/vivienda-survivors/)
+
 > Tienes 30 años, buscas piso y te persigue el mercado inmobiliario.
 > Aguanta **10 minutos** y conseguirás… firmar una hipoteca a 40 años.
 
