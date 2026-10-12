@@ -23,6 +23,11 @@ npm run zip      # zip listo para itch.io
 Cada push a `main` se publica automáticamente en GitHub Pages.
 
 ## 🎨 Cambiar el arte
-Todo lo visible está en [`src/visuals.ts`](src/visuals.ts): cambia un emoji por un sprite y añade el PNG en `public/assets/`. Si la imagen falla, vuelve al emoji.
+Todo lo visible está en [`src/visuals.ts`](src/visuals.ts):
+1. Pon tus PNG en `public/assets/`.
+2. Añádelos a `CUSTOM_ART` (sprite, spritesheet animado o fondo).
+3. Pon `USE_CUSTOM_ART = true`.
+
+Con `false` el juego usa emoji. Si una imagen falla, esa entidad vuelve a su emoji.
 
 El diseño completo está en [`GDD.md`](GDD.md).

@@ -50,9 +50,15 @@ export const FALLBACK_BACKGROUND: BackgroundVisual = {
   cell: 100,
 };
 
-/** Definición activa de cada visual. Sustituye una entrada por un `sprite`/`image` para cambiar el arte. */
-export const VISUALS: VisualsTable = {
-  ...FALLBACK_EMOJI,
+/**
+ * Interruptor del arte personalizado:
+ * - false → emoji + rejilla (no se carga ningún PNG).
+ * - true  → se aplican las entradas de CUSTOM_ART; lo que no esté ahí sigue en emoji.
+ */
+const USE_CUSTOM_ART = false;
+
+/** Arte personalizado. Añade aquí sprites/imágenes (archivos en public/assets/). */
+const CUSTOM_ART: Partial<VisualsTable> = {
   background: { kind: 'tileSprite', key: 'test_bg', path: 'assets/test_bg.png' },
   player: {
     kind: 'sprite',
@@ -64,6 +70,13 @@ export const VISUALS: VisualsTable = {
     anim: { frames: [0, 1, 2, 3], frameRate: 6, repeat: -1 },
   },
 };
+
+/** Definición activa de cada visual. */
+export const VISUALS: VisualsTable = {
+  background: FALLBACK_BACKGROUND,
+  ...FALLBACK_EMOJI,
+  ...(USE_CUSTOM_ART ? CUSTOM_ART : {}),
+} as VisualsTable;
 
 const warned = new Set<string>();
 function warnOnce(key: string, message: string): void {
