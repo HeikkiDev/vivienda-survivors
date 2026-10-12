@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
-import { GAME_HEIGHT, GAME_WIDTH, UI } from '../config';
+import { UI } from '../config';
 import { TEXTS } from '../texts';
+import { onGameResize } from '../utils/layout';
 import { formatTime } from '../utils/math';
 import { createVisual } from '../visuals';
 import type { GameScene, HudState } from './GameScene';
@@ -17,6 +18,10 @@ export class UIScene extends Phaser.Scene {
   private bossBar!: Phaser.GameObjects.Graphics;
   private announcementText!: Phaser.GameObjects.Text;
   private pauseOverlay!: Phaser.GameObjects.Container;
+  private pauseVeil!: Phaser.GameObjects.Rectangle;
+  private pauseTitle!: Phaser.GameObjects.Text;
+  private pauseHint!: Phaser.GameObjects.Text;
+  private pauseButton!: Phaser.GameObjects.GameObject & Phaser.GameObjects.Components.Transform;
   private pausedByUser = false;
 
   constructor() {
@@ -35,13 +40,13 @@ export class UIScene extends Phaser.Scene {
     };
     this.xpBar = this.add.graphics();
     this.levelText = this.add.text(h.textMarginX, h.xpBarHeight + h.textY, '', style).setOrigin(0, 0.5);
-    this.timerText = this.add.text(GAME_WIDTH / 2, h.xpBarHeight + h.textY, '', style).setOrigin(0.5);
+    this.timerText = this.add.text(0, h.xpBarHeight + h.textY, '', style).setOrigin(0.5);
     this.inventoryObjects = [];
     this.inventoryKey = '';
 
     const p = UI.promise;
     this.promiseBanner = this.add
-      .text(GAME_WIDTH / 2, p.bannerY, '', {
+      .text(0, p.bannerY, '', {
         fontFamily: UI.fontFamily,
         fontSize: `${p.bannerSize}px`,
         fontStyle: 'bold',
@@ -59,7 +64,7 @@ export class UIScene extends Phaser.Scene {
 
     const a = UI.announcement;
     this.announcementText = this.add
-      .text(GAME_WIDTH / 2, a.y, '', {
+      .text(0, a.y, '', {
         fontFamily: UI.fontFamily,
         fontSize: `${a.size}px`,
         fontStyle: 'bold',
@@ -71,12 +76,31 @@ export class UIScene extends Phaser.Scene {
       .setVisible(false);
 
     this.createPauseControls();
+    this.layout();
+    onGameResize(this, () => this.layout());
+  }
+
+  /** Coloca lo anclado al centro o a los bordes según el tamaño actual de la vista (Scale.EXPAND). */
+  private layout(): void {
+    const { width, height } = this.scale;
+    const cx = width / 2;
+    const p = UI.pause;
+    this.timerText.setX(cx);
+    this.promiseBanner.setX(cx);
+    this.announcementText.setX(cx);
+    this.pauseButton.setX(width - p.buttonMarginX);
+    this.pauseVeil.setSize(width, height);
+    this.pauseTitle.setX(cx);
+    this.pauseHint.setX(cx);
+    // Fuerza a rehacer el inventario en su nueva posición.
+    this.inventoryKey = '';
   }
 
   private createPauseControls(): void {
     const p = UI.pause;
     this.pausedByUser = false;
-    const button = createVisual(this, 'icon_pause', GAME_WIDTH - p.buttonMarginX, p.buttonY);
+    const button = createVisual(this, 'icon_pause', 0, p.buttonY);
+    this.pauseButton = button;
     const hit = new Phaser.Geom.Rectangle(
       -p.buttonHitPadding,
       -p.buttonHitPadding,
@@ -88,9 +112,10 @@ export class UIScene extends Phaser.Scene {
     this.input.keyboard?.on('keydown-ESC', () => this.togglePause());
     this.input.keyboard?.on('keydown-P', () => this.togglePause());
 
-    const overlay = this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, p.overlayColor, p.overlayAlpha).setOrigin(0);
+    const overlay = this.add.rectangle(0, 0, this.scale.width, this.scale.height, p.overlayColor, p.overlayAlpha).setOrigin(0);
+    this.pauseVeil = overlay;
     const title = this.add
-      .text(GAME_WIDTH / 2, p.titleY, TEXTS.pause.title, {
+      .text(0, p.titleY, TEXTS.pause.title, {
         fontFamily: UI.fontFamily,
         fontSize: `${p.titleSize}px`,
         fontStyle: 'bold',
@@ -98,12 +123,14 @@ export class UIScene extends Phaser.Scene {
       })
       .setOrigin(0.5);
     const hint = this.add
-      .text(GAME_WIDTH / 2, p.hintY, TEXTS.pause.hint, {
+      .text(0, p.hintY, TEXTS.pause.hint, {
         fontFamily: UI.fontFamily,
         fontSize: `${p.hintSize}px`,
         color: p.hintColor,
       })
       .setOrigin(0.5);
+    this.pauseTitle = title;
+    this.pauseHint = hint;
     this.pauseOverlay = this.add.container(0, 0, [overlay, title, hint]).setVisible(false);
     // El botón queda por encima del velo para poder reanudar con un toque.
     this.children.bringToTop(button);
@@ -131,9 +158,9 @@ export class UIScene extends Phaser.Scene {
     this.xpBar
       .clear()
       .fillStyle(h.xpBarBg, h.xpBarBgAlpha)
-      .fillRect(0, 0, GAME_WIDTH, h.xpBarHeight)
+      .fillRect(0, 0, this.scale.width, h.xpBarHeight)
       .fillStyle(h.xpBarFg, 1)
-      .fillRect(0, 0, GAME_WIDTH * ratio, h.xpBarHeight);
+      .fillRect(0, 0, this.scale.width * ratio, h.xpBarHeight);
     this.levelText.setText(TEXTS.hud.level(s.level));
     this.timerText.setText(formatTime(s.elapsed));
     this.updateInventory(s.inventory);
@@ -147,7 +174,7 @@ export class UIScene extends Phaser.Scene {
     this.bossBar.clear();
     if (!boss) return;
     const b = UI.boss;
-    const x = (GAME_WIDTH - b.barWidth) / 2;
+    const x = (this.scale.width - b.barWidth) / 2;
     const ratio = boss.maxHp > 0 ? boss.hp / boss.maxHp : 0;
     this.bossBar
       .fillStyle(b.barBg, b.barBgAlpha)
@@ -194,11 +221,12 @@ export class UIScene extends Phaser.Scene {
   private updatePromiseArrow(target: HudState['promisePickup']): void {
     this.promiseArrow.clear();
     if (!target) return;
-    const onScreen = target.x >= 0 && target.x <= GAME_WIDTH && target.y >= 0 && target.y <= GAME_HEIGHT;
+    const { width, height } = this.scale;
+    const onScreen = target.x >= 0 && target.x <= width && target.y >= 0 && target.y <= height;
     if (onScreen) return;
     const p = UI.promise;
-    const cx = GAME_WIDTH / 2;
-    const cy = GAME_HEIGHT / 2;
+    const cx = width / 2;
+    const cy = height / 2;
     const dx = target.x - cx;
     const dy = target.y - cy;
     const t = Math.min((cx - p.arrowMargin) / Math.abs(dx || 1), (cy - p.arrowMargin) / Math.abs(dy || 1));
@@ -225,7 +253,7 @@ export class UIScene extends Phaser.Scene {
     this.inventoryObjects = [];
     const c = UI.hudIcons;
     const h = UI.hud;
-    const y = GAME_HEIGHT - c.marginBottom;
+    const y = this.scale.height - c.marginBottom;
     inventory.forEach((item, i) => {
       const x = c.marginX + c.spacing / 2 + i * c.spacing;
       this.inventoryObjects.push(createVisual(this, item.icon, x, y));

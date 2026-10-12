@@ -1,7 +1,8 @@
 import Phaser from 'phaser';
 import { BEST_TIME_STORAGE_KEY, GAME_HEIGHT, GAME_WIDTH, LANGUAGES, UI } from '../config';
-import { enterFullscreenLandscape, isIOSSafariBrowser } from '../mobile';
+import { enterFullscreenLandscape, shouldShowIOSInstallHint } from '../mobile';
 import { getLanguage, LANGUAGE_NAMES, setLanguage, TEXTS } from '../texts';
+import { centerOnBaseArea } from '../utils/layout';
 import { formatTime } from '../utils/math';
 
 export class MenuScene extends Phaser.Scene {
@@ -16,6 +17,7 @@ export class MenuScene extends Phaser.Scene {
     const m = UI.menu;
     const cx = GAME_WIDTH / 2;
     this.cameras.main.setBackgroundColor(m.bgColor);
+    centerOnBaseArea(this);
 
     this.add
       .text(cx, m.titleY, TEXTS.menu.title, {
@@ -68,7 +70,7 @@ export class MenuScene extends Phaser.Scene {
 
     this.createLanguageSelector(cx);
 
-    if (isIOSSafariBrowser()) {
+    if (shouldShowIOSInstallHint()) {
       this.add
         .text(cx, m.iosHintY, TEXTS.mobile.iosFullscreen, {
           fontFamily: UI.fontFamily,

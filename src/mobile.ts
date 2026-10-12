@@ -80,15 +80,14 @@ export async function enterFullscreenLandscape(): Promise<void> {
   }
 }
 
-/** iOS Safari abierto en el navegador (no instalado en la pantalla de inicio). */
-export function isIOSSafariBrowser(): boolean {
+/** iOS en el navegador (Safari, Chrome…), no instalado en la pantalla de inicio. */
+export function shouldShowIOSInstallHint(): boolean {
   const ua = navigator.userAgent;
   const isIOS =
     /iPad|iPhone|iPod/.test(ua) ||
     (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > MOBILE.iosTouchPoints);
   if (!isIOS) return false;
-  const isSafari = /Safari/.test(ua) && !/CriOS|FxiOS|EdgiOS|OPiOS/.test(ua);
   const nav = navigator as Navigator & { standalone?: boolean };
   const standalone = nav.standalone === true || window.matchMedia(MOBILE.standaloneQuery).matches;
-  return isSafari && !standalone;
+  return !standalone;
 }

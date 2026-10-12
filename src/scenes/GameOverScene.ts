@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
-import { BEST_TIME_STORAGE_KEY, GAME_HEIGHT, GAME_WIDTH, UI } from '../config';
+import { BEST_TIME_STORAGE_KEY, GAME_WIDTH, UI } from '../config';
 import { TEXTS } from '../texts';
+import { addBaseOverlay, centerOnBaseArea } from '../utils/layout';
 import { formatTime } from '../utils/math';
 
 export interface GameOverData {
@@ -26,7 +27,8 @@ export class GameOverScene extends Phaser.Scene {
     const cx = GAME_WIDTH / 2;
     if (data.recordable) GameOverScene.saveBest(data.timeSeconds);
 
-    this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, g.overlayColor, g.overlayAlpha).setOrigin(0);
+    centerOnBaseArea(this);
+    addBaseOverlay(this, g.overlayColor, g.overlayAlpha);
 
     this.add
       .text(cx, g.titleY, data.victory ? TEXTS.gameOver.victoryTitle : TEXTS.gameOver.defeatTitle, {

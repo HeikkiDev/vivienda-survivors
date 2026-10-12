@@ -1,7 +1,8 @@
 import Phaser from 'phaser';
-import { GAME_HEIGHT, GAME_WIDTH, UI } from '../config';
+import { GAME_WIDTH, UI } from '../config';
 import { type UpgradeOption, upgradeIcon, upgradeTexts } from '../systems/Upgrades';
 import { TEXTS } from '../texts';
+import { addBaseOverlay, centerOnBaseArea } from '../utils/layout';
 import { createVisual } from '../visuals';
 import type { GameScene } from './GameScene';
 
@@ -26,7 +27,8 @@ export class LevelUpScene extends Phaser.Scene {
     this.chosen = false;
     const L = UI.levelUp;
 
-    this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, L.overlayColor, L.overlayAlpha).setOrigin(0).setInteractive();
+    centerOnBaseArea(this);
+    addBaseOverlay(this, L.overlayColor, L.overlayAlpha).setInteractive();
     this.add
       .text(GAME_WIDTH / 2, L.titleY, TEXTS.levelUp.title, {
         fontFamily: UI.fontFamily,

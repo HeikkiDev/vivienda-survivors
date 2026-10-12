@@ -1,5 +1,13 @@
 import Phaser from 'phaser';
-import { CANVAS_BG_COLOR, DEBUG_URL_PARAM, GAME_HEIGHT, GAME_WIDTH, PHYSICS_DEBUG } from './config';
+import {
+  CANVAS_BG_COLOR,
+  DEBUG_URL_PARAM,
+  GAME_HEIGHT,
+  GAME_WIDTH,
+  PHYSICS_DEBUG,
+  VIEW_MAX_HEIGHT,
+  VIEW_MAX_WIDTH,
+} from './config';
 import { setupMobile } from './mobile';
 import { BootScene } from './scenes/BootScene';
 import { GameOverScene } from './scenes/GameOverScene';
@@ -17,10 +25,11 @@ const game = new Phaser.Game({
   height: GAME_HEIGHT,
   backgroundColor: CANVAS_BG_COLOR,
   scale: {
-    mode: Phaser.Scale.FIT,
+    mode: Phaser.Scale.EXPAND,
     autoCenter: Phaser.Scale.CENTER_BOTH,
     width: GAME_WIDTH,
     height: GAME_HEIGHT,
+    max: { width: VIEW_MAX_WIDTH, height: VIEW_MAX_HEIGHT },
   },
   physics: {
     default: 'arcade',

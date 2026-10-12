@@ -4,6 +4,14 @@ import type { EnemyId, PassiveId, PromiseId, WeaponId } from './types';
 export const GAME_WIDTH = 960;
 export const GAME_HEIGHT = 540;
 
+/**
+ * Scale.EXPAND: el área lógica base es GAME_WIDTH×GAME_HEIGHT y crece para llenar la pantalla
+ * hasta estos máximos (ancho en pantallas panorámicas, alto en ventanas más altas que 16:9).
+ * Más allá, se ve con franjas negras.
+ */
+export const VIEW_MAX_WIDTH = 1400;
+export const VIEW_MAX_HEIGHT = 720;
+
 export const WORLD_WIDTH = 3000;
 export const WORLD_HEIGHT = 3000;
 
@@ -233,6 +241,8 @@ export const SPAWN = {
   ringMinDistance: 600,
   ringMaxDistance: 700,
   repositionDistance: 1200,
+  /** Margen mínimo entre la esquina de la pantalla y el anillo de spawn (en 960×540 el anillo no cambia). */
+  offscreenMargin: 40,
   maxAlive: 300,
 } as const;
 

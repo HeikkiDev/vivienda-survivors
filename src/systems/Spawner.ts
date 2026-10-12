@@ -125,6 +125,10 @@ export class Spawner {
   }
 
   private ringPoint(px: number, py: number): { x: number; y: number } {
-    return randomPointInRing(px, py, SPAWN.ringMinDistance, SPAWN.ringMaxDistance, WORLD_WIDTH, WORLD_HEIGHT, this.point);
+    // Con Scale.EXPAND la vista puede ser más ancha que 960×540: el anillo se aleja para seguir fuera de pantalla.
+    const halfDiagonal = Math.hypot(this.scene.scale.width, this.scene.scale.height) / 2;
+    const minR = Math.max(SPAWN.ringMinDistance, halfDiagonal + SPAWN.offscreenMargin);
+    const maxR = minR + (SPAWN.ringMaxDistance - SPAWN.ringMinDistance);
+    return randomPointInRing(px, py, minR, maxR, WORLD_WIDTH, WORLD_HEIGHT, this.point);
   }
 }

@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { DEPTH, GAME_HEIGHT, JOYSTICK } from '../config';
+import { DEPTH, JOYSTICK } from '../config';
 
 type MoveKeys = Record<'up' | 'down' | 'left' | 'right' | 'w' | 'a' | 's' | 'd', Phaser.Input.Keyboard.Key>;
 
@@ -56,7 +56,7 @@ export class InputSystem {
 
   private onDown(pointer: Phaser.Input.Pointer): void {
     if (this.pointerId !== null) return;
-    if (pointer.y < GAME_HEIGHT * JOYSTICK.activationYRatio) return;
+    if (pointer.y < this.scene.scale.height * JOYSTICK.activationYRatio) return;
     this.pointerId = pointer.id;
     this.origin.set(pointer.x, pointer.y);
     this.knob.set(pointer.x, pointer.y);

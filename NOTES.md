@@ -119,3 +119,8 @@
 - Reescalado: además de los listeners de Phaser, `scale.refresh()` en `resize`/`orientationchange`/`visualViewport.resize` y otra vez tras `MOBILE.rescaleDelayMs` (los navegadores móviles dan el tamaño final con retraso).
 - Iconos `public/icons/icon-192.png` y `icon-512.png`: PNG sencillos (casa amarilla sobre fondo oscuro) generados con Python sin dependencias.
 - Verificado con Chrome en emulación móvil (Pixel 7 vertical/horizontal, iPhone 13): overlay en vertical, juego congelado y reanudado, sin scroll, aviso de iOS solo en iPhone, sin errores de consola.
+- **Scale.EXPAND (petición del usuario, tras ver que en iOS con la barra del navegador el juego quedaba pequeño con FIT):** la vista base es 960×540 y crece para llenar la pantalla hasta `VIEW_MAX_WIDTH`×`VIEW_MAX_HEIGHT` (1400×720); más allá, franjas negras. En una pantalla 16:9 no cambia nada.
+  - Menú, level-up y game over siguen maquetados en coordenadas base y centran la cámara en esa zona (`centerOnBaseArea` en `src/utils/layout.ts`); sus velos cubren la vista máxima.
+  - El HUD (UIScene) se ancla a los bordes reales (`this.scale.width/height`) y se recoloca en cada `RESIZE`. El joystick usa la altura real.
+  - Cambio de jugabilidad asumido: en pantallas más anchas se ve más mundo. Para que los enemigos sigan apareciendo fuera de la vista, el anillo de spawn empieza en `max(ringMinDistance, semidiagonal de la vista + offscreenMargin)` y mantiene su grosor (en 960×540 sigue en 600–700).
+- El aviso de "Añadir a pantalla de inicio" se muestra en cualquier navegador de iOS no instalado (Chrome iOS también lo permite), no solo en Safari.
