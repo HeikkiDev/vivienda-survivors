@@ -25,3 +25,17 @@
   UI de control, no una entidad. Cualquier puntero (táctil o ratón) en la mitad inferior lo crea;
   mientras está activo, tiene prioridad sobre el teclado.
 - El joystick vive en `GameScene` (con `setScrollFactor(0)`) hasta que exista `UIScene`.
+
+## H3 — Enemigos y spawner
+- Un `Arcade.Group` (pool, `maxSize` 300) por tipo de enemigo: cada `Enemy` crea su visual una sola vez y
+  se reutiliza con `getFirstDead()`; el tope global de 300 vivos se cuenta en `Spawner`.
+- El spawner acumula `dt` (no usa timers de Phaser) para que la pausa futura lo congele sin más.
+- El minuto de la tabla de spawn y del escalado de HP es `floor(tiempo / 60)`, limitado a 0–9.
+- Daño por contacto: invulnerabilidad global del jugador de 0,5 s; durante ella ningún enemigo hace daño.
+- "Parpadeo alpha 0.5": el visual del jugador se queda a alpha 0,5 mientras dura la invulnerabilidad.
+- La barra de vida bajo el jugador (sección 12) se adelanta a H3 para poder ver el daño; es `Graphics`
+  en `Player.ts` (HUD, no entidad).
+- `GameOverScene` ya existe con la variante de derrota; el récord (mejor tiempo, en segundos) se guarda al
+  terminar la partida, excepto si se empezó con `?min=N` (debug).
+- Rendimiento: Chrome headless limita rAF a ~31 FPS incluso con la escena vacía; con 300 enemigos el coste
+  medido por frame es ~0,4 ms de update + ~0,25 ms de render (muy por debajo de 16,6 ms).

@@ -9,4 +9,13 @@ export const TEXTS = {
     noBest: 'Récord: --:--',
     footer: 'Parodia. Cualquier parecido con la realidad es pura coincidencia (no).',
   },
+  gameOver: {
+    defeatTitle: 'Has vuelto a casa de tus padres.',
+    defeatSubtitle: 'Tu habitación sigue igual que a los 15.',
+    retry: 'Reintentar',
+    level: (n: number) => `Nivel: ${n}`,
+    kills: (n: number) => `Enemigos derrotados: ${n}`,
+    brokenPromises: (n: number) => `Promesas incumplidas: ${n}`,
+    timeSurvived: (t: string) => `Tiempo sobrevivido: ${t}`,
+  },
 } as const;

@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { CANVAS_BG_COLOR, DEBUG_URL_PARAM, GAME_HEIGHT, GAME_WIDTH, PHYSICS_DEBUG } from './config';
 import { BootScene } from './scenes/BootScene';
+import { GameOverScene } from './scenes/GameOverScene';
 import { GameScene } from './scenes/GameScene';
 import { MenuScene } from './scenes/MenuScene';
 
@@ -21,5 +22,5 @@ new Phaser.Game({
     arcade: { gravity: { x: 0, y: 0 }, debug },
   },
   input: { activePointers: 3 },
-  scene: [BootScene, MenuScene, GameScene],
+  scene: [BootScene, MenuScene, GameScene, GameOverScene],
 });
