@@ -102,3 +102,4 @@
 - Verificado: hitbox del jugador idéntica (radio 14, centrada) con sprite y con emoji; borrando los PNG el juego arranca con 🧑 y rejilla, solo `console.warn`; `npm run zip` incluye `assets/` y carga desde subruta.
 - Para volver al arte por defecto basta con quitar las entradas `background` y `player` de `VISUALS`.
 - Post-H9: el arte de prueba queda en `CUSTOM_ART` y se activa con `USE_CUSTOM_ART` (por defecto `false` → emoji + rejilla). Con `false` no se carga ningún PNG.
+- Post-H9 (petición del usuario): las tarjetas de level-up muestran, además del chiste del GDD, una línea `effect` con lo que hace cada arma/pasiva. Los números de las pasivas y la Caña se leen de `config.ts` (texts.ts importa PASSIVES y CANA_HEAL) para que nunca se desincronicen.

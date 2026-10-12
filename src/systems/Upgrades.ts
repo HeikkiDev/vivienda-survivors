@@ -48,7 +48,7 @@ export function upgradeIcon(option: UpgradeOption): IconId {
   return option.kind === 'cana' ? 'icon_cana' : `icon_${option.id}`;
 }
 
-export function upgradeTexts(option: UpgradeOption): { name: string; desc: string } {
+export function upgradeTexts(option: UpgradeOption): { name: string; desc: string; effect: string } {
   if (option.kind === 'cana') return TEXTS.cana;
   return option.kind === 'weapon' ? TEXTS.weapons[option.id] : TEXTS.passives[option.id];
 }

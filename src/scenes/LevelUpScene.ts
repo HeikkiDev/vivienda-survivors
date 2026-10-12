@@ -70,7 +70,7 @@ export class LevelUpScene extends Phaser.Scene {
     const icon = createVisual(this, upgradeIcon(opt), cx, top + L.iconY);
     icon.setScale(icon.scaleX * L.iconScale);
 
-    const { name, desc } = upgradeTexts(opt);
+    const { name, desc, effect } = upgradeTexts(opt);
     this.add
       .text(cx, top + L.nameY, name, {
         fontFamily: UI.fontFamily,
@@ -94,7 +94,17 @@ export class LevelUpScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     this.add
-      .text(cx, top + L.descY, desc, {
+      .text(cx, top + L.effectY, effect, {
+        fontFamily: UI.fontFamily,
+        fontSize: `${L.effectSize}px`,
+        color: L.effectColor,
+        align: 'center',
+        wordWrap: { width: textWidth },
+      })
+      .setOrigin(0.5, 0);
+
+    this.add
+      .text(cx, top + L.cardHeight - L.descBottom, desc, {
         fontFamily: UI.fontFamily,
         fontSize: `${L.descSize}px`,
         fontStyle: 'italic',
@@ -102,7 +112,7 @@ export class LevelUpScene extends Phaser.Scene {
         align: 'center',
         wordWrap: { width: textWidth },
       })
-      .setOrigin(0.5, 0);
+      .setOrigin(0.5, 1);
   }
 
   private choose(index: number): void {

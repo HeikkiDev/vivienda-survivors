@@ -1,4 +1,7 @@
 // TODOS los textos visibles (en español). Ver GDD.md.
+import { CANA_HEAL, PASSIVES } from './config';
+
+const pct = (ratio: number): number => Math.round(ratio * 100);
 
 export const TEXTS = {
   menu: {
@@ -23,18 +26,18 @@ export const TEXTS = {
     key: (n: number) => `[${n}]`,
   },
   weapons: {
-    curriculum: { name: 'Lanzador de currículums', desc: 'Lanza currículums al enemigo más cercano.' },
-    escudo: { name: 'Escudo Ley de Vivienda', desc: 'Protege… en teoría. Depende de tu comunidad autónoma.' },
-    grito: { name: 'Grito "¡Eso es un trastero!"', desc: 'Onda expansiva que daña y empuja a los que te rodean.' },
-    sindicato: { name: 'Sindicato de inquilinos', desc: 'Puños en órbita. La unión hace la fuerza.' },
+    curriculum: { name: 'Lanzador de currículums', desc: 'Lanza currículums al enemigo más cercano.', effect: 'Dispara al enemigo más cercano. Al subir: más proyectiles y atraviesan.' },
+    escudo: { name: 'Escudo Ley de Vivienda', desc: 'Protege… en teoría. Depende de tu comunidad autónoma.', effect: 'Aura permanente que daña a todo lo que tengas cerca.' },
+    grito: { name: 'Grito "¡Eso es un trastero!"', desc: 'Onda expansiva que daña y empuja a los que te rodean.', effect: 'Explosión periódica a tu alrededor: daña y empuja.' },
+    sindicato: { name: 'Sindicato de inquilinos', desc: 'Puños en órbita. La unión hace la fuerza.', effect: 'Puños que orbitan y golpean al pasar. Al subir: más puños.' },
   },
   passives: {
-    aval: { name: 'Aval de tus padres', desc: 'Tus padres avalan con su casa. Sin presión.' },
-    piso: { name: 'Piso compartido', desc: '5 personas, 1 baño. Eficiencia máxima.' },
-    bono: { name: 'Bono Alquiler Joven', desc: 'Llega tarde, pero llega.' },
-    trabajo: { name: 'Segundo trabajo', desc: 'Riders de día, camarero de noche.' },
+    aval: { name: 'Aval de tus padres', desc: 'Tus padres avalan con su casa. Sin presión.', effect: `+${PASSIVES.aval.maxHpPerLevel} vida máxima y cura ${PASSIVES.aval.healPerLevel}.` },
+    piso: { name: 'Piso compartido', desc: '5 personas, 1 baño. Eficiencia máxima.', effect: `−${pct(PASSIVES.piso.cooldownReductionPerLevel)}% recarga de todas las armas.` },
+    bono: { name: 'Bono Alquiler Joven', desc: 'Llega tarde, pero llega.', effect: `+${pct(PASSIVES.bono.pickupRadiusPerLevel)}% radio de recogida y +${pct(PASSIVES.bono.speedPerLevel)}% velocidad.` },
+    trabajo: { name: 'Segundo trabajo', desc: 'Riders de día, camarero de noche.', effect: `+${pct(PASSIVES.trabajo.damagePerLevel)}% daño de todas las armas.` },
   },
-  cana: { name: 'Caña con los colegas', desc: 'Lo único asequible' },
+  cana: { name: 'Caña con los colegas', desc: 'Lo único asequible', effect: `Cura ${CANA_HEAL} de vida.` },
   grito: {
     shout: '¡ESO ES UN TRASTERO!',
   },

@@ -438,9 +438,13 @@ export const UI = {
     levelSize: 16,
     levelColor: '#ffd447',
     newColor: '#7CFC00',
-    descY: 190,
-    descSize: 15,
-    descColor: '#cccccc',
+    effectY: 182,
+    effectSize: 15,
+    effectColor: '#9fe3ff',
+    /** Distancia desde el borde inferior de la tarjeta al final del chiste. */
+    descBottom: 14,
+    descSize: 13,
+    descColor: '#aaaaaa',
   },
   gameOver: {
     overlayColor: 0x000000,
