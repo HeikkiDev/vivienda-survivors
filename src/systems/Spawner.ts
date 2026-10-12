@@ -81,6 +81,23 @@ export class Spawner {
     }
   }
 
+  findNearest(x: number, y: number): Enemy | null {
+    let best: Enemy | null = null;
+    let bestSq = Infinity;
+    for (const group of this.groupList) {
+      const children = group.getChildren() as Enemy[];
+      for (const e of children) {
+        if (!e.active) continue;
+        const d = (e.x - x) ** 2 + (e.y - y) ** 2;
+        if (d < bestSq) {
+          bestSq = d;
+          best = e;
+        }
+      }
+    }
+    return best;
+  }
+
   syncVisuals(): void {
     for (const group of this.groupList) {
       const children = group.getChildren() as Enemy[];

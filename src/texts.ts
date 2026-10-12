@@ -9,6 +9,9 @@ export const TEXTS = {
     noBest: 'Récord: --:--',
     footer: 'Parodia. Cualquier parecido con la realidad es pura coincidencia (no).',
   },
+  hud: {
+    level: (n: number) => `Nv ${n}`,
+  },
   gameOver: {
     defeatTitle: 'Has vuelto a casa de tus padres.',
     defeatSubtitle: 'Tu habitación sigue igual que a los 15.',

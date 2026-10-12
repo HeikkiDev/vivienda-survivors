@@ -4,6 +4,7 @@ import { BootScene } from './scenes/BootScene';
 import { GameOverScene } from './scenes/GameOverScene';
 import { GameScene } from './scenes/GameScene';
 import { MenuScene } from './scenes/MenuScene';
+import { UIScene } from './scenes/UIScene';
 
 const debug = PHYSICS_DEBUG || new URLSearchParams(window.location.search).has(DEBUG_URL_PARAM);
 
@@ -22,5 +23,5 @@ new Phaser.Game({
     arcade: { gravity: { x: 0, y: 0 }, debug },
   },
   input: { activePointers: 3 },
-  scene: [BootScene, MenuScene, GameScene, GameOverScene],
+  scene: [BootScene, MenuScene, GameScene, UIScene, GameOverScene],
 });

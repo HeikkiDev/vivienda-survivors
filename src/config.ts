@@ -22,7 +22,9 @@ export const BEST_TIME_STORAGE_KEY = 'viviendaSurvivors.best';
 export const DEPTH = {
   background: -1000,
   entities: 0,
+  euros: 2,
   enemies: 5,
+  projectiles: 8,
   player: 10,
   healthBar: 11,
   joystick: 1000,
@@ -70,6 +72,49 @@ export const ENEMY_IDS: readonly EnemyId[] = ['ipc', 'casero', 'agencia', 'fondo
 
 /** HP × (1 + hpScalePerMinute × minuto actual). */
 export const ENEMY_HP_SCALE_PER_MINUTE = 0.1;
+
+/** Destello al recibir daño (ms). */
+export const ENEMY_FLASH_MS = 80;
+
+// Sección 5 y 6 — Nivel máximo de armas y pasivas
+export const MAX_UPGRADE_LEVEL = 5;
+
+// Sección 5.1 — Lanzador de currículums
+export interface CurriculumLevel {
+  damage: number;
+  cooldown: number;
+  projectiles: number;
+  pierce: number;
+  speed: number;
+}
+
+export const CURRICULUM = {
+  /** Índice 0 = nivel 1. */
+  levels: [
+    { damage: 10, cooldown: 1.0, projectiles: 1, pierce: 1, speed: 450 },
+    { damage: 12, cooldown: 0.9, projectiles: 1, pierce: 1, speed: 450 },
+    { damage: 14, cooldown: 0.9, projectiles: 2, pierce: 1, speed: 450 },
+    { damage: 16, cooldown: 0.8, projectiles: 2, pierce: 2, speed: 500 },
+    { damage: 20, cooldown: 0.7, projectiles: 3, pierce: 2, speed: 500 },
+  ] as readonly CurriculumLevel[],
+  lifetime: 1.5,
+  /** Abanico ±10° alrededor del objetivo. */
+  spreadDegrees: 10,
+  hitboxRadius: 8,
+  poolSize: 100,
+} as const;
+
+// Sección 9 — Euros (XP)
+export const EURO = {
+  hitboxRadius: 5,
+  maxOnGround: 400,
+} as const;
+
+/** XP para pasar del nivel n al n+1: base + (n − 1) × step. */
+export const XP_CURVE = {
+  base: 5,
+  step: 6,
+} as const;
 
 // Sección 3 y 8 — Spawn
 export const SPAWN = {
@@ -136,6 +181,18 @@ export const UI = {
     footerMarginBottom: 24,
     footerSize: 14,
     footerColor: '#888888',
+  },
+  hud: {
+    xpBarHeight: 10,
+    xpBarBg: 0x222222,
+    xpBarFg: 0x3fa9f5,
+    xpBarBgAlpha: 0.8,
+    textY: 16,
+    textMarginX: 12,
+    textSize: 20,
+    textColor: '#ffffff',
+    textStroke: '#000000',
+    textStrokeThickness: 4,
   },
   gameOver: {
     overlayColor: 0x000000,

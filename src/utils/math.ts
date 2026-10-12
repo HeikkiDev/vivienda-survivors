@@ -1,4 +1,4 @@
-import { SECONDS_PER_MINUTE } from '../config';
+import { SECONDS_PER_MINUTE, XP_CURVE } from '../config';
 
 const PAD_LENGTH = 2;
 
@@ -37,4 +37,9 @@ export function randomPointInRing(
   out.x = Math.min(w, Math.max(0, cx + Math.cos(angle) * dist));
   out.y = Math.min(h, Math.max(0, cy + Math.sin(angle) * dist));
   return out;
+}
+
+/** XP necesaria para pasar del nivel n al n+1. */
+export function xpToNext(level: number): number {
+  return XP_CURVE.base + (level - 1) * XP_CURVE.step;
 }

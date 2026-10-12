@@ -55,6 +55,12 @@ export class Enemy extends Phaser.GameObjects.Zone {
     this.body.setVelocity(dx * v, dy * v);
   }
 
+  /** Resta vida; devuelve true si muere. */
+  takeDamage(amount: number): boolean {
+    this.hp -= amount;
+    return this.hp <= 0;
+  }
+
   deactivate(): void {
     this.setActive(false);
     this.body.stop();

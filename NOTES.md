@@ -39,3 +39,15 @@
   terminar la partida, excepto si se empezó con `?min=N` (debug).
 - Rendimiento: Chrome headless limita rAF a ~31 FPS incluso con la escena vacía; con 300 enemigos el coste
   medido por frame es ~0,4 ms de update + ~0,25 ms de render (muy por debajo de 16,6 ms).
+
+## H4 — Arma inicial y XP
+- Hitbox del currículum (no indicada en el GDD): r = 8 (`CURRICULUM.hitboxRadius`). Pool de 100 proyectiles.
+- Abanico: con N proyectiles se reparten uniformemente entre −10° y +10° (2 → ±10°, 3 → −10°/0°/+10°).
+- "Perforación N" = número de enemigos que puede golpear antes de desaparecer; nunca golpea dos veces al mismo.
+- Si no hay enemigos, el arma espera (no gasta el cooldown) y dispara en cuanto aparece uno.
+- El visual del proyectil no se rota hacia su dirección.
+- Euros: un euro entra en el imán (radio 60) y desde ese momento persigue al jugador a 400 px/s hasta tocarlo
+  (distancia ≤ hitbox jugador + hitbox euro). Hitbox del euro r = 5 (el "r=5" del GDD).
+- HUD (`UIScene`) lee el estado de `GameScene` cada frame (`GameScene.hud`); se lanza/para con `GameScene`.
+- Subida de nivel en H4: se registra con `console.log` y se acumula en `pendingLevelUps` para el menú de H5.
+- El destello de daño (80 ms, `flashVisual`) se aplica ya al herir enemigos (sección 7).
