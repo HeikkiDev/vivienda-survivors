@@ -61,3 +61,4 @@
 - Grito: círculo crece 0,2 s y se desvanece 0,3 s (el GDD no fija el fade); emoji + texto sobre el jugador 0,6 s. Dispara nada más adquirirse.
 - Sindicato: hitbox de cada puño r=12; cooldown de 0,5 s por enemigo guardado en el propio enemigo.
 - Descripciones de armas (salvo la del escudo, que da el GDD) inventadas, en texts.ts.
+- Post-H5: el casero pasa de 🧔 a 🤑 (a petición del usuario; 🧔 se confundía con el jugador 🧑). GDD actualizado.

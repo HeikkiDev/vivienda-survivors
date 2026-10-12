@@ -148,7 +148,7 @@ Todos: se mueven en línea recta hacia el jugador; sin colisión entre enemigos 
 | ID | Nombre | Emoji / forma | HP | Vel. (px/s) | Daño contacto | XP (€) | Hitbox r |
 |---|---|---|---|---|---|---|---|
 | `ipc` | Subida del IPC | `📈` 24 px | 10 | 90 | 5 | 1 | 11 |
-| `casero` | Casero de contrato de 11 meses | `🧔` 28 px | 30 | 70 | 10 | 3 | 13 |
+| `casero` | Casero de contrato de 11 meses | `🤑` 28 px | 30 | 70 | 10 | 3 | 13 |
 | `agencia` | Agencia con honorarios | `🏢` 30 px | 20 | 130 | 8 | 2 | 14 |
 | `fondo` | Fondo buitre | `🦅` 40 px | 120 | 55 | 20 | 10 | 20 |
 

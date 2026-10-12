@@ -21,7 +21,7 @@ const FLASH_ALPHA = 0.3;
 export const FALLBACK_EMOJI: Record<EntityVisualId, EmojiVisual> = {
   player: { kind: 'emoji', char: '🧑', size: 32 },
   ipc: { kind: 'emoji', char: '📈', size: 24 },
-  casero: { kind: 'emoji', char: '🧔', size: 28 },
+  casero: { kind: 'emoji', char: '🤑', size: 28 },
   agencia: { kind: 'emoji', char: '🏢', size: 30 },
   fondo: { kind: 'emoji', char: '🦅', size: 40 },
   boss: { kind: 'emoji', char: '🫧', size: 96 },
