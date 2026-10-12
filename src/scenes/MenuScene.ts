@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
-import { BEST_TIME_STORAGE_KEY, GAME_HEIGHT, GAME_WIDTH, UI } from '../config';
-import { TEXTS } from '../texts';
+import { BEST_TIME_STORAGE_KEY, GAME_HEIGHT, GAME_WIDTH, LANGUAGES, UI } from '../config';
+import { getLanguage, LANGUAGE_NAMES, setLanguage, TEXTS } from '../texts';
 import { formatTime } from '../utils/math';
 
 export class MenuScene extends Phaser.Scene {
@@ -65,7 +65,50 @@ export class MenuScene extends Phaser.Scene {
       })
       .setOrigin(0.5);
 
+    this.createLanguageSelector(cx);
+
     this.input.keyboard?.once('keydown-ENTER', () => this.startGame());
+  }
+
+  private createLanguageSelector(cx: number): void {
+    const m = UI.menu;
+    const current = getLanguage();
+    const items: Phaser.GameObjects.Text[] = [
+      this.add.text(0, m.langY, TEXTS.menu.language, {
+        fontFamily: UI.fontFamily,
+        fontSize: `${m.langSize}px`,
+        color: m.langLabelColor,
+      }),
+    ];
+
+    for (const lang of LANGUAGES) {
+      const active = lang === current;
+      const button = this.add.text(0, m.langY, LANGUAGE_NAMES[lang], {
+        fontFamily: UI.fontFamily,
+        fontSize: `${m.langSize}px`,
+        fontStyle: active ? 'bold' : 'normal',
+        color: active ? m.langActiveColor : m.langColor,
+        backgroundColor: active ? m.langActiveBg : m.langBg,
+        padding: { x: m.langPadX, y: m.langPadY },
+      });
+      if (!active) {
+        button.setInteractive({ useHandCursor: true });
+        button.on('pointerover', () => button.setBackgroundColor(m.langBgHover));
+        button.on('pointerout', () => button.setBackgroundColor(m.langBg));
+        button.on('pointerup', () => {
+          setLanguage(lang);
+          this.scene.restart();
+        });
+      }
+      items.push(button);
+    }
+
+    const totalWidth = items.reduce((sum, t) => sum + t.width, 0) + m.langGap * (items.length - 1);
+    let x = cx - totalWidth / 2;
+    for (const item of items) {
+      item.setOrigin(0, 0.5).setX(x);
+      x += item.width + m.langGap;
+    }
   }
 
   private bestText(): string {

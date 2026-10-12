@@ -10,7 +10,7 @@
 2. Arte: por defecto **emoji en `Text`** y una rejilla dibujada con `Graphics`. Audio: ninguno en el MVP.
 3. **Visuales centralizados (obligatorio):** todo lo que se ve (jugador, enemigos, boss, euros, proyectiles, armas, pickups y el fondo/mapa) se dibuja **solo** a partir de una definición en **`src/visuals.ts`**, mediante la función única `createVisual()`. Ningún otro archivo puede llamar a `this.add.text`/`this.add.sprite`/`this.add.image` para entidades ni contener emoji o rutas de imagen. Ver sección 3.1.
 4. Todos los números del juego viven en **`src/config.ts`**. Prohibido "números mágicos" en otros archivos.
-5. Todos los textos visibles viven en **`src/texts.ts`** (en español).
+5. Todos los textos visibles viven en **`src/texts.ts`**, en inglés (por defecto) y español; el idioma se elige en el menú.
 6. Resolución lógica **960×540**, `Phaser.Scale.FIT`, centrado. Física **Arcade**.
 7. No nombrar partidos ni políticos reales. La sátira es genérica ("el Candidato", "el Gobierno de turno").
 8. Cada hito termina con `npm run build` sin errores y el juego jugable en `npm run dev`.
@@ -338,7 +338,7 @@ Pools: usa `Phaser.Physics.Arcade.Group` con `maxSize` y reutilización (`get()`
 ---
 
 ## 16. Fuera de alcance (NO hacer)
-Personajes extra, varios mapas, evoluciones de armas, tienda/meta-progresión, cofres, audio, guardado de partida, idiomas, backend, leaderboards. (Crear arte final no es tarea del agente; solo el sistema para cambiarlo.)
+Personajes extra, varios mapas, evoluciones de armas, tienda/meta-progresión, cofres, audio, guardado de partida, idiomas adicionales, backend, leaderboards. (Crear arte final no es tarea del agente; solo el sistema para cambiarlo.)
 
 ---
 

@@ -103,3 +103,11 @@
 - Para volver al arte por defecto basta con quitar las entradas `background` y `player` de `VISUALS`.
 - Post-H9: el arte de prueba queda en `CUSTOM_ART` y se activa con `USE_CUSTOM_ART` (por defecto `false` → emoji + rejilla). Con `false` no se carga ningún PNG.
 - Post-H9 (petición del usuario): las tarjetas de level-up muestran, además del chiste del GDD, una línea `effect` con lo que hace cada arma/pasiva. Los números de las pasivas y la Caña se leen de `config.ts` (texts.ts importa PASSIVES y CANA_HEAL) para que nunca se desincronicen.
+
+## Post-H9 — Multi-idioma (petición del usuario)
+- El GDD tenía "idiomas" en *Fuera de alcance*; se implementa por petición explícita (GDD actualizado: inglés por defecto + español).
+- `texts.ts` contiene un diccionario por idioma (`ES`, `EN: Texts`). `TEXTS` es un `export let` (binding vivo de ES modules) que `setLanguage()` reasigna, así que el resto del código sigue usando `TEXTS.x` sin cambios.
+- Idiomas, idioma por defecto (`en`) y clave de localStorage (`viviendaSurvivors.lang`) en `config.ts`. Si localStorage no está disponible, el idioma solo dura la sesión.
+- Selector en el menú (fila "Language: English | Español" bajo el récord); al cambiar se reinicia `MenuScene`. Solo se puede cambiar desde el menú.
+- `<html lang>` se actualiza al idioma activo. El título "VIVIENDA SURVIVORS" no se traduce (es el nombre del juego).
+- Para añadir un idioma: añadir el código a `LANGUAGES` en config.ts, un diccionario `Texts` y su nombre en `LANGUAGE_NAMES`.

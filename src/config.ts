@@ -25,6 +25,11 @@ export const CANVAS_BG_COLOR = '#000000';
 
 export const BEST_TIME_STORAGE_KEY = 'viviendaSurvivors.best';
 
+export const LANGUAGES = ['en', 'es'] as const;
+export type Language = (typeof LANGUAGES)[number];
+export const DEFAULT_LANGUAGE: Language = 'en';
+export const LANGUAGE_STORAGE_KEY = 'viviendaSurvivors.lang';
+
 export const DEPTH = {
   background: -1000,
   entities: 0,
@@ -343,6 +348,17 @@ export const UI = {
     footerMarginBottom: 24,
     footerSize: 14,
     footerColor: '#888888',
+    langY: 440,
+    langSize: 18,
+    langGap: 16,
+    langLabelColor: '#aaaaaa',
+    langColor: '#dddddd',
+    langActiveColor: '#1a1a1a',
+    langBg: '#333333',
+    langBgHover: '#555555',
+    langActiveBg: '#ffd447',
+    langPadX: 12,
+    langPadY: 6,
   },
   hud: {
     xpBarHeight: 10,
