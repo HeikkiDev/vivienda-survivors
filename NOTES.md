@@ -94,3 +94,10 @@
 2. En itch.io: *Kind of project* = HTML, subir el zip y marcar *This file will be played in the browser*.
 3. *Viewport dimensions* 960×540, activar *Mobile friendly* (orientación horizontal) y, opcionalmente, *Fullscreen button*.
 - Comprobado sirviendo el zip descomprimido desde una subruta (`/html/12345/index.html`, como hace itch.io): carga sin errores ni 404.
+
+## H9 — Sprites personalizados
+- `public/assets/test_player.png` (spritesheet 4 frames de 32×32) y `test_bg.png` (tile 64×64) son PNG de prueba generados con un script de Python sin dependencias; no son arte final.
+- El GDD pide `player` como `sprite` con `scale:1`; además se añaden `frameWidth/frameHeight/anim` a esa misma entrada para cubrir el criterio de animación sin tocar otra entrada.
+- `git diff --stat` del cambio de arte: solo `src/visuals.ts` + los 2 PNG (este NOTES.md es solo documentación).
+- Verificado: hitbox del jugador idéntica (radio 14, centrada) con sprite y con emoji; borrando los PNG el juego arranca con 🧑 y rejilla, solo `console.warn`; `npm run zip` incluye `assets/` y carga desde subruta.
+- Para volver al arte por defecto basta con quitar las entradas `background` y `player` de `VISUALS`.

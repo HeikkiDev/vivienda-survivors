@@ -52,8 +52,17 @@ export const FALLBACK_BACKGROUND: BackgroundVisual = {
 
 /** Definición activa de cada visual. Sustituye una entrada por un `sprite`/`image` para cambiar el arte. */
 export const VISUALS: VisualsTable = {
-  background: FALLBACK_BACKGROUND,
   ...FALLBACK_EMOJI,
+  background: { kind: 'tileSprite', key: 'test_bg', path: 'assets/test_bg.png' },
+  player: {
+    kind: 'sprite',
+    key: 'test_player',
+    path: 'assets/test_player.png',
+    scale: 1,
+    frameWidth: 32,
+    frameHeight: 32,
+    anim: { frames: [0, 1, 2, 3], frameRate: 6, repeat: -1 },
+  },
 };
 
 const warned = new Set<string>();
