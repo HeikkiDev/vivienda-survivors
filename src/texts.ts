@@ -12,6 +12,10 @@ export const TEXTS = {
   hud: {
     level: (n: number) => `Nv ${n}`,
   },
+  pause: {
+    title: 'PAUSA',
+    hint: 'Esc / P o ⏸ para continuar',
+  },
   levelUp: {
     title: '¡Ascenso! (de sueldo no)',
     newItem: '¡NUEVO!',

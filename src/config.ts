@@ -9,6 +9,12 @@ export const WORLD_HEIGHT = 3000;
 
 export const CAMERA_LERP = 0.1;
 
+/** Sección 15 (H8) — Shake leve de cámara al recibir daño. */
+export const CAMERA_SHAKE = {
+  durationMs: 100,
+  intensity: 0.005,
+} as const;
+
 export const PHYSICS_DEBUG = false;
 /** Parámetro de URL para activar el debug físico: `?debug=1`. */
 export const DEBUG_URL_PARAM = 'debug';
@@ -42,6 +48,8 @@ export const PLAYER = {
   speed: 200,
   invulnerabilitySeconds: 0.5,
   invulnerabilityAlpha: 0.5,
+  /** Periodo (s) de cada fase del parpadeo durante la invulnerabilidad. */
+  invulnerabilityBlinkSeconds: 0.1,
   pickupRadius: 60,
   euroAttractSpeed: 400,
   regenPerSecond: 0,
@@ -355,6 +363,19 @@ export const UI = {
     levelOffsetX: 12,
     levelOffsetY: 10,
     levelSize: 13,
+  },
+  pause: {
+    buttonMarginX: 24,
+    buttonY: 26,
+    buttonHitPadding: 8,
+    overlayColor: 0x000000,
+    overlayAlpha: 0.6,
+    titleY: 150,
+    titleSize: 48,
+    titleColor: '#ffd447',
+    hintY: 205,
+    hintSize: 18,
+    hintColor: '#dddddd',
   },
   boss: {
     barY: 42,

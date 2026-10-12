@@ -82,3 +82,15 @@
 - Oleada turística: 40 `agencia` repartidas uniformemente en un círculo de 650 px (recortado al mundo), respetando el tope de 300.
 - Con `?min=N` se omiten los eventos anteriores (oleada, aviso, boss); con `?min=8` el boss aparece al instante sin aviso.
 - Victoria a 10:00: guarda récord 10:00 (si la partida no empezó con `?min`). La pantalla de victoria no muestra el tiempo (es 10:00).
+
+## H8 — Pulido y deploy
+- Shake de cámara (100 ms, 0.005) cada vez que el jugador recibe daño real (contacto o 💸).
+- La invulnerabilidad ahora parpadea (alterna alpha 0,5/1 cada 0,1 s) en vez de quedarse fija a 0,5.
+- Pausa gestionada en UIScene (no hay escena de pausa en la estructura del GDD): Esc, P o botón ⏸ (`icon_pause` en visuals.ts, arriba a la derecha) pausan/reanudan GameScene con velo y texto. No se puede pausar con el menú de nivel abierto.
+- Textos finales de victoria/derrota ya completos desde H7.
+
+### Deploy en itch.io
+1. `npm run zip` → genera `vivienda-survivors.zip` (contenido de `dist/` con `index.html` en la raíz; rutas relativas por `base: './'`).
+2. En itch.io: *Kind of project* = HTML, subir el zip y marcar *This file will be played in the browser*.
+3. *Viewport dimensions* 960×540, activar *Mobile friendly* (orientación horizontal) y, opcionalmente, *Fullscreen button*.
+- Comprobado sirviendo el zip descomprimido desde una subruta (`/html/12345/index.html`, como hace itch.io): carga sin errores ni 404.

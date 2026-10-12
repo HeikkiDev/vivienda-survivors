@@ -16,6 +16,8 @@ export class UIScene extends Phaser.Scene {
   private promiseArrow!: Phaser.GameObjects.Graphics;
   private bossBar!: Phaser.GameObjects.Graphics;
   private announcementText!: Phaser.GameObjects.Text;
+  private pauseOverlay!: Phaser.GameObjects.Container;
+  private pausedByUser = false;
 
   constructor() {
     super('UIScene');
@@ -67,6 +69,58 @@ export class UIScene extends Phaser.Scene {
       })
       .setOrigin(0.5)
       .setVisible(false);
+
+    this.createPauseControls();
+  }
+
+  private createPauseControls(): void {
+    const p = UI.pause;
+    this.pausedByUser = false;
+    const button = createVisual(this, 'icon_pause', GAME_WIDTH - p.buttonMarginX, p.buttonY);
+    const hit = new Phaser.Geom.Rectangle(
+      -p.buttonHitPadding,
+      -p.buttonHitPadding,
+      button.width + p.buttonHitPadding * 2,
+      button.height + p.buttonHitPadding * 2,
+    );
+    button.setInteractive({ hitArea: hit, hitAreaCallback: Phaser.Geom.Rectangle.Contains, useHandCursor: true });
+    button.on('pointerdown', () => this.togglePause());
+    this.input.keyboard?.on('keydown-ESC', () => this.togglePause());
+    this.input.keyboard?.on('keydown-P', () => this.togglePause());
+
+    const overlay = this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, p.overlayColor, p.overlayAlpha).setOrigin(0);
+    const title = this.add
+      .text(GAME_WIDTH / 2, p.titleY, TEXTS.pause.title, {
+        fontFamily: UI.fontFamily,
+        fontSize: `${p.titleSize}px`,
+        fontStyle: 'bold',
+        color: p.titleColor,
+      })
+      .setOrigin(0.5);
+    const hint = this.add
+      .text(GAME_WIDTH / 2, p.hintY, TEXTS.pause.hint, {
+        fontFamily: UI.fontFamily,
+        fontSize: `${p.hintSize}px`,
+        color: p.hintColor,
+      })
+      .setOrigin(0.5);
+    this.pauseOverlay = this.add.container(0, 0, [overlay, title, hint]).setVisible(false);
+    // El botón queda por encima del velo para poder reanudar con un toque.
+    this.children.bringToTop(button);
+  }
+
+  private togglePause(): void {
+    const game = this.scene.get('GameScene') as GameScene;
+    if (this.pausedByUser) {
+      this.pausedByUser = false;
+      this.pauseOverlay.setVisible(false);
+      this.scene.resume('GameScene');
+      return;
+    }
+    if (!game.canPause) return;
+    this.pausedByUser = true;
+    this.pauseOverlay.setVisible(true);
+    this.scene.pause('GameScene');
   }
 
   update(): void {

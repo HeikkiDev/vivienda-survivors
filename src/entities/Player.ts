@@ -50,7 +50,9 @@ export class Player extends Phaser.GameObjects.Zone {
   tick(dt: number): void {
     if (this.invulnerableTime > 0) {
       this.invulnerableTime = Math.max(0, this.invulnerableTime - dt);
-      this.visual.setAlpha(this.invulnerableTime > 0 ? PLAYER.invulnerabilityAlpha : 1);
+      const phase = Math.floor(this.invulnerableTime / PLAYER.invulnerabilityBlinkSeconds);
+      const dim = this.invulnerableTime > 0 && phase % 2 === 0;
+      this.visual.setAlpha(dim ? PLAYER.invulnerabilityAlpha : 1);
     }
   }
 

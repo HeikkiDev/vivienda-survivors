@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import {
   BOSS,
   CAMERA_LERP,
+  CAMERA_SHAKE,
   DEBUG_START_MINUTE_PARAM,
   DEPTH,
   ENEMY_FLASH_MS,
@@ -346,15 +347,25 @@ export class GameScene extends Phaser.Scene {
   }
 
   private onEnemyContact(enemy: Enemy): void {
-    if (this.ended || !enemy.active || this.modifiers.invulnerable) return;
-    if (this.player.takeHit(enemy.stats.damage) && this.player.isDead) this.endGame(false);
+    if (this.ended || !enemy.active) return;
+    this.hurtPlayer(enemy.stats.damage);
   }
 
   private onBossBullet(bullet: BossBullet): void {
     if (this.ended || !bullet.active) return;
     bullet.deactivate();
-    if (this.modifiers.invulnerable) return;
-    if (this.player.takeHit(BOSS.bullet.damage) && this.player.isDead) this.endGame(false);
+    this.hurtPlayer(BOSS.bullet.damage);
+  }
+
+  private hurtPlayer(damage: number): void {
+    if (this.modifiers.invulnerable || !this.player.takeHit(damage)) return;
+    this.cameras.main.shake(CAMERA_SHAKE.durationMs, CAMERA_SHAKE.intensity);
+    if (this.player.isDead) this.endGame(false);
+  }
+
+  /** Pausa manual (Esc/P/botón) solo si no hay menú de nivel abierto ni la partida ha terminado. */
+  get canPause(): boolean {
+    return !this.levelUpOpen && !this.ended;
   }
 
   private endGame(victory: boolean): void {

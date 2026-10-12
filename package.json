@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "zip": "npm run build && cd dist && rm -f ../vivienda-survivors.zip && zip -qr ../vivienda-survivors.zip ."
   },
   "dependencies": {
     "phaser": "3.90.0"
