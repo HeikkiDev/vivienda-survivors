@@ -29,7 +29,7 @@ export class GameOverScene extends Phaser.Scene {
     this.add.rectangle(0, 0, GAME_WIDTH, GAME_HEIGHT, g.overlayColor, g.overlayAlpha).setOrigin(0);
 
     this.add
-      .text(cx, g.titleY, TEXTS.gameOver.defeatTitle, {
+      .text(cx, g.titleY, data.victory ? TEXTS.gameOver.victoryTitle : TEXTS.gameOver.defeatTitle, {
         fontFamily: UI.fontFamily,
         fontSize: `${g.titleSize}px`,
         fontStyle: 'bold',
@@ -38,7 +38,7 @@ export class GameOverScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     this.add
-      .text(cx, g.subtitleY, TEXTS.gameOver.defeatSubtitle, {
+      .text(cx, g.subtitleY, data.victory ? TEXTS.gameOver.victorySubtitle : TEXTS.gameOver.defeatSubtitle, {
         fontFamily: UI.fontFamily,
         fontSize: `${g.subtitleSize}px`,
         fontStyle: 'italic',
@@ -50,8 +50,8 @@ export class GameOverScene extends Phaser.Scene {
       TEXTS.gameOver.level(data.level),
       TEXTS.gameOver.kills(data.kills),
       TEXTS.gameOver.brokenPromises(data.brokenPromises),
-      TEXTS.gameOver.timeSurvived(formatTime(data.timeSeconds)),
     ];
+    if (!data.victory) stats.push(TEXTS.gameOver.timeSurvived(formatTime(data.timeSeconds)));
     this.add
       .text(cx, g.statsY, stats.join('\n'), {
         fontFamily: UI.fontFamily,
@@ -63,7 +63,7 @@ export class GameOverScene extends Phaser.Scene {
       .setOrigin(0.5, 0);
 
     const button = this.add
-      .text(cx, g.buttonY, TEXTS.gameOver.retry, {
+      .text(cx, g.buttonY, data.victory ? TEXTS.gameOver.victoryButton : TEXTS.gameOver.retry, {
         fontFamily: UI.fontFamily,
         fontSize: `${g.buttonSize}px`,
         fontStyle: 'bold',

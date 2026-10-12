@@ -25,6 +25,8 @@ export const DEPTH = {
   aura: 1,
   euros: 2,
   enemies: 5,
+  boss: 6,
+  bossBullets: 7,
   projectiles: 8,
   effects: 9,
   player: 10,
@@ -233,6 +235,31 @@ export const SPAWN_TABLE: readonly SpawnRow[] = [
   { interval: 0.35, count: 8, weights: { ipc: 25, casero: 25, agencia: 30, fondo: 20 } },
 ];
 
+// Sección 7.1 — Boss: Burbuja 2.0
+export const BOSS = {
+  stats: { hp: 3000, speed: 60, damage: 30, xp: 50, hitboxRadius: 45 } as EnemyStats,
+  spawnMinute: 8,
+  /** Segundos de aviso antes de aparecer. */
+  warningSeconds: 3,
+  shootInterval: 5,
+  bulletCount: 8,
+  bullet: { damage: 10, speed: 200, lifetime: 3, hitboxRadius: 8 },
+  bulletPoolSize: 32,
+  /** Segundos que se muestra el texto al morir. */
+  deathTextSeconds: 3,
+} as const;
+
+// Sección 8 — Oleada especial "Temporada turística"
+export const TOURIST_WAVE = {
+  minute: 5,
+  enemy: 'agencia' as EnemyId,
+  count: 40,
+  radius: 650,
+} as const;
+
+/** Sección 11 — Victoria al llegar a este minuto. */
+export const VICTORY_MINUTE = 10;
+
 // Sección 10 — Promesa electoral
 /** Multiplicadores temporales de una promesa (los ausentes valen 1). */
 export interface PromiseEffect {
@@ -328,6 +355,22 @@ export const UI = {
     levelOffsetX: 12,
     levelOffsetY: 10,
     levelSize: 13,
+  },
+  boss: {
+    barY: 42,
+    barWidth: 400,
+    barHeight: 10,
+    barBg: 0x222222,
+    barBgAlpha: 0.8,
+    barFg: 0xff4fa3,
+    barStroke: 0x000000,
+    barStrokeWidth: 2,
+  },
+  announcement: {
+    y: 150,
+    size: 26,
+    warningColor: '#ff5555',
+    infoColor: '#ffd447',
   },
   promise: {
     bannerY: 62,

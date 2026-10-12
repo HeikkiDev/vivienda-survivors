@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import {
+  ENEMIES,
   ENEMY_HP_SCALE_PER_MINUTE,
   ENEMY_IDS,
   SECONDS_PER_MINUTE,
@@ -48,17 +49,22 @@ export class Spawner {
   }
 
   spawn(id: EnemyId, minute: number, px: number, py: number): Enemy | null {
+    const p = this.ringPoint(px, py);
+    return this.spawnAt(id, minute, p.x, p.y);
+  }
+
+  /** Genera un enemigo en (x, y), respetando el tope global. */
+  spawnAt(id: EnemyId, minute: number, x: number, y: number): Enemy | null {
     if (this.alive >= SPAWN.maxAlive) return null;
     const group = this.groups[id];
     let enemy = group.getFirstDead(false) as Enemy | null;
     if (!enemy) {
       if (group.isFull()) return null;
-      enemy = new Enemy(this.scene, id);
+      enemy = new Enemy(this.scene, id, ENEMIES[id]);
       group.add(enemy);
       enemy.initBody();
     }
-    const p = this.ringPoint(px, py);
-    enemy.spawn(p.x, p.y, 1 + ENEMY_HP_SCALE_PER_MINUTE * minute);
+    enemy.spawn(x, y, 1 + ENEMY_HP_SCALE_PER_MINUTE * minute);
     this.alive++;
     return enemy;
   }

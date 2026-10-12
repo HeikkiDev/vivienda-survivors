@@ -72,3 +72,13 @@
 - Banner: buff = texto de la promesa + cuenta atrás; incumplida = "❌ PROMESA INCUMPLIDA" + cuenta atrás del debuff (15 s); cumplida = "✅ ¡Promesa cumplida! (milagro)" durante 3 s (duración no fijada en el GDD).
 - La flecha indicadora es un triángulo `Graphics` en UIScene (indicador de HUD, no entidad), en el borde de pantalla en la dirección de la urna.
 - "Promesas incumplidas" cuenta las tiradas fallidas.
+
+## H7 — Boss, oleada turística, victoria
+- `Boss` extiende `Enemy` (constructor generalizado a `visualId + stats`) en su propio Arcade Group; así las 4 armas le afectan sin cambios. Inmune al knockback del grito. HP fijo 3000 (sin escalado por minuto).
+- El boss aparece en el anillo de spawn (600–700 px), persigue al jugador, no se reposiciona si se queda lejos y le afecta la promesa de velocidad de enemigos.
+- Al morir suelta **un** euro de valor 50 y muestra el texto 3 s (duración no fijada en el GDD).
+- Proyectiles 💸: pool propio, hitbox r=8 (no fijada en el GDD), primer anillo 5 s después de aparecer. Desaparecen al tocar al jugador aunque esté en invulnerabilidad.
+- Aviso del boss y texto de muerte: rótulo centrado en el HUD. La barra de vida del boss va bajo el temporizador.
+- Oleada turística: 40 `agencia` repartidas uniformemente en un círculo de 650 px (recortado al mundo), respetando el tope de 300.
+- Con `?min=N` se omiten los eventos anteriores (oleada, aviso, boss); con `?min=8` el boss aparece al instante sin aviso.
+- Victoria a 10:00: guarda récord 10:00 (si la partida no empezó con `?min`). La pantalla de victoria no muestra el tiempo (es 10:00).

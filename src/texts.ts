@@ -46,7 +46,14 @@ export const TEXTS = {
     broken: '❌ PROMESA INCUMPLIDA',
     countdown: (seconds: number) => `${seconds} s`,
   },
+  boss: {
+    warning: '⚠️ ¡Se está inflando la BURBUJA 2.0!',
+    death: 'La burbuja ha pinchado… de momento.',
+  },
   gameOver: {
+    victoryTitle: '🏠 Has firmado la hipoteca… a 40 años.',
+    victorySubtitle: 'Euribor + 1,5%. Enhorabuena (?)',
+    victoryButton: 'Volver a buscar piso',
     defeatTitle: 'Has vuelto a casa de tus padres.',
     defeatSubtitle: 'Tu habitación sigue igual que a los 15.',
     retry: 'Reintentar',

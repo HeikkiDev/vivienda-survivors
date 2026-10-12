@@ -1,12 +1,11 @@
 import Phaser from 'phaser';
-import { DEPTH, ENEMIES, type EnemyStats } from '../config';
-import type { EnemyId } from '../types';
+import { DEPTH, type EnemyStats } from '../config';
+import type { EntityVisualId } from '../types';
 import { createVisual } from '../visuals';
 
-/** Enemigo genérico configurado por ID. Cuerpo físico invisible + visual que lo sigue. */
+/** Enemigo genérico configurado por ID (el boss también lo usa). Cuerpo físico invisible + visual que lo sigue. */
 export class Enemy extends Phaser.GameObjects.Zone {
   declare body: Phaser.Physics.Arcade.Body;
-  readonly enemyId: EnemyId;
   readonly stats: EnemyStats;
   readonly visual: Phaser.GameObjects.Text | Phaser.GameObjects.Sprite;
   hp = 0;
@@ -17,14 +16,12 @@ export class Enemy extends Phaser.GameObjects.Zone {
   private knockbackVx = 0;
   private knockbackVy = 0;
 
-  constructor(scene: Phaser.Scene, enemyId: EnemyId) {
-    const stats = ENEMIES[enemyId];
+  constructor(scene: Phaser.Scene, visualId: EntityVisualId, stats: EnemyStats, depth: number = DEPTH.enemies) {
     const diameter = stats.hitboxRadius * 2;
     super(scene, 0, 0, diameter, diameter);
-    this.enemyId = enemyId;
     this.stats = stats;
     scene.add.existing(this);
-    this.visual = createVisual(scene, enemyId, 0, 0).setDepth(DEPTH.enemies).setVisible(false);
+    this.visual = createVisual(scene, visualId, 0, 0).setDepth(depth).setVisible(false);
     this.setActive(false);
   }
 

@@ -14,6 +14,8 @@ export class UIScene extends Phaser.Scene {
   private inventoryKey = '';
   private promiseBanner!: Phaser.GameObjects.Text;
   private promiseArrow!: Phaser.GameObjects.Graphics;
+  private bossBar!: Phaser.GameObjects.Graphics;
+  private announcementText!: Phaser.GameObjects.Text;
 
   constructor() {
     super('UIScene');
@@ -51,6 +53,20 @@ export class UIScene extends Phaser.Scene {
       .setOrigin(0.5, 0)
       .setVisible(false);
     this.promiseArrow = this.add.graphics();
+    this.bossBar = this.add.graphics();
+
+    const a = UI.announcement;
+    this.announcementText = this.add
+      .text(GAME_WIDTH / 2, a.y, '', {
+        fontFamily: UI.fontFamily,
+        fontSize: `${a.size}px`,
+        fontStyle: 'bold',
+        align: 'center',
+        stroke: h.textStroke,
+        strokeThickness: h.textStrokeThickness,
+      })
+      .setOrigin(0.5)
+      .setVisible(false);
   }
 
   update(): void {
@@ -69,6 +85,33 @@ export class UIScene extends Phaser.Scene {
     this.updateInventory(s.inventory);
     this.updatePromiseBanner(s.promise);
     this.updatePromiseArrow(s.promisePickup);
+    this.updateBossBar(s.boss);
+    this.updateAnnouncement(s.announcement);
+  }
+
+  private updateBossBar(boss: HudState['boss']): void {
+    this.bossBar.clear();
+    if (!boss) return;
+    const b = UI.boss;
+    const x = (GAME_WIDTH - b.barWidth) / 2;
+    const ratio = boss.maxHp > 0 ? boss.hp / boss.maxHp : 0;
+    this.bossBar
+      .fillStyle(b.barBg, b.barBgAlpha)
+      .fillRect(x, b.barY, b.barWidth, b.barHeight)
+      .fillStyle(b.barFg, 1)
+      .fillRect(x, b.barY, b.barWidth * ratio, b.barHeight)
+      .lineStyle(b.barStrokeWidth, b.barStroke, 1)
+      .strokeRect(x, b.barY, b.barWidth, b.barHeight);
+  }
+
+  private updateAnnouncement(announcement: HudState['announcement']): void {
+    if (!announcement) {
+      this.announcementText.setVisible(false);
+      return;
+    }
+    const a = UI.announcement;
+    const color = announcement.kind === 'warning' ? a.warningColor : a.infoColor;
+    this.announcementText.setText(announcement.text).setColor(color).setVisible(true);
   }
 
   private updatePromiseBanner(status: HudState['promise']): void {

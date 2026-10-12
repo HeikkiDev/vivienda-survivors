@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import {
+  BOSS,
   CAMERA_LERP,
   DEBUG_START_MINUTE_PARAM,
   DEPTH,
@@ -8,10 +9,14 @@ import {
   MS_PER_SECOND,
   PLAYER,
   SECONDS_PER_MINUTE,
+  SPAWN,
   SPAWN_TABLE,
+  TOURIST_WAVE,
+  VICTORY_MINUTE,
   WORLD_HEIGHT,
   WORLD_WIDTH,
 } from '../config';
+import { Boss, BossBulletPool, type BossBullet } from '../entities/Boss';
 import type { Enemy } from '../entities/Enemy';
 import { Player } from '../entities/Player';
 import { XpGemPool } from '../entities/XpGem';
@@ -20,8 +25,9 @@ import { InputSystem } from '../systems/Input';
 import { Modifiers } from '../systems/Modifiers';
 import { Spawner } from '../systems/Spawner';
 import { applyNonWeaponUpgrade, generateUpgradeOptions, type UpgradeOption } from '../systems/Upgrades';
+import { TEXTS } from '../texts';
 import type { IconId, WeaponId } from '../types';
-import { xpToNext } from '../utils/math';
+import { randomPointInRing, xpToNext } from '../utils/math';
 import { createBackground, flashVisual } from '../visuals';
 import { Curriculums } from '../weapons/Curriculums';
 import { EscudoLey } from '../weapons/EscudoLey';
@@ -40,6 +46,20 @@ export interface HudState {
   promise: PromiseStatus | null;
   /** Posición en pantalla del pickup de promesa, si existe. */
   promisePickup: { x: number; y: number } | null;
+  boss: { hp: number; maxHp: number } | null;
+  announcement: Announcement | null;
+}
+
+export interface Announcement {
+  text: string;
+  kind: 'warning' | 'info';
+  remaining: number;
+}
+
+/** Eventos únicos de la partida (instante en segundos). */
+interface TimedEvent {
+  at: number;
+  run: () => void;
 }
 
 export class GameScene extends Phaser.Scene {
@@ -51,6 +71,11 @@ export class GameScene extends Phaser.Scene {
   private weaponCtx!: WeaponContext;
   private modifiers!: Modifiers;
   private elections!: Elections;
+  private boss!: Boss;
+  private bossGroup!: Phaser.Physics.Arcade.Group;
+  private bossBullets!: BossBulletPool;
+  private timedEvents: TimedEvent[] = [];
+  private announcement: Announcement | null = null;
   private levelUpOpen = false;
   private elapsed = 0;
   private kills = 0;
@@ -80,6 +105,8 @@ export class GameScene extends Phaser.Scene {
       inventory,
       promise: this.elections.current,
       promisePickup: pickup.active ? { x: pickup.x - cam.scrollX, y: pickup.y - cam.scrollY } : null,
+      boss: this.boss.active ? { hp: Math.max(0, this.boss.hp), maxHp: this.boss.maxHp } : null,
+      announcement: this.announcement,
     };
   }
 
@@ -109,18 +136,31 @@ export class GameScene extends Phaser.Scene {
     this.gems = new XpGemPool(this);
     this.elections = new Elections(this, this.modifiers, this.elapsed, () => this.brokenPromises++);
 
+    this.bossGroup = this.physics.add.group({ maxSize: 1 });
+    this.boss = new Boss(this);
+    this.bossGroup.add(this.boss);
+    this.boss.initBody();
+    this.bossBullets = new BossBulletPool(this);
+    this.announcement = null;
+    this.timedEvents = this.buildTimedEvents(this.elapsed);
+    const enemyTargets = [...this.spawner.groupList, this.bossGroup];
+
     this.weaponCtx = {
       scene: this,
       player: this.player,
       modifiers: this.modifiers,
-      enemyGroups: this.spawner.groupList,
-      findNearestEnemy: (x, y) => this.spawner.findNearest(x, y),
-      forEachEnemy: (cb) => this.spawner.forEachActive(cb),
+      enemyGroups: enemyTargets,
+      findNearestEnemy: (x, y) => this.findNearestEnemy(x, y),
+      forEachEnemy: (cb) => {
+        this.spawner.forEachActive(cb);
+        if (this.boss.active) cb(this.boss);
+      },
       damageEnemy: (e, amount) => this.damageEnemy(e, amount),
     };
     this.weapons = [this.createWeapon('curriculum')];
 
-    this.physics.add.overlap(this.player, this.spawner.groupList, (_p, e) => this.onEnemyContact(e as Enemy));
+    this.physics.add.overlap(this.player, enemyTargets, (_p, e) => this.onEnemyContact(e as Enemy));
+    this.physics.add.overlap(this.player, this.bossBullets.group, (_p, b) => this.onBossBullet(b as BossBullet));
 
     this.scene.launch('UIScene');
 
@@ -144,11 +184,25 @@ export class GameScene extends Phaser.Scene {
     if (this.ended) return;
     const dt = deltaMs / MS_PER_SECOND;
     this.elapsed += dt;
+    if (this.elapsed >= VICTORY_MINUTE * SECONDS_PER_MINUTE) {
+      this.endGame(true);
+      return;
+    }
+    while (this.timedEvents.length > 0 && this.elapsed >= this.timedEvents[0].at) this.timedEvents.shift()!.run();
+    if (this.announcement) {
+      this.announcement.remaining -= dt;
+      if (this.announcement.remaining <= 0) this.announcement = null;
+    }
 
     this.player.tick(dt);
     this.player.move(this.inputSystem.getDirection(), this.modifiers.playerSpeed);
     this.spawner.update(dt, this.elapsed, this.player.x, this.player.y);
     this.spawner.updateEnemies(this.player.x, this.player.y, this.modifiers.enemySpeed, dt);
+    if (this.boss.active) {
+      this.boss.chase(this.player.x, this.player.y, this.modifiers.enemySpeed, dt);
+      if (this.boss.tickShoot(dt)) this.bossBullets.fireRing(this.boss.x, this.boss.y);
+    }
+    this.bossBullets.update(dt);
     for (const w of this.weapons) w.update(dt);
     this.elections.update(dt, this.elapsed, this.player.x, this.player.y, PLAYER.hitboxRadius);
 
@@ -161,6 +215,54 @@ export class GameScene extends Phaser.Scene {
     );
     if (collected > 0) this.addXp(collected * this.modifiers.xpGain);
     if (this.pendingLevelUps > 0 && !this.levelUpOpen) this.openLevelUp();
+  }
+
+  /** Oleada turística, aviso del boss y boss. Con `?min=N` se omiten los anteriores a ese minuto. */
+  private buildTimedEvents(startElapsed: number): TimedEvent[] {
+    const bossAt = BOSS.spawnMinute * SECONDS_PER_MINUTE;
+    const all: TimedEvent[] = [
+      { at: TOURIST_WAVE.minute * SECONDS_PER_MINUTE, run: () => this.spawnTouristWave() },
+      { at: bossAt - BOSS.warningSeconds, run: () => this.announce(TEXTS.boss.warning, 'warning', BOSS.warningSeconds) },
+      { at: bossAt, run: () => this.spawnBoss() },
+    ];
+    return all.filter((e) => e.at >= startElapsed).sort((a, b) => a.at - b.at);
+  }
+
+  private announce(text: string, kind: Announcement['kind'], seconds: number): void {
+    this.announcement = { text, kind, remaining: seconds };
+  }
+
+  private spawnTouristWave(): void {
+    const { x: px, y: py } = this.player;
+    const minute = Spawner.minuteOf(this.elapsed);
+    for (let i = 0; i < TOURIST_WAVE.count; i++) {
+      const angle = (i / TOURIST_WAVE.count) * Math.PI * 2;
+      const x = Phaser.Math.Clamp(px + Math.cos(angle) * TOURIST_WAVE.radius, 0, WORLD_WIDTH);
+      const y = Phaser.Math.Clamp(py + Math.sin(angle) * TOURIST_WAVE.radius, 0, WORLD_HEIGHT);
+      this.spawner.spawnAt(TOURIST_WAVE.enemy, minute, x, y);
+    }
+  }
+
+  private spawnBoss(): void {
+    const p = randomPointInRing(
+      this.player.x,
+      this.player.y,
+      SPAWN.ringMinDistance,
+      SPAWN.ringMaxDistance,
+      WORLD_WIDTH,
+      WORLD_HEIGHT,
+      { x: 0, y: 0 },
+    );
+    this.boss.spawn(p.x, p.y, 1);
+  }
+
+  private findNearestEnemy(x: number, y: number): Enemy | null {
+    const nearest = this.spawner.findNearest(x, y);
+    if (!this.boss.active) return nearest;
+    if (!nearest) return this.boss;
+    const dBoss = (this.boss.x - x) ** 2 + (this.boss.y - y) ** 2;
+    const dNear = (nearest.x - x) ** 2 + (nearest.y - y) ** 2;
+    return dBoss < dNear ? this.boss : nearest;
   }
 
   private createWeapon(id: WeaponId): Weapon {
@@ -213,6 +315,8 @@ export class GameScene extends Phaser.Scene {
     this.player.syncVisual();
     this.spawner.syncVisuals();
     this.gems.syncVisuals();
+    if (this.boss.active) this.boss.syncVisual();
+    this.bossBullets.syncVisuals();
     for (const w of this.weapons) w.syncVisuals();
   }
 
@@ -222,7 +326,12 @@ export class GameScene extends Phaser.Scene {
     if (!enemy.takeDamage(amount)) return;
     const { x, y } = enemy;
     const value = enemy.stats.xp;
-    this.spawner.kill(enemy);
+    if (enemy === this.boss) {
+      this.boss.deactivate();
+      this.announce(TEXTS.boss.death, 'info', BOSS.deathTextSeconds);
+    } else {
+      this.spawner.kill(enemy);
+    }
     this.kills++;
     this.gems.drop(x, y, value);
   }
@@ -239,6 +348,13 @@ export class GameScene extends Phaser.Scene {
   private onEnemyContact(enemy: Enemy): void {
     if (this.ended || !enemy.active || this.modifiers.invulnerable) return;
     if (this.player.takeHit(enemy.stats.damage) && this.player.isDead) this.endGame(false);
+  }
+
+  private onBossBullet(bullet: BossBullet): void {
+    if (this.ended || !bullet.active) return;
+    bullet.deactivate();
+    if (this.modifiers.invulnerable) return;
+    if (this.player.takeHit(BOSS.bullet.damage) && this.player.isDead) this.endGame(false);
   }
 
   private endGame(victory: boolean): void {
