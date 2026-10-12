@@ -13,6 +13,10 @@ const ES = {
     footer: 'Parodia. Cualquier parecido con la realidad es pura coincidencia (no).',
     language: 'Idioma:',
   },
+  mobile: {
+    rotate: 'Gira el móvil 📱↻',
+    iosFullscreen: 'Para pantalla completa: Compartir → Añadir a pantalla de inicio',
+  },
   hud: {
     level: (n: number) => `Nv ${n}`,
   },
@@ -84,6 +88,10 @@ const EN: Texts = {
     noBest: 'Best: --:--',
     footer: 'Parody. Any resemblance to reality is purely coincidental (not).',
     language: 'Language:',
+  },
+  mobile: {
+    rotate: 'Rotate your phone 📱↻',
+    iosFullscreen: 'For fullscreen: Share → Add to Home Screen',
   },
   hud: {
     level: (n: number) => `Lv ${n}`,

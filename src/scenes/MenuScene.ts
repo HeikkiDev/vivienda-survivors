@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { BEST_TIME_STORAGE_KEY, GAME_HEIGHT, GAME_WIDTH, LANGUAGES, UI } from '../config';
+import { enterFullscreenLandscape, isIOSSafariBrowser } from '../mobile';
 import { getLanguage, LANGUAGE_NAMES, setLanguage, TEXTS } from '../texts';
 import { formatTime } from '../utils/math';
 
@@ -67,6 +68,16 @@ export class MenuScene extends Phaser.Scene {
 
     this.createLanguageSelector(cx);
 
+    if (isIOSSafariBrowser()) {
+      this.add
+        .text(cx, m.iosHintY, TEXTS.mobile.iosFullscreen, {
+          fontFamily: UI.fontFamily,
+          fontSize: `${m.iosHintSize}px`,
+          color: m.iosHintColor,
+        })
+        .setOrigin(0.5);
+    }
+
     this.input.keyboard?.once('keydown-ENTER', () => this.startGame());
   }
 
@@ -125,6 +136,7 @@ export class MenuScene extends Phaser.Scene {
   private startGame(): void {
     if (this.starting) return;
     this.starting = true;
+    void enterFullscreenLandscape();
     this.scene.start('GameScene');
   }
 }

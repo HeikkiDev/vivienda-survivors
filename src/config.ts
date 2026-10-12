@@ -18,6 +18,14 @@ export const CAMERA_SHAKE = {
 export const PHYSICS_DEBUG = false;
 /** Parámetro de URL para activar el debug físico: `?debug=1`. */
 export const DEBUG_URL_PARAM = 'debug';
+
+/** Experiencia móvil: media query de vertical y retardo para recalcular la escala tras girar/redimensionar. */
+export const MOBILE = {
+  portraitQuery: '(orientation: portrait)',
+  standaloneQuery: '(display-mode: standalone), (display-mode: fullscreen)',
+  rescaleDelayMs: 250,
+  iosTouchPoints: 1,
+} as const;
 /** Parámetro de URL para empezar el reloj en un minuto concreto: `?min=7`. */
 export const DEBUG_START_MINUTE_PARAM = 'min';
 
@@ -359,6 +367,9 @@ export const UI = {
     langActiveBg: '#ffd447',
     langPadX: 12,
     langPadY: 6,
+    iosHintY: 478,
+    iosHintSize: 14,
+    iosHintColor: '#ffd447',
   },
   hud: {
     xpBarHeight: 10,

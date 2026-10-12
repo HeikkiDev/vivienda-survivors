@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { CANVAS_BG_COLOR, DEBUG_URL_PARAM, GAME_HEIGHT, GAME_WIDTH, PHYSICS_DEBUG } from './config';
+import { setupMobile } from './mobile';
 import { BootScene } from './scenes/BootScene';
 import { GameOverScene } from './scenes/GameOverScene';
 import { GameScene } from './scenes/GameScene';
@@ -9,7 +10,7 @@ import { UIScene } from './scenes/UIScene';
 
 const debug = PHYSICS_DEBUG || new URLSearchParams(window.location.search).has(DEBUG_URL_PARAM);
 
-new Phaser.Game({
+const game = new Phaser.Game({
   type: Phaser.AUTO,
   parent: 'game',
   width: GAME_WIDTH,
@@ -18,6 +19,8 @@ new Phaser.Game({
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
+    width: GAME_WIDTH,
+    height: GAME_HEIGHT,
   },
   physics: {
     default: 'arcade',
@@ -26,3 +29,5 @@ new Phaser.Game({
   input: { activePointers: 3 },
   scene: [BootScene, MenuScene, GameScene, UIScene, LevelUpScene, GameOverScene],
 });
+
+setupMobile(game);

@@ -111,3 +111,11 @@
 - Selector en el menú (fila "Language: English | Español" bajo el récord); al cambiar se reinicia `MenuScene`. Solo se puede cambiar desde el menú.
 - `<html lang>` se actualiza al idioma activo. El título "VIVIENDA SURVIVORS" no se traduce (es el nombre del juego).
 - Para añadir un idioma: añadir el código a `LANGUAGES` en config.ts, un diccionario `Texts` y su nombre en `LANGUAGE_NAMES`.
+
+## Post-H10 — Experiencia móvil (petición del usuario)
+- Lógica en `src/mobile.ts` (`setupMobile`, `enterFullscreenLandscape`, `isIOSSafariBrowser`); números en `MOBILE` (config.ts) y textos en `TEXTS.mobile` (texts.ts, ES/EN). El emoji 📱↻ del aviso de girar vive en texts.ts porque es texto de interfaz HTML, no una entidad del juego.
+- CSS: el padding `env(safe-area-inset-*)` va en `body` (box-sizing border-box) y `#game` ocupa el 100% de su área de contenido, porque Phaser mide el padre con `getBoundingClientRect()` (incluye padding) y el canvas pisaría los insets si el padding estuviera en `#game`.
+- Vertical = `matchMedia('(orientation: portrait)')`, también en escritorio con ventana más alta que ancha (opción más simple). Mientras dura, se pausan todas las escenas en marcha (también las que arranquen después, vía `POST_STEP`) y al volver a horizontal se reanudan solo esas; las pausas propias del juego (menú de pausa, level-up) se respetan.
+- Reescalado: además de los listeners de Phaser, `scale.refresh()` en `resize`/`orientationchange`/`visualViewport.resize` y otra vez tras `MOBILE.rescaleDelayMs` (los navegadores móviles dan el tamaño final con retraso).
+- Iconos `public/icons/icon-192.png` y `icon-512.png`: PNG sencillos (casa amarilla sobre fondo oscuro) generados con Python sin dependencias.
+- Verificado con Chrome en emulación móvil (Pixel 7 vertical/horizontal, iPhone 13): overlay en vertical, juego congelado y reanudado, sin scroll, aviso de iOS solo en iPhone, sin errores de consola.
