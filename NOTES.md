@@ -152,3 +152,4 @@
 - Al morir: física en pausa, sacudida de cámara, destello rojo y zoom lento sobre el jugador, que cae de lado y se desvanece. Los enemigos se quedan congelados.
 - En UIScene: velo rojo oscuro, título "DERROTA" que cae rebotando y subtítulo; tras `DEFEAT_ANIM.durationMs` se funde a negro y aparece GameOverScene.
 - Victoria y derrota comparten `HudState.ending`; el confeti de la victoria se configura con `FallingPiecesConfig`.
+- Depuración: `?win=1` gana nada más empezar la partida para ver la animación de victoria (no guarda récord).

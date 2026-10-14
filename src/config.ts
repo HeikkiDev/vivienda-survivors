@@ -36,6 +36,8 @@ export const MOBILE = {
 } as const;
 /** Parámetro de URL para empezar el reloj en un minuto concreto: `?min=7`. */
 export const DEBUG_START_MINUTE_PARAM = 'min';
+/** Parámetro de URL para ganar al empezar la partida (ver la animación de victoria): `?win=1`. */
+export const DEBUG_WIN_PARAM = 'win';
 
 export const CANVAS_BG_COLOR = '#000000';
 

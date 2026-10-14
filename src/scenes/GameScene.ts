@@ -4,6 +4,7 @@ import {
   CAMERA_LERP,
   CAMERA_SHAKE,
   DEBUG_START_MINUTE_PARAM,
+  DEBUG_WIN_PARAM,
   DEFEAT_ANIM,
   DEPTH,
   ENEMY_FLASH_MS,
@@ -102,6 +103,7 @@ export class GameScene extends Phaser.Scene {
   private ended = false;
   private ending: EndingKind | null = null;
   private debugStart = false;
+  private debugWin = false;
 
   constructor() {
     super('GameScene');
@@ -132,7 +134,8 @@ export class GameScene extends Phaser.Scene {
 
   create(): void {
     const startMinute = GameScene.debugStartMinute();
-    this.debugStart = startMinute > 0;
+    this.debugWin = new URLSearchParams(window.location.search).has(DEBUG_WIN_PARAM);
+    this.debugStart = startMinute > 0 || this.debugWin;
     this.elapsed = startMinute * SECONDS_PER_MINUTE;
     this.kills = 0;
     this.level = 1;
@@ -207,7 +210,7 @@ export class GameScene extends Phaser.Scene {
     if (this.ended) return;
     const dt = deltaMs / MS_PER_SECOND;
     this.elapsed += dt;
-    if (this.elapsed >= VICTORY_MINUTE * SECONDS_PER_MINUTE) {
+    if (this.debugWin || this.elapsed >= VICTORY_MINUTE * SECONDS_PER_MINUTE) {
       this.endGame(true);
       return;
     }
