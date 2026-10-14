@@ -48,13 +48,15 @@ Aparecen en los minutos 2, 4, 6 y 8 (una flecha indica dónde). Al cogerla tiene
 | ¡Vivienda digna para todos! | Invulnerable | Te mueves ×0,6 |
 
 ## 👾 Enemigos
-| Enemigo | Cómo es |
-|---|---|
-| 📈 **Subida del IPC** | Débil y numeroso. |
-| 🤑 **Casero de contrato de 11 meses** | Lento pero aguanta. |
-| 🏢 **Agencia con honorarios** | Rápida. En el minuto 5 llega la *temporada turística*: 40 agencias te rodean. |
-| 🦅 **Fondo buitre** | Grande, duro y pega fuerte. |
-| 🫧 **Burbuja 2.0** (boss, min. 8) | 3000 de vida; cada 5 s dispara un anillo de 💸. No hace falta matarla para ganar. |
+| Enemigo | Aparece | Cómo es |
+|---|---|---|
+| 📈 **Subida del IPC** | 00:00 | Débil y numeroso. |
+| 🤑 **Casero de contrato de 11 meses** | 01:00 | Lento pero aguanta. |
+| 🏢 **Agencia con honorarios** | 02:00 | Rápida. En el **05:00** llega la *temporada turística*: 40 agencias te rodean. |
+| 🦅 **Fondo buitre** | 04:00 | Grande, duro y pega fuerte. Cada vez hay más. |
+| 🫧 **Burbuja 2.0** (boss) | 08:00 | 3000 de vida; cada 5 s dispara un anillo de 💸. Se avisa 3 s antes. No hace falta matarla para ganar. |
+
+Cada enemigo nuevo se presenta con un cartel la primera vez que aparece.
 
 Los enemigos se hacen más resistentes cada minuto. Aguanta hasta el **10:00** para ganar… y si caes antes, también hay animación de derrota.
 
