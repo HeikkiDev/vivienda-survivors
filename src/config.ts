@@ -428,8 +428,8 @@ export const UI = {
   },
   /** Presentación de cada tipo de enemigo la primera vez que aparece en la partida. */
   enemyIntro: {
-    seconds: 4,
-    fadeSeconds: 0.3,
+    seconds: 8,
+    fadeSeconds: 0.6,
     marginBottom: 80,
     padX: 14,
     padY: 10,
