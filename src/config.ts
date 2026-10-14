@@ -48,6 +48,9 @@ export type Language = (typeof LANGUAGES)[number];
 export const DEFAULT_LANGUAGE: Language = 'es';
 export const LANGUAGE_STORAGE_KEY = 'viviendaSurvivors.lang';
 
+/** Enlace que acompaña al texto de compartir (GDD H12). */
+export const SHARE_URL = 'https://heikkidev.github.io/vivienda-survivors/';
+
 export const AUDIO = {
   sfxMaxInstances: 4,
   sfxMinIntervalMs: 50,
@@ -632,13 +635,22 @@ export const UI = {
     statsSize: 20,
     statsLineSpacing: 8,
     statsColor: '#ffd447',
-    buttonY: 440,
+    buttonY: 420,
     buttonSize: 28,
     buttonColor: '#1a1a1a',
     buttonBg: '#ffd447',
     buttonBgHover: '#ffe680',
     buttonPadX: 24,
     buttonPadY: 10,
+    shareY: 485,
+    shareSize: 20,
+    shareColor: '#ffffff',
+    shareBg: '#3a3a4a',
+    shareBgHover: '#55556a',
+    sharePadX: 18,
+    sharePadY: 8,
+    /** Tiempo que el botón muestra "¡Copiado!". */
+    copiedMs: 2000,
   },
 } as const;
 

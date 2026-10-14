@@ -171,3 +171,11 @@
 - El estado de silencio lo guarda `AudioManager`: en Web Audio, `sound.mute` se lee de un nodo de ganancia que no cambia al instante.
 - `BootScene` sustituye la decodificación de audio de Phaser por una con `.catch`: la original hace `console.error` y deja una promesa rechazada sin capturar.
 - El volumen de cada entrada vive en `sounds.ts` (como los tamaños en `visuals.ts`); los límites del gestor, en `config.ts`.
+
+## H12 — Compartir resultado
+- `navigator.share` solo se usa en dispositivos táctiles (`pointer: coarse`): Chrome y Safari de escritorio también lo tienen, pero el GDD pide portapapeles en escritorio.
+- Si el usuario cancela el menú nativo (`AbortError`), no se hace nada. Si `share` falla por otro motivo, se intenta el portapapeles.
+- Sin portapapeles (p. ej. iframe de itch.io sin permiso `clipboard-write`), el texto se muestra en un `window.prompt` para copiarlo a mano: es lo más simple y no añade UI.
+- La cifra de enemigos usa `toLocaleString`; en español no agrupa los números de 4 cifras ("1234"), que es la norma de la RAE.
+- Las partidas con `?min`/`?win` también se pueden compartir (no hay récord en juego).
+- Se reubica el botón de reintentar (y 440 → 420) para dejar sitio al de compartir en 960×540.

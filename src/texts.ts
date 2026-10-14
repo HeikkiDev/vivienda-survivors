@@ -23,6 +23,23 @@ function describeEffect(effect: PromiseEffect, labels: EffectLabels, decimalSep:
     .join(', ');
 }
 
+/** Datos de la partida para el texto de compartir (GDD H12). */
+export interface ShareStats {
+  time: string;
+  level: number;
+  kills: number;
+  brokenPromises: number;
+  url: string;
+}
+
+const shareStatsEs = (s: ShareStats): string =>
+  `Nivel ${s.level} · ${s.kills.toLocaleString('es-ES')} enemigos derrotados · ` +
+  `${s.brokenPromises} ${s.brokenPromises === 1 ? 'promesa incumplida' : 'promesas incumplidas'}`;
+
+const shareStatsEn = (s: ShareStats): string =>
+  `Level ${s.level} · ${s.kills.toLocaleString('en-US')} enemies defeated · ` +
+  `${s.brokenPromises} broken ${s.brokenPromises === 1 ? 'promise' : 'promises'}`;
+
 const ES_EFFECT_LABELS: EffectLabels = {
   damage: 'Daño',
   enemySpeed: 'Velocidad enemigos',
@@ -134,6 +151,13 @@ const ES = {
     kills: (n: number) => `Enemigos derrotados: ${n}`,
     brokenPromises: (n: number) => `Promesas incumplidas: ${n}`,
     timeSurvived: (t: string) => `Tiempo sobrevivido: ${t}`,
+    share: '📤 Compartir',
+    copied: '✅ ¡Copiado!',
+    manualCopy: 'Copia este texto para compartirlo:',
+    shareVictory: (s: ShareStats) =>
+      `🏠 He firmado una hipoteca a 40 años en Vivienda Survivors. ${shareStatsEs(s)}. ¿Y tú? ${s.url}`,
+    shareDefeat: (s: ShareStats) =>
+      `🛏️ He vuelto a casa de mis padres tras ${s.time} buscando piso en Vivienda Survivors. ${shareStatsEs(s)}. ¿Aguantas más? ${s.url}`,
   },
 };
 
@@ -231,6 +255,13 @@ const EN: Texts = {
     kills: (n: number) => `Enemies defeated: ${n}`,
     brokenPromises: (n: number) => `Broken promises: ${n}`,
     timeSurvived: (t: string) => `Time survived: ${t}`,
+    share: '📤 Share',
+    copied: '✅ Copied!',
+    manualCopy: 'Copy this text to share it:',
+    shareVictory: (s: ShareStats) =>
+      `🏠 I signed a 40-year mortgage in Vivienda Survivors. ${shareStatsEn(s)}. Can you beat that? ${s.url}`,
+    shareDefeat: (s: ShareStats) =>
+      `🛏️ I moved back in with my parents after ${s.time} of flat hunting in Vivienda Survivors. ${shareStatsEn(s)}. Can you last longer? ${s.url}`,
   },
 };
 

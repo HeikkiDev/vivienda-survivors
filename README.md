@@ -15,6 +15,7 @@ Clon minimalista de *Vampire Survivors* y sátira (genérica) sobre la crisis de
 - **Subir de nivel:** recoge 💶 y elige 1 de 3 mejoras (clic, tap o `1` `2` `3`).
 - **Promesas electorales 🗳️:** cada 2 minutos. ¿Se cumplirá? Spoiler: probablemente no.
 - **Pausa:** `Esc` / `P` o el botón ⏸.
+- **Compartir:** al acabar la partida, "📤 Compartir" genera un texto con tu resultado (menú nativo en móvil, portapapeles en escritorio).
 - **Sonido:** botón 🔊/🔇 junto a la pausa, o la tecla `M`. Se recuerda entre partidas.
 - **Idioma:** inglés o español, se elige en el menú principal.
 - **Móvil:** se juega en horizontal y a pantalla completa; se puede instalar como app.

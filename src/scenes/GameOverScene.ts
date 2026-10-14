@@ -1,9 +1,10 @@
 import Phaser from 'phaser';
-import { BEST_TIME_STORAGE_KEY, GAME_WIDTH, UI } from '../config';
+import { BEST_TIME_STORAGE_KEY, GAME_WIDTH, SHARE_URL, UI } from '../config';
 import { AudioManager } from '../systems/AudioManager';
 import { TEXTS } from '../texts';
 import { addBaseOverlay, centerOnBaseArea } from '../utils/layout';
 import { formatTime } from '../utils/math';
+import { shareText } from '../utils/share';
 
 export interface GameOverData {
   victory: boolean;
@@ -80,6 +81,47 @@ export class GameOverScene extends Phaser.Scene {
     button.on('pointerout', () => button.setBackgroundColor(g.buttonBg));
     button.on('pointerup', () => this.restart());
     this.input.keyboard?.once('keydown-ENTER', () => this.restart());
+
+    this.createShareButton(cx, data);
+  }
+
+  private createShareButton(cx: number, data: GameOverData): void {
+    const g = UI.gameOver;
+    const stats = {
+      time: formatTime(data.timeSeconds),
+      level: data.level,
+      kills: data.kills,
+      brokenPromises: data.brokenPromises,
+      url: SHARE_URL,
+    };
+    const text = data.victory ? TEXTS.gameOver.shareVictory(stats) : TEXTS.gameOver.shareDefeat(stats);
+    const button = this.add
+      .text(cx, g.shareY, TEXTS.gameOver.share, {
+        fontFamily: UI.fontFamily,
+        fontSize: `${g.shareSize}px`,
+        fontStyle: 'bold',
+        color: g.shareColor,
+        backgroundColor: g.shareBg,
+        padding: { x: g.sharePadX, y: g.sharePadY },
+      })
+      .setOrigin(0.5)
+      .setInteractive({ useHandCursor: true });
+    button.on('pointerover', () => button.setBackgroundColor(g.shareBgHover));
+    button.on('pointerout', () => button.setBackgroundColor(g.shareBg));
+    let resetTimer: Phaser.Time.TimerEvent | null = null;
+    // pointerup sigue siendo un gesto del usuario: navigator.share y el portapapeles lo exigen.
+    button.on('pointerup', async () => {
+      const result = await shareText(text);
+      if (!this.scene.isActive()) return;
+      if (result === 'manual') {
+        window.prompt(TEXTS.gameOver.manualCopy, text);
+        return;
+      }
+      if (result !== 'copied') return;
+      button.setText(TEXTS.gameOver.copied);
+      resetTimer?.remove();
+      resetTimer = this.time.delayedCall(g.copiedMs, () => button.setText(TEXTS.gameOver.share));
+    });
   }
 
   private static saveBest(timeSeconds: number): void {

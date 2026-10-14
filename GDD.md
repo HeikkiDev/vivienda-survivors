@@ -365,12 +365,12 @@ Pools: usa `Phaser.Physics.Arcade.Group` con `maxSize` y reutilización (`get()`
   - Victoria: *"🏠 He firmado una hipoteca a 40 años en Vivienda Survivors. Nivel 17 · 1.234 caseros derrotados · 3 promesas incumplidas. ¿Y tú? <url>"*
   - Derrota: *"🛏️ He vuelto a casa de mis padres tras 04:12 buscando piso en Vivienda Survivors. ¿Aguantas más? <url>"*
 - La URL del juego se define en `src/config.ts` (`SHARE_URL`).
-- Comportamiento: si existe `navigator.share` (móvil), se abre el menú nativo de compartir. Si no, se copia el texto al portapapeles y el botón muestra *"¡Copiado!"* durante 2 s.
+- Comportamiento: en táctil (`pointer: coarse`) con `navigator.share`, se abre el menú nativo de compartir. Si no, se copia el texto al portapapeles y el botón muestra *"¡Copiado!"* durante 2 s.
 - Sin backend ni capturas de pantalla: solo texto + enlace. La vista previa del enlace la aportan las meta etiquetas Open Graph de `index.html`.
 - ✅ En escritorio, al pulsar "Compartir" el texto queda en el portapapeles y aparece "¡Copiado!".
 - ✅ En móvil se abre el menú nativo; si el usuario cancela, no hay errores.
 - ✅ El texto refleja los datos reales de la partida (tiempo, nivel, enemigos, promesas incumplidas) y cambia según victoria o derrota.
-- ✅ Si no hay ni `navigator.share` ni portapapeles disponible, el botón muestra el texto para copiarlo a mano, sin errores.
+- ✅ Si no hay ni `navigator.share` ni portapapeles disponible, el botón muestra el texto en un `prompt` para copiarlo a mano, sin errores.
 
 ---
 
