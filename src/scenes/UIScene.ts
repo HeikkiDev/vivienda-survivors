@@ -364,7 +364,8 @@ export class UIScene extends Phaser.Scene {
   }
 
   private updatePromiseBanner(status: HudState['promise']): void {
-    if (!status) {
+    // Si se cumple basta con el aviso central "¡Promesa cumplida!".
+    if (!status || status.phase === 'fulfilled') {
       this.promiseBanner.setVisible(false);
       return;
     }
@@ -381,12 +382,9 @@ export class UIScene extends Phaser.Scene {
         t.question(seconds),
       ].join('\n');
       color = p.buffColor;
-    } else if (status.phase === 'debuff') {
+    } else {
       text = `${TEXTS.promise.brokenTitle(TEXTS.promises[status.id])}\n${TEXTS.promise.brokenDetail(TEXTS.promise.effect(promise.debuff), seconds)}`;
       color = p.brokenColor;
-    } else {
-      text = `${TEXTS.promise.fulfilledTitle(TEXTS.promises[status.id])}\n${TEXTS.promise.fulfilledDetail}`;
-      color = p.fulfilledColor;
     }
     this.promiseBanner.setText(text).setColor(color).setVisible(true);
   }

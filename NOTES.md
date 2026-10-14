@@ -156,7 +156,7 @@
 
 ## Promesas electorales más claras (petición del usuario)
 - Al aparecer la urna: anuncio "🗳️ ¡Elecciones! Ha aparecido una urna: cógela" (`PROMESA.spawnAnnounceSeconds`); se quita al cogerla.
-- Durante el buff, el banner explica la apuesta en 3 líneas: promesa, "Ahora: <buff> · Si se incumple: <debuff>" y "¿Se cumplirá? N s".
-- Al resolverse: anuncio central "✅ ¡Promesa cumplida! (milagro)" o "❌ PROMESA INCUMPLIDA" (`PROMESA.resolveAnnounceSeconds`), y el banner muestra la promesa con la consecuencia ("Se acaba el efecto, sin penalización" o "<debuff> durante N s").
+- Durante el buff, el banner explica la apuesta en 3 líneas: promesa, "<buff> · Si se incumple: <debuff>" y "¿Se cumplirá? N s".
+- Al resolverse: anuncio central "✅ ¡Promesa cumplida! (milagro)" o "❌ PROMESA INCUMPLIDA" (`PROMESA.resolveAnnounceSeconds`), Si se cumple solo queda el aviso (el banner se oculta); si se incumple, el banner muestra la promesa y "<debuff> durante N s".
 - Los efectos se describen en `texts.ts` a partir de los multiplicadores de `PROMISES` (config), sin duplicar números.
 - El anuncio central baja a y=180 para no pisar el banner de 3 líneas.

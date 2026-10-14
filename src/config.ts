@@ -563,7 +563,6 @@ export const UI = {
     bannerPadY: 6,
     bannerBg: '#000000aa',
     buffColor: '#ffd447',
-    fulfilledColor: '#7CFC00',
     brokenColor: '#ff5555',
     arrowMargin: 28,
     arrowSize: 14,
