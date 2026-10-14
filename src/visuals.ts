@@ -66,7 +66,7 @@ function png(file: string): EntityVisual {
 
 /** Arte personalizado. Añade aquí sprites/imágenes (archivos en public/assets/). */
 const CUSTOM_ART: Partial<VisualsTable> = {
-  background: { kind: 'tileSprite', key: 'test_bg', path: 'assets/test_bg.png' },
+  background: { kind: 'tileSprite', key: 'bg_solar', path: 'assets/bg_solar.png' },
   player: {
     kind: 'sprite',
     key: 'art_player',

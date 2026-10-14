@@ -129,3 +129,5 @@
 - Los PNG de `public/assets/` (salvo `test_*`) se generan por código (Pillow) a 2× el tamaño del emoji
   y se usan con `scale: 0.5` (`ART_SCALE` en `visuals.ts`). Los iconos de armas reutilizan el PNG del arma.
 - `player.png` es una hoja de 4 frames de 64×64 (caminar). `getVisualAssets()` no repite claves.
+- Fondo `bg_solar.png` (128×128, sin costuras) generado por `tools/gen_background.py` (Pillow, semilla fija);
+  `tools/preview_bg.png` es el mosaico 3×3 de comprobación.
