@@ -96,7 +96,7 @@
 - Comprobado sirviendo el zip descomprimido desde una subruta (`/html/12345/index.html`, como hace itch.io): carga sin errores ni 404.
 
 ## H9 — Sprites personalizados
-- `public/assets/test_player.png` (spritesheet 4 frames de 32×32) y `test_bg.png` (tile 64×64) son PNG de prueba generados con un script de Python sin dependencias; no son arte final.
+- `public/assets/test_player.png` (spritesheet 4 frames de 32×32) y `test_bg.png` (tile 64×64) son PNG de prueba generados con un script de Python sin dependencias; no son arte final. Se borraron una vez sustituidos por el arte definitivo, para no incluirlos en el build.
 - El GDD pide `player` como `sprite` con `scale:1`; además se añaden `frameWidth/frameHeight/anim` a esa misma entrada para cubrir el criterio de animación sin tocar otra entrada.
 - `git diff --stat` del cambio de arte: solo `src/visuals.ts` + los 2 PNG (este NOTES.md es solo documentación).
 - Verificado: hitbox del jugador idéntica (radio 14, centrada) con sprite y con emoji; borrando los PNG el juego arranca con 🧑 y rejilla, solo `console.warn`; `npm run zip` incluye `assets/` y carga desde subruta.
@@ -160,3 +160,7 @@
 - Al resolverse: anuncio central "✅ ¡Promesa cumplida! (milagro)" o "❌ PROMESA INCUMPLIDA" (`PROMESA.resolveAnnounceSeconds`), Si se cumple solo queda el aviso (el banner se oculta); si se incumple, el banner muestra la promesa y "<debuff> durante N s".
 - Los efectos se describen en `texts.ts` a partir de los multiplicadores de `PROMISES` (config), sin duplicar números.
 - El anuncio central baja a y=180 para no pisar el banner de 3 líneas.
+
+## Publicación — meta etiquetas
+- `index.html` incluye `description`, Open Graph y Twitter card en español (idioma de la sátira); no son texto del juego, por eso no van en `texts.ts`.
+- `og:image` necesita URL absoluta: apunta a GitHub Pages (`public/og-image.jpg`, 1200×630, recorte de `docs/screenshot.png`). En itch.io la vista previa la gestiona la propia página de itch.

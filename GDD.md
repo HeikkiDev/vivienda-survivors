@@ -347,10 +347,36 @@ Pools: usa `Phaser.Physics.Arcade.Group` con `maxSize` y reutilización (`get()`
 - ✅ El idioma elegido se guarda en localStorage y se mantiene al recargar; si localStorage no está disponible, se usa inglés sin errores.
 - ✅ `<html lang>` refleja el idioma activo. Ningún texto visible fuera de `texts.ts`.
 
+**H11 — Sonido**
+- Efectos cortos y una música en bucle, en tono de humor. Sin dependencias nuevas: se usa el sistema de audio de Phaser (Web Audio con fallback a HTML5 Audio).
+- Archivos en `public/assets/audio/` (`.ogg` + `.mp3` de fallback). Las claves y rutas se definen **solo** en `src/sounds.ts` (mismo patrón que `visuals.ts`); el resto del código llama a `playSfx(scene, 'clave')`. Volúmenes y límites en `src/config.ts`.
+- Efectos mínimos: disparo de currículum, impacto en enemigo, muerte de enemigo, recoger euro, subir de nivel, daño al jugador, recoger caja electoral, promesa cumplida, promesa incumplida, aviso del boss, victoria y derrota.
+- Música: un tema del menú y otro de la partida en bucle. Al aparecer el boss puede subir de intensidad (opcional).
+- Botón 🔊/🔇 en el menú y en la pausa. La preferencia se guarda en localStorage (`viviendaSurvivors.muted`). La tecla `M` silencia o reactiva el sonido.
+- Límite de efectos simultáneos del mismo tipo (p. ej. máx. 4 impactos a la vez) para no saturar con hordas grandes.
+- ✅ El audio arranca tras la primera interacción del usuario (política de autoplay), sin errores en consola.
+- ✅ Si un archivo de audio falla, el juego sigue sin sonido para esa clave, con `console.warn` y sin errores.
+- ✅ Silenciar se mantiene al recargar. Pausa y menú de mejoras pausan los efectos de la partida, no la música.
+- ✅ Funciona en móvil (iOS Safari incluido) y en la versión de itch.io (rutas relativas).
+- ✅ Todo el audio es libre de derechos (CC0 o creado para el juego); los créditos van en `README.md`.
+
+**H12 — Compartir resultado**
+- En la pantalla de fin de partida (victoria y derrota), un botón **"Compartir"** bajo el de reintentar.
+- Genera un texto corto y gracioso con el resultado, en el idioma activo, desde `src/texts.ts`. Ejemplos:
+  - Victoria: *"🏠 He firmado una hipoteca a 40 años en Vivienda Survivors. Nivel 17 · 1.234 caseros derrotados · 3 promesas incumplidas. ¿Y tú? <url>"*
+  - Derrota: *"🛏️ He vuelto a casa de mis padres tras 04:12 buscando piso en Vivienda Survivors. ¿Aguantas más? <url>"*
+- La URL del juego se define en `src/config.ts` (`SHARE_URL`).
+- Comportamiento: si existe `navigator.share` (móvil), se abre el menú nativo de compartir. Si no, se copia el texto al portapapeles y el botón muestra *"¡Copiado!"* durante 2 s.
+- Sin backend ni capturas de pantalla: solo texto + enlace. La vista previa del enlace la aportan las meta etiquetas Open Graph de `index.html`.
+- ✅ En escritorio, al pulsar "Compartir" el texto queda en el portapapeles y aparece "¡Copiado!".
+- ✅ En móvil se abre el menú nativo; si el usuario cancela, no hay errores.
+- ✅ El texto refleja los datos reales de la partida (tiempo, nivel, enemigos, promesas incumplidas) y cambia según victoria o derrota.
+- ✅ Si no hay ni `navigator.share` ni portapapeles disponible, el botón muestra el texto para copiarlo a mano, sin errores.
+
 ---
 
 ## 16. Fuera de alcance (NO hacer)
-Personajes extra, varios mapas, evoluciones de armas, tienda/meta-progresión, cofres, audio, guardado de partida, idiomas adicionales, backend, leaderboards. (Crear arte final no es tarea del agente; solo el sistema para cambiarlo.)
+Personajes extra, varios mapas, evoluciones de armas, tienda/meta-progresión, cofres, guardado de partida, idiomas adicionales, backend, leaderboards. (Crear arte final no es tarea del agente; solo el sistema para cambiarlo.)
 
 ---
 
@@ -373,7 +399,7 @@ Reglas:
 - Todos los números en src/config.ts y todos los textos en src/texts.ts,
   copiados exactamente de las tablas del GDD.
 - Respeta la estructura de archivos de la sección 14.
-- Trabaja hito a hito (sección 15, H1 a H10). Empieza por H1. Al terminar cada hito:
+- Trabaja hito a hito (sección 15, H1 a H12). Empieza por H1. Al terminar cada hito:
   1) ejecuta `npm run build` y corrige todos los errores,
   2) comprueba cada criterio de aceptación,
   3) haz commit con el mensaje "H<n>: <título>",
