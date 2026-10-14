@@ -236,15 +236,13 @@ export class UIScene extends Phaser.Scene {
     this.time.delayedCall(VICTORY_ANIM.durationMs, () => this.cameras.main.fadeOut(VICTORY_ANIM.fadeOutMs));
   }
 
-  /** Derrota: velo rojo oscuro, lluvia, título que cae rebotando, subtítulo y fundido. */
+  /** Derrota: velo rojo oscuro, título que cae rebotando, subtítulo y fundido. */
   private showDefeat(): void {
     const d = UI.defeat;
     const { width, height } = this.scale;
 
     const veil = this.add.rectangle(0, 0, width, height, d.veilColor, 1).setOrigin(0).setAlpha(0);
     this.tweens.add({ targets: veil, alpha: d.veilAlpha, duration: d.veilMs });
-
-    this.spawnFalling(width, height, d.rain);
 
     const titleY = height * d.titleYRatio;
     const title = this.addEndingText(-d.titleSize, TEXTS.defeat.title, d.titleSize, d.titleColor, d.titleStrokeThickness);
@@ -262,7 +260,7 @@ export class UIScene extends Phaser.Scene {
     this.time.delayedCall(DEFEAT_ANIM.durationMs, () => this.cameras.main.fadeOut(DEFEAT_ANIM.fadeOutMs));
   }
 
-  /** Confeti o lluvia: rectángulos que caen de arriba abajo escalonados. */
+  /** Confeti: rectángulos que caen de arriba abajo escalonados. */
   private spawnFalling(width: number, height: number, p: FallingPiecesConfig): void {
     for (let i = 0; i < p.count; i++) {
       const w = Phaser.Math.Between(p.minW, p.maxW);

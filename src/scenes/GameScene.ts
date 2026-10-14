@@ -449,7 +449,7 @@ export class GameScene extends Phaser.Scene {
     this.fadeToGameOver(v.durationMs, v.fadeOutMs, true);
   }
 
-  /** Los enemigos se quedan quietos rodeándote y el jugador cae; UIScene oscurece y pone el título y la lluvia. */
+  /** Los enemigos se quedan quietos rodeándote y el jugador cae; UIScene oscurece y pone el título. */
   private playDefeat(): void {
     const d = DEFEAT_ANIM;
     const cam = this.cameras.main;

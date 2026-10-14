@@ -326,7 +326,7 @@ export const DEFEAT_ANIM = {
   playerFallAlpha: 0.5,
 } as const;
 
-/** Piezas que caen por la pantalla en las secuencias de fin (confeti, lluvia). */
+/** Piezas que caen por la pantalla en las secuencias de fin (confeti). */
 export interface FallingPiecesConfig {
   count: number;
   colors: readonly number[];
@@ -542,21 +542,6 @@ export const UI = {
     subtitleColor: '#dddddd',
     subtitleDelayMs: 1300,
     subtitleFadeMs: 600,
-    rain: {
-      count: 220,
-      colors: [0x8fa3b8, 0x6c7f93, 0xaab8c6],
-      alpha: 0.6,
-      minW: 2,
-      maxW: 2,
-      minH: 14,
-      maxH: 24,
-      angleJitter: 0,
-      driftX: 0,
-      spinDeg: 0,
-      fallMinMs: 500,
-      fallMaxMs: 900,
-      spawnSpreadMs: 3000,
-    } satisfies FallingPiecesConfig,
   },
   announcement: {
     y: 150,

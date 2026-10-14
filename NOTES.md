@@ -150,5 +150,5 @@
 
 ## Animación de derrota (petición del usuario, fuera del GDD)
 - Al morir: física en pausa, sacudida de cámara, destello rojo y zoom lento sobre el jugador, que cae de lado y se desvanece. Los enemigos se quedan congelados.
-- En UIScene: velo rojo oscuro, lluvia gris, título "DERROTA" que cae rebotando y subtítulo; tras `DEFEAT_ANIM.durationMs` se funde a negro y aparece GameOverScene.
-- Victoria y derrota comparten `HudState.ending` y `spawnFalling()` (confeti/lluvia configurables con `FallingPiecesConfig`).
+- En UIScene: velo rojo oscuro, título "DERROTA" que cae rebotando y subtítulo; tras `DEFEAT_ANIM.durationMs` se funde a negro y aparece GameOverScene.
+- Victoria y derrota comparten `HudState.ending`; el confeti de la victoria se configura con `FallingPiecesConfig`.
