@@ -7,12 +7,16 @@
 
 Clon minimalista de *Vampire Survivors* y sátira (genérica) sobre la crisis de la vivienda. Hecho con **Phaser 3 + TypeScript + Vite**, sin backend.
 
+![Partida en el minuto 8: la Burbuja 2.0 y una horda de enemigos rodean al jugador](docs/screenshot.png)
+
 ## 🎮 Cómo se juega
 - **Moverse:** WASD / flechas, o joystick táctil tocando la mitad inferior de la pantalla.
 - **Atacar:** no hace falta, tus armas disparan solas.
 - **Subir de nivel:** recoge 💶 y elige 1 de 3 mejoras (clic, tap o `1` `2` `3`).
 - **Promesas electorales 🗳️:** cada 2 minutos. ¿Se cumplirá? Spoiler: probablemente no.
 - **Pausa:** `Esc` / `P` o el botón ⏸.
+- **Idioma:** inglés o español, se elige en el menú principal.
+- **Móvil:** se juega en horizontal y a pantalla completa; se puede instalar como app.
 
 ## ⚔️ Armas (máx. nivel 5)
 | Arma | Qué hace |
@@ -29,6 +33,7 @@ Clon minimalista de *Vampire Survivors* y sátira (genérica) sobre la crisis de
 | 🛏️ **Piso compartido** | −8% tiempo de recarga de todas las armas |
 | 🎫 **Bono Alquiler Joven** | +15% radio para recoger 💶 y +5% velocidad |
 | 💼 **Segundo trabajo** | +10% daño de todas las armas |
+| 💻 **Teletrabajo** | Regenera +0,3 de vida por segundo |
 | 🍺 **Caña con los colegas** | Cura 30. Aparece cuando ya no quedan otras mejoras. |
 
 ## 🗳️ Promesas electorales
@@ -51,7 +56,7 @@ Aparecen en los minutos 2, 4, 6 y 8 (una flecha indica dónde). Al cogerla tiene
 | 🦅 **Fondo buitre** | Grande, duro y pega fuerte. |
 | 🫧 **Burbuja 2.0** (boss, min. 8) | 3000 de vida; cada 5 s dispara un anillo de 💸. No hace falta matarla para ganar. |
 
-Los enemigos se hacen más resistentes cada minuto. Aguanta hasta el **10:00** para ganar.
+Los enemigos se hacen más resistentes cada minuto. Aguanta hasta el **10:00** para ganar… y si caes antes, también hay animación de derrota.
 
 ## 🛠️ Desarrollo
 ```bash
@@ -63,12 +68,20 @@ npm run zip      # zip listo para itch.io
 
 Cada push a `main` se publica automáticamente en GitHub Pages.
 
+Parámetros de URL para probar (las partidas con `min` o `win` no guardan récord):
+| Parámetro | Qué hace |
+|---|---|
+| `?min=N` | Empieza en el minuto `N` (0–9). |
+| `?win=1` | Ganas nada más empezar, para ver la animación de victoria. |
+| `?debug=1` | Muestra las hitboxes de la física. |
+
 ## 🎨 Cambiar el arte
 Todo lo visible está en [`src/visuals.ts`](src/visuals.ts):
 1. Pon tus PNG en `public/assets/`.
 2. Añádelos a `CUSTOM_ART` (sprite, spritesheet animado o fondo).
-3. Pon `USE_CUSTOM_ART = true`.
 
-Con `false` el juego usa emoji. Si una imagen falla, esa entidad vuelve a su emoji.
+`USE_CUSTOM_ART = true` (por defecto) usa los PNG; con `false` el juego usa solo emoji. Si una imagen falla, esa entidad vuelve a su emoji.
+
+Algunos iconos se generan con scripts de Pillow en [`tools/`](tools/) (p. ej. `python tools/gen_icon_teletrabajo.py`).
 
 El diseño completo está en [`GDD.md`](GDD.md).
