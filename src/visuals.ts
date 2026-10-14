@@ -55,20 +55,49 @@ export const FALLBACK_BACKGROUND: BackgroundVisual = {
  * - false → emoji + rejilla (no se carga ningún PNG).
  * - true  → se aplican las entradas de CUSTOM_ART; lo que no esté ahí sigue en emoji.
  */
-const USE_CUSTOM_ART = false;
+const USE_CUSTOM_ART = true;
+
+/** Los PNG de public/assets/ están dibujados al doble del tamaño en pantalla (nitidez en HiDPI). */
+const ART_SCALE = 0.5;
+
+function png(file: string): EntityVisual {
+  return { kind: 'sprite', key: `art_${file}`, path: `assets/${file}.png`, scale: ART_SCALE };
+}
 
 /** Arte personalizado. Añade aquí sprites/imágenes (archivos en public/assets/). */
 const CUSTOM_ART: Partial<VisualsTable> = {
   background: { kind: 'tileSprite', key: 'test_bg', path: 'assets/test_bg.png' },
   player: {
     kind: 'sprite',
-    key: 'test_player',
-    path: 'assets/test_player.png',
-    scale: 1,
-    frameWidth: 32,
-    frameHeight: 32,
+    key: 'art_player',
+    path: 'assets/player.png',
+    scale: ART_SCALE,
+    frameWidth: 64,
+    frameHeight: 64,
     anim: { frames: [0, 1, 2, 3], frameRate: 6, repeat: -1 },
   },
+  ipc: png('ipc'),
+  casero: png('casero'),
+  agencia: png('agencia'),
+  fondo: png('fondo'),
+  boss: png('boss'),
+  bossBullet: png('bossBullet'),
+  euro: png('euro'),
+  promesa: png('promesa'),
+  curriculum: png('curriculum'),
+  escudo: png('escudo'),
+  grito: png('grito'),
+  sindicato: png('sindicato'),
+  icon_curriculum: png('curriculum'),
+  icon_escudo: png('escudo'),
+  icon_grito: png('grito'),
+  icon_sindicato: png('sindicato'),
+  icon_aval: png('icon_aval'),
+  icon_piso: png('icon_piso'),
+  icon_bono: png('icon_bono'),
+  icon_trabajo: png('icon_trabajo'),
+  icon_cana: png('icon_cana'),
+  icon_pause: png('icon_pause'),
 };
 
 /** Definición activa de cada visual. */
@@ -185,7 +214,10 @@ export function getVisualAssets(): Array<
   { key: string; path: string; frameWidth?: number; frameHeight?: number }
 > {
   const assets: Array<{ key: string; path: string; frameWidth?: number; frameHeight?: number }> = [];
+  const seen = new Set<string>();
   for (const def of Object.values(VISUALS) as Array<EntityVisual | BackgroundVisual>) {
+    if (def.kind === 'grid' || def.kind === 'emoji' || seen.has(def.key)) continue;
+    seen.add(def.key);
     if (def.kind === 'sprite') {
       assets.push({ key: def.key, path: def.path, frameWidth: def.frameWidth, frameHeight: def.frameHeight });
     } else if (def.kind === 'image' || def.kind === 'tileSprite') {

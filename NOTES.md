@@ -124,3 +124,8 @@
   - El HUD (UIScene) se ancla a los bordes reales (`this.scale.width/height`) y se recoloca en cada `RESIZE`. El joystick usa la altura real.
   - Cambio de jugabilidad asumido: en pantallas más anchas se ve más mundo. Para que los enemigos sigan apareciendo fuera de la vista, el anillo de spawn empieza en `max(ringMinDistance, semidiagonal de la vista + offscreenMargin)` y mantiene su grosor (en 960×540 sigue en 600–700).
 - El aviso de "Añadir a pantalla de inicio" se muestra en cualquier navegador de iOS no instalado (Chrome iOS también lo permite), no solo en Safari.
+
+## Arte PNG
+- Los PNG de `public/assets/` (salvo `test_*`) se generan por código (Pillow) a 2× el tamaño del emoji
+  y se usan con `scale: 0.5` (`ART_SCALE` en `visuals.ts`). Los iconos de armas reutilizan el PNG del arma.
+- `player.png` es una hoja de 4 frames de 64×64 (caminar). `getVisualAssets()` no repite claves.
