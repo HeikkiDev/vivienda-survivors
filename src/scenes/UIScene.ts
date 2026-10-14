@@ -1,11 +1,11 @@
 import Phaser from 'phaser';
-import { UI, VICTORY_ANIM } from '../config';
+import { DEFEAT_ANIM, type FallingPiecesConfig, UI, VICTORY_ANIM } from '../config';
 import { TEXTS } from '../texts';
 import { onGameResize } from '../utils/layout';
 import { formatTime } from '../utils/math';
 import { createVisual } from '../visuals';
 import type { EnemyId } from '../types';
-import type { GameScene, HudState } from './GameScene';
+import type { EndingKind, GameScene, HudState } from './GameScene';
 
 /** HUD en escena paralela (no se mueve con la cámara). */
 export class UIScene extends Phaser.Scene {
@@ -28,7 +28,7 @@ export class UIScene extends Phaser.Scene {
     Phaser.GameObjects.Components.Transform &
     Phaser.GameObjects.Components.Visible;
   private pausedByUser = false;
-  private victoryShown = false;
+  private endingShown = false;
 
   constructor() {
     super('UIScene');
@@ -83,7 +83,7 @@ export class UIScene extends Phaser.Scene {
 
     this.enemyIntroCard = null;
     this.enemyIntroId = null;
-    this.victoryShown = false;
+    this.endingShown = false;
 
     this.createPauseControls();
     this.layout();
@@ -180,32 +180,39 @@ export class UIScene extends Phaser.Scene {
     this.updateBossBar(s.boss);
     this.updateAnnouncement(s.announcement);
     this.updateEnemyIntro(s.enemyIntro);
-    if (s.victory) this.showVictory();
+    if (s.ending) this.showEnding(s.ending);
+  }
+
+  private showEnding(kind: EndingKind): void {
+    if (this.endingShown) return;
+    this.endingShown = true;
+    this.pauseButton.setVisible(false).disableInteractive();
+    if (kind === 'victory') this.showVictory();
+    else this.showDefeat();
+  }
+
+  private addEndingText(y: number, text: string, size: number, color: string, strokeThickness: number): Phaser.GameObjects.Text {
+    return this.add
+      .text(this.scale.width / 2, y, text, {
+        fontFamily: UI.fontFamily,
+        fontSize: `${size}px`,
+        fontStyle: 'bold',
+        color,
+        stroke: UI.hud.textStroke,
+        strokeThickness,
+      })
+      .setOrigin(0.5);
   }
 
   /** Celebración de victoria: confeti, título que aparece de golpe y late, subtítulo y fundido. */
   private showVictory(): void {
-    if (this.victoryShown) return;
-    this.victoryShown = true;
     const v = UI.victory;
-    const h = UI.hud;
     const { width, height } = this.scale;
-    this.pauseButton.setVisible(false).disableInteractive();
 
-    this.spawnConfetti(width, height);
+    this.spawnFalling(width, height, v.confetti);
 
     const titleY = height * v.titleYRatio;
-    const title = this.add
-      .text(width / 2, titleY, TEXTS.victory.title, {
-        fontFamily: UI.fontFamily,
-        fontSize: `${v.titleSize}px`,
-        fontStyle: 'bold',
-        color: v.titleColor,
-        stroke: h.textStroke,
-        strokeThickness: v.titleStrokeThickness,
-      })
-      .setOrigin(0.5)
-      .setScale(0);
+    const title = this.addEndingText(titleY, TEXTS.victory.title, v.titleSize, v.titleColor, v.titleStrokeThickness).setScale(0);
     this.tweens.add({ targets: title, scale: 1, duration: v.popMs, ease: 'Back.easeOut' });
     this.tweens.add({
       targets: title,
@@ -217,37 +224,61 @@ export class UIScene extends Phaser.Scene {
       ease: 'Sine.easeInOut',
     });
 
-    const subtitle = this.add
-      .text(width / 2, titleY + v.subtitleGap, TEXTS.victory.subtitle, {
-        fontFamily: UI.fontFamily,
-        fontSize: `${v.subtitleSize}px`,
-        fontStyle: 'bold',
-        color: v.subtitleColor,
-        stroke: h.textStroke,
-        strokeThickness: h.textStrokeThickness,
-      })
-      .setOrigin(0.5)
-      .setAlpha(0);
+    const subtitle = this.addEndingText(
+      titleY + v.subtitleGap,
+      TEXTS.victory.subtitle,
+      v.subtitleSize,
+      v.subtitleColor,
+      UI.hud.textStrokeThickness,
+    ).setAlpha(0);
     this.tweens.add({ targets: subtitle, alpha: 1, duration: v.subtitleFadeMs, delay: v.subtitleDelayMs });
 
     this.time.delayedCall(VICTORY_ANIM.durationMs, () => this.cameras.main.fadeOut(VICTORY_ANIM.fadeOutMs));
   }
 
-  private spawnConfetti(width: number, height: number): void {
-    const v = UI.victory;
-    for (let i = 0; i < v.confettiCount; i++) {
-      const w = Phaser.Math.Between(v.confettiMinW, v.confettiMaxW);
-      const ph = Phaser.Math.Between(v.confettiMinH, v.confettiMaxH);
+  /** Derrota: velo rojo oscuro, lluvia, título que cae rebotando, subtítulo y fundido. */
+  private showDefeat(): void {
+    const d = UI.defeat;
+    const { width, height } = this.scale;
+
+    const veil = this.add.rectangle(0, 0, width, height, d.veilColor, 1).setOrigin(0).setAlpha(0);
+    this.tweens.add({ targets: veil, alpha: d.veilAlpha, duration: d.veilMs });
+
+    this.spawnFalling(width, height, d.rain);
+
+    const titleY = height * d.titleYRatio;
+    const title = this.addEndingText(-d.titleSize, TEXTS.defeat.title, d.titleSize, d.titleColor, d.titleStrokeThickness);
+    this.tweens.add({ targets: title, y: titleY, duration: d.titleDropMs, delay: d.titleDropDelayMs, ease: 'Bounce.easeOut' });
+
+    const subtitle = this.addEndingText(
+      titleY + d.subtitleGap,
+      TEXTS.defeat.subtitle,
+      d.subtitleSize,
+      d.subtitleColor,
+      UI.hud.textStrokeThickness,
+    ).setAlpha(0);
+    this.tweens.add({ targets: subtitle, alpha: 1, duration: d.subtitleFadeMs, delay: d.subtitleDelayMs });
+
+    this.time.delayedCall(DEFEAT_ANIM.durationMs, () => this.cameras.main.fadeOut(DEFEAT_ANIM.fadeOutMs));
+  }
+
+  /** Confeti o lluvia: rectángulos que caen de arriba abajo escalonados. */
+  private spawnFalling(width: number, height: number, p: FallingPiecesConfig): void {
+    for (let i = 0; i < p.count; i++) {
+      const w = Phaser.Math.Between(p.minW, p.maxW);
+      const h = Phaser.Math.Between(p.minH, p.maxH);
       const x = Phaser.Math.Between(0, width);
-      const color = Phaser.Utils.Array.GetRandom(v.confettiColors as number[]);
-      const piece = this.add.rectangle(x, -ph, w, ph, color).setAngle(Phaser.Math.Between(0, 360));
+      const color = Phaser.Utils.Array.GetRandom(p.colors as number[]);
+      const piece = this.add
+        .rectangle(x, -h, w, h, color, p.alpha)
+        .setAngle(Phaser.Math.Between(-p.angleJitter, p.angleJitter));
       this.tweens.add({
         targets: piece,
-        y: height + ph,
-        x: x + Phaser.Math.Between(-v.confettiDriftX, v.confettiDriftX),
-        angle: piece.angle + Phaser.Math.Between(-v.confettiSpinDeg, v.confettiSpinDeg),
-        duration: Phaser.Math.Between(v.confettiFallMinMs, v.confettiFallMaxMs),
-        delay: Phaser.Math.Between(0, v.confettiSpawnSpreadMs),
+        y: height + h,
+        x: x + Phaser.Math.Between(-p.driftX, p.driftX),
+        angle: piece.angle + Phaser.Math.Between(-p.spinDeg, p.spinDeg),
+        duration: Phaser.Math.Between(p.fallMinMs, p.fallMaxMs),
+        delay: Phaser.Math.Between(0, p.spawnSpreadMs),
         ease: 'Sine.easeIn',
         onComplete: () => piece.destroy(),
       });

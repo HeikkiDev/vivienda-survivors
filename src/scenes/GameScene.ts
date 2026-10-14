@@ -4,6 +4,7 @@ import {
   CAMERA_LERP,
   CAMERA_SHAKE,
   DEBUG_START_MINUTE_PARAM,
+  DEFEAT_ANIM,
   DEPTH,
   ENEMY_FLASH_MS,
   EURO,
@@ -52,9 +53,11 @@ export interface HudState {
   boss: { hp: number; maxHp: number } | null;
   announcement: Announcement | null;
   enemyIntro: EnemyIntro | null;
-  /** true durante la celebración de victoria (antes de GameOverScene). */
-  victory: boolean;
+  /** Secuencia de fin en curso (antes de GameOverScene). */
+  ending: EndingKind | null;
 }
+
+export type EndingKind = 'victory' | 'defeat';
 
 export interface EnemyIntro {
   id: EnemyId;
@@ -97,7 +100,7 @@ export class GameScene extends Phaser.Scene {
   private pendingLevelUps = 0;
   private brokenPromises = 0;
   private ended = false;
-  private celebrating = false;
+  private ending: EndingKind | null = null;
   private debugStart = false;
 
   constructor() {
@@ -111,7 +114,7 @@ export class GameScene extends Phaser.Scene {
     }
     const pickup = this.elections.pickup;
     const cam = this.cameras.main;
-    const c = this.celebrating;
+    const c = this.ending !== null;
     return {
       elapsed: this.elapsed,
       level: this.level,
@@ -123,7 +126,7 @@ export class GameScene extends Phaser.Scene {
       boss: !c && this.boss.active ? { hp: Math.max(0, this.boss.hp), maxHp: this.boss.maxHp } : null,
       announcement: c ? null : this.announcement,
       enemyIntro: c ? null : this.enemyIntro,
-      victory: c,
+      ending: this.ending,
     };
   }
 
@@ -138,7 +141,7 @@ export class GameScene extends Phaser.Scene {
     this.levelUpOpen = false;
     this.brokenPromises = 0;
     this.ended = false;
-    this.celebrating = false;
+    this.ending = null;
     this.modifiers = new Modifiers();
 
     this.physics.world.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
@@ -409,20 +412,17 @@ export class GameScene extends Phaser.Scene {
   private endGame(victory: boolean): void {
     if (this.ended) return;
     this.ended = true;
-    if (victory) {
-      this.playVictory();
-      return;
-    }
-    this.showGameOver(false);
-  }
-
-  /** Congela la partida, despeja enemigos y celebra; UIScene pone el título y el confeti. */
-  private playVictory(): void {
-    const v = VICTORY_ANIM;
-    this.celebrating = true;
-    this.elapsed = VICTORY_MINUTE * SECONDS_PER_MINUTE;
+    this.ending = victory ? 'victory' : 'defeat';
     this.physics.pause();
     this.player.move(Phaser.Math.Vector2.ZERO, 0);
+    if (victory) this.playVictory();
+    else this.playDefeat();
+  }
+
+  /** Despeja enemigos y celebra; UIScene pone el título y el confeti. */
+  private playVictory(): void {
+    const v = VICTORY_ANIM;
+    this.elapsed = VICTORY_MINUTE * SECONDS_PER_MINUTE;
 
     const cam = this.cameras.main;
     cam.flash(v.flashMs, v.flashColor.r, v.flashColor.g, v.flashColor.b);
@@ -446,9 +446,32 @@ export class GameScene extends Phaser.Scene {
       ease: 'Sine.easeInOut',
     });
 
-    this.time.delayedCall(v.durationMs, () => {
-      cam.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => this.showGameOver(true));
-      cam.fadeOut(v.fadeOutMs);
+    this.fadeToGameOver(v.durationMs, v.fadeOutMs, true);
+  }
+
+  /** Los enemigos se quedan quietos rodeándote y el jugador cae; UIScene oscurece y pone el título y la lluvia. */
+  private playDefeat(): void {
+    const d = DEFEAT_ANIM;
+    const cam = this.cameras.main;
+    cam.shake(d.shakeMs, d.shakeIntensity, true);
+    cam.flash(d.flashMs, d.flashColor.r, d.flashColor.g, d.flashColor.b);
+    cam.zoomTo(d.zoom, d.zoomMs, 'Sine.easeOut');
+    for (const b of this.bossBullets.group.getChildren() as BossBullet[]) if (b.active) b.deactivate();
+    this.tweens.add({
+      targets: this.player.visual,
+      angle: d.playerFallAngle,
+      alpha: d.playerFallAlpha,
+      duration: d.playerFallMs,
+      ease: 'Quad.easeIn',
+    });
+    this.fadeToGameOver(d.durationMs, d.fadeOutMs, false);
+  }
+
+  private fadeToGameOver(afterMs: number, fadeMs: number, victory: boolean): void {
+    const cam = this.cameras.main;
+    this.time.delayedCall(afterMs, () => {
+      cam.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => this.showGameOver(victory));
+      cam.fadeOut(fadeMs);
     });
   }
 

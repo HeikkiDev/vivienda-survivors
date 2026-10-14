@@ -73,6 +73,10 @@ const ES = {
     title: '¡VICTORIA!',
     subtitle: `Has aguantado ${VICTORY_MINUTE} minutos… ahora toca firmar.`,
   },
+  defeat: {
+    title: 'DERROTA',
+    subtitle: 'El mercado inmobiliario ha podido contigo.',
+  },
   gameOver: {
     victoryTitle: '🏠 Has firmado la hipoteca… a 40 años.',
     victorySubtitle: 'Euribor + 1,5%. Enhorabuena (?)',
@@ -159,6 +163,10 @@ const EN: Texts = {
   victory: {
     title: 'VICTORY!',
     subtitle: `You lasted ${VICTORY_MINUTE} minutes… now it's time to sign.`,
+  },
+  defeat: {
+    title: 'DEFEAT',
+    subtitle: 'The housing market got the better of you.',
   },
   gameOver: {
     victoryTitle: '🏠 You signed the mortgage… for 40 years.',

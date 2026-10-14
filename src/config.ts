@@ -310,6 +310,41 @@ export const VICTORY_ANIM = {
   playerPulseMs: 300,
 } as const;
 
+/** Secuencia de derrota antes de la pantalla final (petición del usuario, ver NOTES.md). */
+export const DEFEAT_ANIM = {
+  durationMs: 3500,
+  fadeOutMs: 800,
+  flashMs: 400,
+  flashColor: { r: 255, g: 40, b: 40 },
+  shakeMs: 500,
+  shakeIntensity: 0.02,
+  zoom: 1.6,
+  zoomMs: 2500,
+  /** El jugador cae de lado y se apaga. */
+  playerFallAngle: 90,
+  playerFallMs: 600,
+  playerFallAlpha: 0.5,
+} as const;
+
+/** Piezas que caen por la pantalla en las secuencias de fin (confeti, lluvia). */
+export interface FallingPiecesConfig {
+  count: number;
+  colors: readonly number[];
+  alpha: number;
+  minW: number;
+  maxW: number;
+  minH: number;
+  maxH: number;
+  /** Ángulo inicial aleatorio en ±angleJitter grados. */
+  angleJitter: number;
+  driftX: number;
+  spinDeg: number;
+  fallMinMs: number;
+  fallMaxMs: number;
+  /** Las piezas salen escalonadas durante este tiempo. */
+  spawnSpreadMs: number;
+}
+
 // Sección 10 — Promesa electoral
 /** Multiplicadores temporales de una promesa (los ausentes valen 1). */
 export interface PromiseEffect {
@@ -475,18 +510,53 @@ export const UI = {
     popMs: 600,
     pulseScale: 1.08,
     pulseMs: 450,
-    confettiCount: 140,
-    confettiColors: [0xffd447, 0xff4fa3, 0x3fa9f5, 0x7cfc00, 0xffffff, 0xff8c1a] as readonly number[],
-    confettiMinW: 6,
-    confettiMaxW: 10,
-    confettiMinH: 10,
-    confettiMaxH: 16,
-    confettiDriftX: 80,
-    confettiSpinDeg: 720,
-    confettiFallMinMs: 1800,
-    confettiFallMaxMs: 3200,
-    /** Los trozos salen escalonados durante este tiempo. */
-    confettiSpawnSpreadMs: 1800,
+    confetti: {
+      count: 140,
+      colors: [0xffd447, 0xff4fa3, 0x3fa9f5, 0x7cfc00, 0xffffff, 0xff8c1a],
+      alpha: 1,
+      minW: 6,
+      maxW: 10,
+      minH: 10,
+      maxH: 16,
+      angleJitter: 180,
+      driftX: 80,
+      spinDeg: 720,
+      fallMinMs: 1800,
+      fallMaxMs: 3200,
+      spawnSpreadMs: 1800,
+    } satisfies FallingPiecesConfig,
+  },
+  defeat: {
+    veilColor: 0x2a0000,
+    veilAlpha: 0.6,
+    veilMs: 1200,
+    titleYRatio: 0.3,
+    titleSize: 72,
+    titleColor: '#ff4444',
+    titleStrokeThickness: 8,
+    /** Caída del título desde fuera de la pantalla, con rebote. */
+    titleDropDelayMs: 300,
+    titleDropMs: 1000,
+    subtitleGap: 64,
+    subtitleSize: 24,
+    subtitleColor: '#dddddd',
+    subtitleDelayMs: 1300,
+    subtitleFadeMs: 600,
+    rain: {
+      count: 220,
+      colors: [0x8fa3b8, 0x6c7f93, 0xaab8c6],
+      alpha: 0.6,
+      minW: 2,
+      maxW: 2,
+      minH: 14,
+      maxH: 24,
+      angleJitter: 0,
+      driftX: 0,
+      spinDeg: 0,
+      fallMinMs: 500,
+      fallMaxMs: 900,
+      spawnSpreadMs: 3000,
+    } satisfies FallingPiecesConfig,
   },
   announcement: {
     y: 150,
