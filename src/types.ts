@@ -7,7 +7,8 @@ export type EntityVisual =
       frameWidth?: number;
       frameHeight?: number;
       scale: number;
-      anim?: { frames: number[]; frameRate: number; repeat: number };
+      /** idleFrame: frame que se muestra cuando la entidad está quieta (ver setVisualAnimating). */
+      anim?: { frames: number[]; frameRate: number; repeat: number; idleFrame?: number };
     };
 
 export type BackgroundVisual =

@@ -10,7 +10,7 @@
 2. Arte: por defecto **emoji en `Text`** y una rejilla dibujada con `Graphics`. Audio: ninguno en el MVP.
 3. **Visuales centralizados (obligatorio):** todo lo que se ve (jugador, enemigos, boss, euros, proyectiles, armas, pickups y el fondo/mapa) se dibuja **solo** a partir de una definición en **`src/visuals.ts`**, mediante la función única `createVisual()`. Ningún otro archivo puede llamar a `this.add.text`/`this.add.sprite`/`this.add.image` para entidades ni contener emoji o rutas de imagen. Ver sección 3.1.
 4. Todos los números del juego viven en **`src/config.ts`**. Prohibido "números mágicos" en otros archivos.
-5. Todos los textos visibles viven en **`src/texts.ts`**, en inglés (por defecto) y español; el idioma se elige en el menú.
+5. Todos los textos visibles viven en **`src/texts.ts`**, en español (por defecto) e inglés; el idioma se elige en el menú.
 6. Resolución lógica **960×540**, `Phaser.Scale.FIT`, centrado. Física **Arcade**.
 7. No nombrar partidos ni políticos reales. La sátira es genérica ("el Candidato", "el Gobierno de turno").
 8. Cada hito termina con `npm run build` sin errores y el juego jugable en `npm run dev`.
@@ -154,6 +154,8 @@ Todos: se mueven en línea recta hacia el jugador; sin colisión entre enemigos 
 
 **Escalado:** HP de enemigos ×(1 + 0.10 × minuto actual). Velocidad no escala.
 
+**Presentación:** la primera vez que aparece cada tipo de enemigo en la partida se muestra durante 4 s una tarjeta abajo al centro con su icono, nombre y una mini descripción (textos en `texts.ts`). Si coinciden varios, salen en cola, uno tras otro.
+
 ### 7.1 Boss: 🫧 Burbuja 2.0
 - Aparece en el **minuto 8:00** (aviso en pantalla 3 s antes: *"⚠️ ¡Se está inflando la BURBUJA 2.0!"*).
 - HP **3000**, velocidad **60 px/s**, daño contacto **30**, emoji 96 px, hitbox r=45, inmune a knockback.
@@ -227,6 +229,7 @@ Los efectos se aplican como multiplicadores temporales en un objeto `modifiers` 
 - Bajo el jugador: barra de vida 40×5 px (verde/rojo).
 - Banner promesa (si activa) bajo el temporizador.
 - Abajo izquierda: iconos de armas/pasivas con nivel.
+- Abajo centro: tarjeta de presentación del enemigo nuevo (ver §7).
 - Todo el HUD en una escena `UIScene` paralela (no se mueve con la cámara).
 
 ---
@@ -337,7 +340,7 @@ Pools: usa `Phaser.Physics.Arcade.Group` con `maxSize` y reutilización (`get()`
 
 **H10 — Multi-idioma (inglés y español)**
 - `src/texts.ts` tiene un diccionario completo por idioma (inglés y español, mismo tipo `Texts`). `TEXTS` apunta siempre al idioma activo y se cambia con `setLanguage()`.
-- Idiomas disponibles, idioma por defecto (`en`) y clave de localStorage en `src/config.ts`.
+- Idiomas disponibles, idioma por defecto (`es`) y clave de localStorage en `src/config.ts`.
 - Selector "Language: English | Español" en el menú de inicio, bajo el récord; el idioma activo aparece resaltado.
 - ✅ Primera visita (sin localStorage): todo el juego sale en inglés.
 - ✅ Al pulsar otro idioma en el menú, el menú se redibuja al instante en ese idioma y la partida (HUD, level-up, promesas, boss, pausa, fin de partida) sale en ese idioma.

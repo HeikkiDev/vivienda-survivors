@@ -17,7 +17,7 @@ export class EscudoLey extends Weapon {
     this.visual = createVisual(scene, 'escudo', player.x, player.y);
     if (this.visual instanceof Phaser.GameObjects.Sprite) {
       this.aura = null;
-      this.visual.setDepth(DEPTH.aura);
+      this.visual.setDepth(DEPTH.aura).setAlpha(ESCUDO.spriteAlpha);
     } else {
       this.aura = scene.add.graphics().setDepth(DEPTH.aura);
       this.visual.setDepth(DEPTH.effects);

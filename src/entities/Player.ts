@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { DEPTH, HEALTH_BAR, PLAYER } from '../config';
-import { createVisual } from '../visuals';
+import { createVisual, setVisualAnimating } from '../visuals';
 
 /** Cuerpo físico invisible (hitbox de config.ts) + visual de visuals.ts que lo sigue. */
 export class Player extends Phaser.GameObjects.Zone {
@@ -35,6 +35,7 @@ export class Player extends Phaser.GameObjects.Zone {
   move(direction: Phaser.Math.Vector2, speedMultiplier: number): void {
     const v = PLAYER.speed * speedMultiplier;
     this.body.setVelocity(direction.x * v, direction.y * v);
+    setVisualAnimating(this.visual, 'player', direction.lengthSq() > 0);
   }
 
   heal(amount: number): void {

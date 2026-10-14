@@ -43,7 +43,7 @@ export const BEST_TIME_STORAGE_KEY = 'viviendaSurvivors.best';
 
 export const LANGUAGES = ['en', 'es'] as const;
 export type Language = (typeof LANGUAGES)[number];
-export const DEFAULT_LANGUAGE: Language = 'en';
+export const DEFAULT_LANGUAGE: Language = 'es';
 export const LANGUAGE_STORAGE_KEY = 'viviendaSurvivors.lang';
 
 export const DEPTH = {
@@ -157,6 +157,8 @@ export const ESCUDO = {
   ] as readonly EscudoLevel[],
   auraColor: 0x3a7bff,
   auraAlpha: 0.25,
+  /** Opacidad del escudo cuando su visual es un sprite estirado al radio del aura. */
+  spriteAlpha: 0.35,
 } as const;
 
 // Sección 5.3 — Grito "¡Eso es un trastero!"
@@ -423,6 +425,25 @@ export const UI = {
     barFg: 0xff4fa3,
     barStroke: 0x000000,
     barStrokeWidth: 2,
+  },
+  /** Presentación de cada tipo de enemigo la primera vez que aparece en la partida. */
+  enemyIntro: {
+    seconds: 4,
+    fadeSeconds: 0.3,
+    marginBottom: 80,
+    padX: 14,
+    padY: 10,
+    iconGap: 12,
+    lineGap: 4,
+    radius: 10,
+    bg: 0x000000,
+    bgAlpha: 0.7,
+    stroke: 0xffd447,
+    strokeWidth: 2,
+    nameSize: 18,
+    nameColor: '#ffd447',
+    descSize: 14,
+    descColor: '#ffffff',
   },
   announcement: {
     y: 150,

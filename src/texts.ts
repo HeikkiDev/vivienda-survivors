@@ -58,6 +58,12 @@ const ES = {
     broken: '❌ PROMESA INCUMPLIDA',
     countdown: (seconds: number) => `${seconds} s`,
   },
+  enemies: {
+    ipc: { name: 'Subida del IPC', desc: 'Sube poco a poco, pero nunca para.' },
+    casero: { name: 'Casero de contrato de 11 meses', desc: 'Te renueva cada año… subiendo el precio.' },
+    agencia: { name: 'Agencia con honorarios', desc: 'Llega la primera y te cobra por enseñarte el piso.' },
+    fondo: { name: 'Fondo buitre', desc: 'Lento pero duro. Compra edificios enteros.' },
+  },
   boss: {
     warning: '⚠️ ¡Se está inflando la BURBUJA 2.0!',
     death: 'La burbuja ha pinchado… de momento.',
@@ -133,6 +139,12 @@ const EN: Texts = {
     fulfilled: '✅ Promise kept! (miracle)',
     broken: '❌ PROMISE BROKEN',
     countdown: (seconds: number) => `${seconds} s`,
+  },
+  enemies: {
+    ipc: { name: 'Inflation Spike', desc: 'Rises slowly, but never stops.' },
+    casero: { name: '11-Month-Lease Landlord', desc: 'Renews your contract every year… at a higher price.' },
+    agencia: { name: 'Agency with Fees', desc: 'Gets there first and charges you for the viewing.' },
+    fondo: { name: 'Vulture Fund', desc: 'Slow but tough. Buys whole buildings.' },
   },
   boss: {
     warning: '⚠️ BUBBLE 2.0 is inflating!',

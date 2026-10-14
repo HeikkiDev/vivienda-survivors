@@ -13,6 +13,7 @@ import {
   SPAWN,
   SPAWN_TABLE,
   TOURIST_WAVE,
+  UI,
   VICTORY_MINUTE,
   WORLD_HEIGHT,
   WORLD_WIDTH,
@@ -27,7 +28,7 @@ import { Modifiers } from '../systems/Modifiers';
 import { Spawner } from '../systems/Spawner';
 import { applyNonWeaponUpgrade, generateUpgradeOptions, type UpgradeOption } from '../systems/Upgrades';
 import { TEXTS } from '../texts';
-import type { IconId, WeaponId } from '../types';
+import type { EnemyId, IconId, WeaponId } from '../types';
 import { randomPointInRing, xpToNext } from '../utils/math';
 import { createBackground, flashVisual } from '../visuals';
 import { Curriculums } from '../weapons/Curriculums';
@@ -49,6 +50,12 @@ export interface HudState {
   promisePickup: { x: number; y: number } | null;
   boss: { hp: number; maxHp: number } | null;
   announcement: Announcement | null;
+  enemyIntro: EnemyIntro | null;
+}
+
+export interface EnemyIntro {
+  id: EnemyId;
+  remaining: number;
 }
 
 export interface Announcement {
@@ -77,6 +84,8 @@ export class GameScene extends Phaser.Scene {
   private bossBullets!: BossBulletPool;
   private timedEvents: TimedEvent[] = [];
   private announcement: Announcement | null = null;
+  private enemyIntro: EnemyIntro | null = null;
+  private enemyIntroQueue: EnemyId[] = [];
   private levelUpOpen = false;
   private elapsed = 0;
   private kills = 0;
@@ -108,6 +117,7 @@ export class GameScene extends Phaser.Scene {
       promisePickup: pickup.active ? { x: pickup.x - cam.scrollX, y: pickup.y - cam.scrollY } : null,
       boss: this.boss.active ? { hp: Math.max(0, this.boss.hp), maxHp: this.boss.maxHp } : null,
       announcement: this.announcement,
+      enemyIntro: this.enemyIntro,
     };
   }
 
@@ -133,7 +143,9 @@ export class GameScene extends Phaser.Scene {
     this.cameras.main.startFollow(this.player, true, CAMERA_LERP, CAMERA_LERP);
 
     this.inputSystem = new InputSystem(this);
-    this.spawner = new Spawner(this);
+    this.enemyIntro = null;
+    this.enemyIntroQueue = [];
+    this.spawner = new Spawner(this, (id) => this.enemyIntroQueue.push(id));
     this.gems = new XpGemPool(this);
     this.elections = new Elections(this, this.modifiers, this.elapsed, () => this.brokenPromises++);
 
@@ -194,6 +206,7 @@ export class GameScene extends Phaser.Scene {
       this.announcement.remaining -= dt;
       if (this.announcement.remaining <= 0) this.announcement = null;
     }
+    this.updateEnemyIntro(dt);
 
     this.player.tick(dt);
     this.player.move(this.inputSystem.getDirection(), this.modifiers.playerSpeed);
@@ -227,6 +240,17 @@ export class GameScene extends Phaser.Scene {
       { at: bossAt, run: () => this.spawnBoss() },
     ];
     return all.filter((e) => e.at >= startElapsed).sort((a, b) => a.at - b.at);
+  }
+
+  /** Muestra de uno en uno los enemigos nuevos de la cola. */
+  private updateEnemyIntro(dt: number): void {
+    if (this.enemyIntro) {
+      this.enemyIntro.remaining -= dt;
+      if (this.enemyIntro.remaining > 0) return;
+      this.enemyIntro = null;
+    }
+    const next = this.enemyIntroQueue.shift();
+    if (next) this.enemyIntro = { id: next, remaining: UI.enemyIntro.seconds };
   }
 
   private announce(text: string, kind: Announcement['kind'], seconds: number): void {

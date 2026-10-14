@@ -20,8 +20,13 @@ export class Spawner {
   private accumulator = 0;
   private alive = 0;
   private readonly point = { x: 0, y: 0 };
+  private readonly seen = new Set<EnemyId>();
 
-  constructor(private readonly scene: Phaser.Scene) {
+  /** `onFirstSpawn` se llama la primera vez que aparece cada tipo de enemigo en la partida. */
+  constructor(
+    private readonly scene: Phaser.Scene,
+    private readonly onFirstSpawn: (id: EnemyId) => void = () => {},
+  ) {
     const make = () => scene.physics.add.group({ maxSize: SPAWN.maxAlive });
     this.groups = { ipc: make(), casero: make(), agencia: make(), fondo: make() };
     this.groupList = ENEMY_IDS.map((id) => this.groups[id]);
@@ -66,6 +71,10 @@ export class Spawner {
     }
     enemy.spawn(x, y, 1 + ENEMY_HP_SCALE_PER_MINUTE * minute);
     this.alive++;
+    if (!this.seen.has(id)) {
+      this.seen.add(id);
+      this.onFirstSpawn(id);
+    }
     return enemy;
   }
 

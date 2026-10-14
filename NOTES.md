@@ -105,9 +105,9 @@
 - Post-H9 (petición del usuario): las tarjetas de level-up muestran, además del chiste del GDD, una línea `effect` con lo que hace cada arma/pasiva. Los números de las pasivas y la Caña se leen de `config.ts` (texts.ts importa PASSIVES y CANA_HEAL) para que nunca se desincronicen.
 
 ## Post-H9 — Multi-idioma (petición del usuario)
-- El GDD tenía "idiomas" en *Fuera de alcance*; se implementa por petición explícita (GDD actualizado: inglés por defecto + español).
+- El GDD tenía "idiomas" en *Fuera de alcance*; se implementa por petición explícita (GDD actualizado: español por defecto + inglés).
 - `texts.ts` contiene un diccionario por idioma (`ES`, `EN: Texts`). `TEXTS` es un `export let` (binding vivo de ES modules) que `setLanguage()` reasigna, así que el resto del código sigue usando `TEXTS.x` sin cambios.
-- Idiomas, idioma por defecto (`en`) y clave de localStorage (`viviendaSurvivors.lang`) en `config.ts`. Si localStorage no está disponible, el idioma solo dura la sesión.
+- Idiomas, idioma por defecto (`es`) y clave de localStorage (`viviendaSurvivors.lang`) en `config.ts`. Si localStorage no está disponible, el idioma solo dura la sesión.
 - Selector en el menú (fila "Language: English | Español" bajo el récord); al cambiar se reinicia `MenuScene`. Solo se puede cambiar desde el menú.
 - `<html lang>` se actualiza al idioma activo. El título "VIVIENDA SURVIVORS" no se traduce (es el nombre del juego).
 - Para añadir un idioma: añadir el código a `LANGUAGES` en config.ts, un diccionario `Texts` y su nombre en `LANGUAGE_NAMES`.
@@ -129,5 +129,13 @@
 - Los PNG de `public/assets/` (salvo `test_*`) se generan por código (Pillow) a 2× el tamaño del emoji
   y se usan con `scale: 0.5` (`ART_SCALE` en `visuals.ts`). Los iconos de armas reutilizan el PNG del arma.
 - `player.png` es una hoja de 4 frames de 64×64 (caminar). `getVisualAssets()` no repite claves.
-- Fondo `bg_solar.png` (128×128, sin costuras) generado por `tools/gen_background.py` (Pillow, semilla fija);
+- Fondo `bg_acera.png` (acera de baldosas, 128×128, sin costuras) generado por `tools/gen_background.py` (Pillow, semilla fija);
   `tools/preview_bg.png` es el mosaico 3×3 de comprobación.
+- A petición del usuario, euro 22 px (GDD: 14) y promesa 44 px (GDD: 32) para que se vean en el mapa.
+- `escudo.png` es de 480 px porque sin aura de Graphics se estira al diámetro del aura (hasta 230 px);
+  el icono del HUD usa `icon_escudo.png` (48 px).
+
+## Presentación de enemigos
+- A petición del usuario (no estaba en el GDD original): la primera vez que aparece cada tipo de enemigo se muestra una tarjeta
+  (icono + nombre + descripción) abajo al centro durante `UI.enemyIntro.seconds`. Es un elemento aparte del aviso del boss
+  para no pisarse; si llegan varios a la vez, se encolan. El jefe no se presenta (ya tiene su aviso).

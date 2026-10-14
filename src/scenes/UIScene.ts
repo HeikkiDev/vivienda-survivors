@@ -4,6 +4,7 @@ import { TEXTS } from '../texts';
 import { onGameResize } from '../utils/layout';
 import { formatTime } from '../utils/math';
 import { createVisual } from '../visuals';
+import type { EnemyId } from '../types';
 import type { GameScene, HudState } from './GameScene';
 
 /** HUD en escena paralela (no se mueve con la cámara). */
@@ -17,6 +18,8 @@ export class UIScene extends Phaser.Scene {
   private promiseArrow!: Phaser.GameObjects.Graphics;
   private bossBar!: Phaser.GameObjects.Graphics;
   private announcementText!: Phaser.GameObjects.Text;
+  private enemyIntroCard: Phaser.GameObjects.Container | null = null;
+  private enemyIntroId: EnemyId | null = null;
   private pauseOverlay!: Phaser.GameObjects.Container;
   private pauseVeil!: Phaser.GameObjects.Rectangle;
   private pauseTitle!: Phaser.GameObjects.Text;
@@ -75,6 +78,9 @@ export class UIScene extends Phaser.Scene {
       .setOrigin(0.5)
       .setVisible(false);
 
+    this.enemyIntroCard = null;
+    this.enemyIntroId = null;
+
     this.createPauseControls();
     this.layout();
     onGameResize(this, () => this.layout());
@@ -92,6 +98,7 @@ export class UIScene extends Phaser.Scene {
     this.pauseVeil.setSize(width, height);
     this.pauseTitle.setX(cx);
     this.pauseHint.setX(cx);
+    this.enemyIntroCard?.setPosition(cx, height - UI.enemyIntro.marginBottom);
     // Fuerza a rehacer el inventario en su nueva posición.
     this.inventoryKey = '';
   }
@@ -168,6 +175,62 @@ export class UIScene extends Phaser.Scene {
     this.updatePromiseArrow(s.promisePickup);
     this.updateBossBar(s.boss);
     this.updateAnnouncement(s.announcement);
+    this.updateEnemyIntro(s.enemyIntro);
+  }
+
+  /** Tarjeta (icono + nombre + descripción) del enemigo nuevo; se rehace solo al cambiar de enemigo. */
+  private updateEnemyIntro(intro: HudState['enemyIntro']): void {
+    const e = UI.enemyIntro;
+    if (!intro) {
+      this.enemyIntroCard?.destroy();
+      this.enemyIntroCard = null;
+      this.enemyIntroId = null;
+      return;
+    }
+    if (intro.id !== this.enemyIntroId) {
+      this.enemyIntroCard?.destroy();
+      this.enemyIntroCard = this.buildEnemyIntroCard(intro.id);
+      this.enemyIntroId = intro.id;
+    }
+    const shown = e.seconds - intro.remaining;
+    this.enemyIntroCard!.setAlpha(Math.min(1, shown / e.fadeSeconds, intro.remaining / e.fadeSeconds));
+  }
+
+  private buildEnemyIntroCard(id: EnemyId): Phaser.GameObjects.Container {
+    const e = UI.enemyIntro;
+    const h = UI.hud;
+    const info = TEXTS.enemies[id];
+    const icon = createVisual(this, id, 0, 0);
+    const name = this.add
+      .text(0, 0, info.name, {
+        fontFamily: UI.fontFamily,
+        fontSize: `${e.nameSize}px`,
+        fontStyle: 'bold',
+        color: e.nameColor,
+        stroke: h.textStroke,
+        strokeThickness: h.textStrokeThickness,
+      })
+      .setOrigin(0, 1);
+    const desc = this.add
+      .text(0, 0, info.desc, { fontFamily: UI.fontFamily, fontSize: `${e.descSize}px`, color: e.descColor })
+      .setOrigin(0, 0);
+    const textW = Math.max(name.width, desc.width);
+    const contentH = Math.max(icon.displayHeight, name.height + e.lineGap + desc.height);
+    const width = e.padX * 2 + icon.displayWidth + e.iconGap + textW;
+    const height = e.padY * 2 + contentH;
+    const left = -width / 2;
+    icon.setPosition(left + e.padX + icon.displayWidth / 2, 0);
+    const textX = left + e.padX + icon.displayWidth + e.iconGap;
+    const textTop = -(name.height + e.lineGap + desc.height) / 2;
+    name.setPosition(textX, textTop + name.height);
+    desc.setPosition(textX, textTop + name.height + e.lineGap);
+    const bg = this.add
+      .graphics()
+      .fillStyle(e.bg, e.bgAlpha)
+      .fillRoundedRect(left, -height / 2, width, height, e.radius)
+      .lineStyle(e.strokeWidth, e.stroke, 1)
+      .strokeRoundedRect(left, -height / 2, width, height, e.radius);
+    return this.add.container(this.scale.width / 2, this.scale.height - e.marginBottom, [bg, icon, name, desc]);
   }
 
   private updateBossBar(boss: HudState['boss']): void {

@@ -26,8 +26,8 @@ export const FALLBACK_EMOJI: Record<EntityVisualId, EmojiVisual> = {
   fondo: { kind: 'emoji', char: '🦅', size: 40 },
   boss: { kind: 'emoji', char: '🫧', size: 96 },
   bossBullet: { kind: 'emoji', char: '💸', size: 20 },
-  euro: { kind: 'emoji', char: '💶', size: 14 },
-  promesa: { kind: 'emoji', char: '🗳️', size: 32 },
+  euro: { kind: 'emoji', char: '💶', size: 22 },
+  promesa: { kind: 'emoji', char: '🗳️', size: 44 },
   curriculum: { kind: 'emoji', char: '📄', size: 20 },
   escudo: { kind: 'emoji', char: '🛡️', size: 24 },
   grito: { kind: 'emoji', char: '📢', size: 24 },
@@ -66,7 +66,7 @@ function png(file: string): EntityVisual {
 
 /** Arte personalizado. Añade aquí sprites/imágenes (archivos en public/assets/). */
 const CUSTOM_ART: Partial<VisualsTable> = {
-  background: { kind: 'tileSprite', key: 'bg_solar', path: 'assets/bg_solar.png' },
+  background: { kind: 'tileSprite', key: 'bg_acera', path: 'assets/bg_acera.png' },
   player: {
     kind: 'sprite',
     key: 'art_player',
@@ -74,7 +74,7 @@ const CUSTOM_ART: Partial<VisualsTable> = {
     scale: ART_SCALE,
     frameWidth: 64,
     frameHeight: 64,
-    anim: { frames: [0, 1, 2, 3], frameRate: 6, repeat: -1 },
+    anim: { frames: [0, 1, 2, 3], frameRate: 6, repeat: -1, idleFrame: 4 },
   },
   ipc: png('ipc'),
   casero: png('casero'),
@@ -89,7 +89,7 @@ const CUSTOM_ART: Partial<VisualsTable> = {
   grito: png('grito'),
   sindicato: png('sindicato'),
   icon_curriculum: png('curriculum'),
-  icon_escudo: png('escudo'),
+  icon_escudo: png('icon_escudo'),
   icon_grito: png('grito'),
   icon_sindicato: png('sindicato'),
   icon_aval: png('icon_aval'),
@@ -192,6 +192,26 @@ export function createBackground(
   }
   if (def.kind === 'image') return scene.add.image(0, 0, def.key).setOrigin(0).setDisplaySize(worldW, worldH);
   return scene.add.tileSprite(0, 0, worldW, worldH, def.key).setOrigin(0);
+}
+
+/** Activa o congela la animación de un sprite; quieto muestra `anim.idleFrame` (o el primer frame). */
+export function setVisualAnimating(
+  visual: Phaser.GameObjects.Text | Phaser.GameObjects.Sprite,
+  id: EntityVisualId,
+  animating: boolean,
+): void {
+  if (!(visual instanceof Phaser.GameObjects.Sprite)) return;
+  const anims = visual.anims;
+  const current = anims.currentAnim;
+  if (!current || anims.isPlaying === animating) return;
+  if (animating) {
+    anims.play(current.key);
+    return;
+  }
+  anims.stop();
+  const def = VISUALS[id];
+  const idle = def.kind === 'sprite' ? def.anim?.idleFrame : undefined;
+  visual.setFrame(idle ?? current.frames[0].textureFrame);
 }
 
 /** Destello de daño: tint en sprites, alpha en emoji. */
