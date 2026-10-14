@@ -6,7 +6,7 @@ import type { PassiveId } from '../types';
  * Pasivas (aditivas por nivel) × efecto temporal de la promesa electoral activa (buff o debuff).
  */
 export class Modifiers {
-  readonly passiveLevels: Record<PassiveId, number> = { aval: 0, piso: 0, bono: 0, trabajo: 0 };
+  readonly passiveLevels: Record<PassiveId, number> = { aval: 0, piso: 0, bono: 0, trabajo: 0, teletrabajo: 0 };
   /** Lo fija `Elections` mientras dura un buff o debuff. */
   promiseEffect: PromiseEffect | null = null;
 
@@ -32,6 +32,10 @@ export class Modifiers {
 
   get playerSpeed(): number {
     return (1 + PASSIVES.bono.speedPerLevel * this.passiveLevels.bono) * (this.promiseEffect?.playerSpeed ?? 1);
+  }
+
+  get regenPerSecond(): number {
+    return PASSIVES.teletrabajo.regenPerLevel * this.passiveLevels.teletrabajo;
   }
 
   get enemySpeed(): number {

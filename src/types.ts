@@ -18,7 +18,7 @@ export type BackgroundVisual =
 export type EmojiVisual = Extract<EntityVisual, { kind: 'emoji' }>;
 
 export type WeaponId = 'curriculum' | 'escudo' | 'grito' | 'sindicato';
-export type PassiveId = 'aval' | 'piso' | 'bono' | 'trabajo';
+export type PassiveId = 'aval' | 'piso' | 'bono' | 'trabajo' | 'teletrabajo';
 export type PromiseId = 'viviendas' | 'alquiler' | 'ayudas' | 'especulacion' | 'digna';
 export type EnemyId = 'ipc' | 'casero' | 'agencia' | 'fondo';
 

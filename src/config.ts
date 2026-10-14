@@ -104,7 +104,7 @@ export const ENEMIES: Record<EnemyId, EnemyStats> = {
 
 export const ENEMY_IDS: readonly EnemyId[] = ['ipc', 'casero', 'agencia', 'fondo'];
 export const WEAPON_IDS: readonly WeaponId[] = ['curriculum', 'escudo', 'grito', 'sindicato'];
-export const PASSIVE_IDS: readonly PassiveId[] = ['aval', 'piso', 'bono', 'trabajo'];
+export const PASSIVE_IDS: readonly PassiveId[] = ['aval', 'piso', 'bono', 'trabajo', 'teletrabajo'];
 
 /** HP × (1 + hpScalePerMinute × minuto actual). */
 export const ENEMY_HP_SCALE_PER_MINUTE = 0.1;
@@ -215,11 +215,14 @@ export const SINDICATO = {
 } as const;
 
 // Sección 6 — Pasivas (se acumulan aditivamente por nivel)
+export const TELETRABAJO_REGEN_PER_LEVEL = 0.3;
+
 export const PASSIVES = {
   aval: { maxHpPerLevel: 20, healPerLevel: 20 },
   piso: { cooldownReductionPerLevel: 0.08 },
   bono: { pickupRadiusPerLevel: 0.15, speedPerLevel: 0.05 },
   trabajo: { damagePerLevel: 0.1 },
+  teletrabajo: { regenPerLevel: TELETRABAJO_REGEN_PER_LEVEL },
 } as const;
 
 // Sección 9.1 — Menú de subida de nivel

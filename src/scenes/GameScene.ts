@@ -209,6 +209,7 @@ export class GameScene extends Phaser.Scene {
     this.updateEnemyIntro(dt);
 
     this.player.tick(dt);
+    this.applyPlayerRegen(dt);
     this.player.move(this.inputSystem.getDirection(), this.modifiers.playerSpeed);
     this.spawner.update(dt, this.elapsed, this.player.x, this.player.y);
     this.spawner.updateEnemies(this.player.x, this.player.y, this.modifiers.enemySpeed, dt);
@@ -229,6 +230,12 @@ export class GameScene extends Phaser.Scene {
     );
     if (collected > 0) this.addXp(collected * this.modifiers.xpGain);
     if (this.pendingLevelUps > 0 && !this.levelUpOpen) this.openLevelUp();
+  }
+
+  private applyPlayerRegen(dt: number): void {
+    const regenPerSecond = this.modifiers.regenPerSecond;
+    if (regenPerSecond <= 0 || this.player.isDead || this.player.hp >= this.player.maxHp) return;
+    this.player.heal(regenPerSecond * dt);
   }
 
   /** Oleada turística, aviso del boss y boss. Con `?min=N` se omiten los anteriores a ese minuto. */

@@ -40,6 +40,7 @@ export const FALLBACK_EMOJI: Record<EntityVisualId, EmojiVisual> = {
   icon_piso: { kind: 'emoji', char: '🛏️', size: 24 },
   icon_bono: { kind: 'emoji', char: '🎫', size: 24 },
   icon_trabajo: { kind: 'emoji', char: '💼', size: 24 },
+  icon_teletrabajo: { kind: 'emoji', char: '💻', size: 24 },
   icon_cana: { kind: 'emoji', char: '🍺', size: 24 },
   icon_pause: { kind: 'emoji', char: '⏸️', size: 24 },
 };
@@ -96,6 +97,7 @@ const CUSTOM_ART: Partial<VisualsTable> = {
   icon_piso: png('icon_piso'),
   icon_bono: png('icon_bono'),
   icon_trabajo: png('icon_trabajo'),
+  icon_teletrabajo: { kind: 'sprite', key: 'icon_teletrabajo', path: 'assets/icon_teletrabajo.png', scale: 1 },
   icon_cana: png('icon_cana'),
   icon_pause: png('icon_pause'),
 };

@@ -41,6 +41,7 @@ const ES = {
     piso: { name: 'Piso compartido', desc: '5 personas, 1 baño. Eficiencia máxima.', effect: `−${pct(PASSIVES.piso.cooldownReductionPerLevel)}% recarga de todas las armas.` },
     bono: { name: 'Bono Alquiler Joven', desc: 'Llega tarde, pero llega.', effect: `+${pct(PASSIVES.bono.pickupRadiusPerLevel)}% radio de recogida y +${pct(PASSIVES.bono.speedPerLevel)}% velocidad.` },
     trabajo: { name: 'Segundo trabajo', desc: 'Riders de día, camarero de noche.', effect: `+${pct(PASSIVES.trabajo.damagePerLevel)}% daño de todas las armas.` },
+    teletrabajo: { name: 'Teletrabajo', desc: 'Sin transporte, sin gastos. +0,3 HP/s', effect: `Regenera +${String(PASSIVES.teletrabajo.regenPerLevel).replace('.', ',')} HP/s.` },
   },
   cana: { name: 'Caña con los colegas', desc: 'Lo único asequible', effect: `Cura ${CANA_HEAL} de vida.` },
   grito: {
@@ -123,6 +124,7 @@ const EN: Texts = {
     piso: { name: 'Shared Flat', desc: '5 people, 1 bathroom. Peak efficiency.', effect: `−${pct(PASSIVES.piso.cooldownReductionPerLevel)}% cooldown on all weapons.` },
     bono: { name: 'Youth Rent Allowance', desc: 'Arrives late, but it arrives.', effect: `+${pct(PASSIVES.bono.pickupRadiusPerLevel)}% pickup radius and +${pct(PASSIVES.bono.speedPerLevel)}% speed.` },
     trabajo: { name: 'Second Job', desc: 'Rider by day, waiter by night.', effect: `+${pct(PASSIVES.trabajo.damagePerLevel)}% damage on all weapons.` },
+    teletrabajo: { name: 'Remote Work', desc: 'No commute, no expenses. +0.3 HP/s', effect: `Regenerates +${PASSIVES.teletrabajo.regenPerLevel} HP/s.` },
   },
   cana: { name: 'Beer with Friends', desc: 'The only affordable thing', effect: `Heals ${CANA_HEAL} HP.` },
   grito: {
