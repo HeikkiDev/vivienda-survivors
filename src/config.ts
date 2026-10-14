@@ -48,6 +48,16 @@ export type Language = (typeof LANGUAGES)[number];
 export const DEFAULT_LANGUAGE: Language = 'es';
 export const LANGUAGE_STORAGE_KEY = 'viviendaSurvivors.lang';
 
+export const AUDIO = {
+  sfxMaxInstances: 4,
+  sfxMinIntervalMs: 50,
+  /** ±5 % de tono aleatorio en cada efecto. */
+  sfxPitchVariation: 0.05,
+  /** Volumen de la música en pausa y en el menú de mejoras (fracción del normal). */
+  musicDuckedFactor: 0.3,
+  mutedStorageKey: 'viviendaSurvivors.muted',
+};
+
 export const DEPTH = {
   background: -1000,
   entities: 0,
@@ -465,6 +475,8 @@ export const UI = {
     buttonMarginX: 24,
     buttonY: 26,
     buttonHitPadding: 8,
+    /** El botón de silencio va a la izquierda del de pausa. */
+    muteOffsetX: 44,
     overlayColor: 0x000000,
     overlayAlpha: 0.6,
     titleY: 150,

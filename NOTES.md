@@ -164,3 +164,10 @@
 ## Publicación — meta etiquetas
 - `index.html` incluye `description`, Open Graph y Twitter card en español (idioma de la sátira); no son texto del juego, por eso no van en `texts.ts`.
 - `og:image` necesita URL absoluta: apunta a GitHub Pages (`public/og-image.jpg`, 1200×630, recorte de `docs/screenshot.png`). En itch.io la vista previa la gestiona la propia página de itch.
+
+## H11 — Sonido
+- Los efectos se sacan de los eventos del juego: `shoot` en cada ráfaga de currículums (no en cada proyectil), `hit` en cada daño a enemigo, `coin` por frame en que se recogen euros, `levelup` al abrir el menú de mejoras y en la victoria, `promise` al coger la caja y si la promesa se cumple, `hurt` al recibir daño y `death` en la derrota.
+- La música va en `.ogg` y `.mp3`: Phaser elige el primer formato que soporta el navegador (Safari/iOS no siempre reproduce Ogg Vorbis). El vorbis nativo de ffmpeg es experimental y exige estéreo.
+- El estado de silencio lo guarda `AudioManager`: en Web Audio, `sound.mute` se lee de un nodo de ganancia que no cambia al instante.
+- `BootScene` sustituye la decodificación de audio de Phaser por una con `.catch`: la original hace `console.error` y deja una promesa rechazada sin capturar.
+- El volumen de cada entrada vive en `sounds.ts` (como los tamaños en `visuals.ts`); los límites del gestor, en `config.ts`.

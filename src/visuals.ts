@@ -43,6 +43,8 @@ export const FALLBACK_EMOJI: Record<EntityVisualId, EmojiVisual> = {
   icon_teletrabajo: { kind: 'emoji', char: '💻', size: 24 },
   icon_cana: { kind: 'emoji', char: '🍺', size: 24 },
   icon_pause: { kind: 'emoji', char: '⏸️', size: 24 },
+  icon_sound_on: { kind: 'emoji', char: '🔊', size: 22 },
+  icon_sound_off: { kind: 'emoji', char: '🔇', size: 22 },
 };
 
 export const FALLBACK_BACKGROUND: BackgroundVisual = {

@@ -15,6 +15,7 @@ Clon minimalista de *Vampire Survivors* y sátira (genérica) sobre la crisis de
 - **Subir de nivel:** recoge 💶 y elige 1 de 3 mejoras (clic, tap o `1` `2` `3`).
 - **Promesas electorales 🗳️:** cada 2 minutos. ¿Se cumplirá? Spoiler: probablemente no.
 - **Pausa:** `Esc` / `P` o el botón ⏸.
+- **Sonido:** botón 🔊/🔇 junto a la pausa, o la tecla `M`. Se recuerda entre partidas.
 - **Idioma:** inglés o español, se elige en el menú principal.
 - **Móvil:** se juega en horizontal y a pantalla completa; se puede instalar como app.
 
@@ -83,5 +84,14 @@ Todo lo visible está en [`src/visuals.ts`](src/visuals.ts):
 2. Añádelos a `CUSTOM_ART` (sprite, spritesheet animado o fondo).
 
 `USE_CUSTOM_ART = true` (por defecto) usa los PNG; con `false` el juego usa solo emoji. Si una imagen falla, esa entidad vuelve a su emoji.
+
+## 🔊 Cambiar el sonido
+Todo el audio está en [`src/sounds.ts`](src/sounds.ts) (clave, ruta y volumen); los archivos van en `public/assets/sfx/` y `public/assets/music/`. Si uno falta, el juego sigue sin ese sonido.
+
+Los efectos y la música son chiptune generado por código con [`tools/gen_sfx.py`](tools/gen_sfx.py) (numpy + ffmpeg), así que no hay derechos de terceros:
+```bash
+python3 tools/gen_sfx.py          # efectos; la música solo si no existe
+python3 tools/gen_sfx.py --music  # regenera también la música
+```
 
 El diseño completo está en [`GDD.md`](GDD.md).

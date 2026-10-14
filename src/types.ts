@@ -22,7 +22,7 @@ export type PassiveId = 'aval' | 'piso' | 'bono' | 'trabajo' | 'teletrabajo';
 export type PromiseId = 'viviendas' | 'alquiler' | 'ayudas' | 'especulacion' | 'digna';
 export type EnemyId = 'ipc' | 'casero' | 'agencia' | 'fondo';
 
-export type IconId = `icon_${WeaponId | PassiveId}` | 'icon_cana' | 'icon_pause';
+export type IconId = `icon_${WeaponId | PassiveId}` | 'icon_cana' | 'icon_pause' | 'icon_sound_on' | 'icon_sound_off';
 
 export type EntityVisualId =
   | 'player'

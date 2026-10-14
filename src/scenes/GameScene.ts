@@ -26,6 +26,7 @@ import { Boss, BossBulletPool, type BossBullet } from '../entities/Boss';
 import type { Enemy } from '../entities/Enemy';
 import { Player } from '../entities/Player';
 import { XpGemPool } from '../entities/XpGem';
+import { AudioManager } from '../systems/AudioManager';
 import { Elections, type PromiseStatus } from '../systems/Elections';
 import { InputSystem } from '../systems/Input';
 import { Modifiers } from '../systems/Modifiers';
@@ -164,10 +165,12 @@ export class GameScene extends Phaser.Scene {
     this.elections = new Elections(this, this.modifiers, this.elapsed, {
       onSpawn: () => this.announce(TEXTS.promise.spawned, 'info', PROMESA.spawnAnnounceSeconds),
       onPickup: () => {
+        AudioManager.playSfx('promise');
         if (this.announcement?.text === TEXTS.promise.spawned) this.announcement = null;
       },
       onResolve: (fulfilled) => {
-        if (!fulfilled) this.brokenPromises++;
+        if (fulfilled) AudioManager.playSfx('promise');
+        else this.brokenPromises++;
         this.announce(
           fulfilled ? TEXTS.promise.fulfilled : TEXTS.promise.broken,
           fulfilled ? 'info' : 'warning',
@@ -255,7 +258,10 @@ export class GameScene extends Phaser.Scene {
       PLAYER.euroAttractSpeed,
       PLAYER.hitboxRadius + EURO.hitboxRadius,
     );
-    if (collected > 0) this.addXp(collected * this.modifiers.xpGain);
+    if (collected > 0) {
+      AudioManager.playSfx('coin');
+      this.addXp(collected * this.modifiers.xpGain);
+    }
     if (this.pendingLevelUps > 0 && !this.levelUpOpen) this.openLevelUp();
   }
 
@@ -345,6 +351,8 @@ export class GameScene extends Phaser.Scene {
 
   private openLevelUp(): void {
     this.levelUpOpen = true;
+    AudioManager.playSfx('levelup');
+    AudioManager.setMusicDucked(true);
     const data: LevelUpData = { options: generateUpgradeOptions(this.weaponLevels(), this.modifiers) };
     // scene.pause detiene update, física (physics.pause) y reloj/timers de la escena.
     this.scene.pause();
@@ -366,6 +374,7 @@ export class GameScene extends Phaser.Scene {
     this.pendingLevelUps = Math.max(0, this.pendingLevelUps - 1);
     if (this.pendingLevelUps > 0) return generateUpgradeOptions(this.weaponLevels(), this.modifiers);
     this.levelUpOpen = false;
+    AudioManager.setMusicDucked(false);
     this.scene.resume();
     return null;
   }
@@ -382,6 +391,7 @@ export class GameScene extends Phaser.Scene {
   private damageEnemy(enemy: Enemy, amount: number): void {
     if (!enemy.active) return;
     flashVisual(this, enemy.visual, ENEMY_FLASH_MS);
+    AudioManager.playSfx('hit');
     if (!enemy.takeDamage(amount)) return;
     const { x, y } = enemy;
     const value = enemy.stats.xp;
@@ -417,6 +427,7 @@ export class GameScene extends Phaser.Scene {
 
   private hurtPlayer(damage: number): void {
     if (this.modifiers.invulnerable || !this.player.takeHit(damage)) return;
+    if (!this.player.isDead) AudioManager.playSfx('hurt');
     this.cameras.main.shake(CAMERA_SHAKE.durationMs, CAMERA_SHAKE.intensity);
     if (this.player.isDead) this.endGame(false);
   }
@@ -432,6 +443,8 @@ export class GameScene extends Phaser.Scene {
     this.ending = victory ? 'victory' : 'defeat';
     this.physics.pause();
     this.player.move(Phaser.Math.Vector2.ZERO, 0);
+    AudioManager.stopMusic();
+    AudioManager.playSfx(victory ? 'levelup' : 'death');
     if (victory) this.playVictory();
     else this.playDefeat();
   }

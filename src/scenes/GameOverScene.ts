@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { BEST_TIME_STORAGE_KEY, GAME_WIDTH, UI } from '../config';
+import { AudioManager } from '../systems/AudioManager';
 import { TEXTS } from '../texts';
 import { addBaseOverlay, centerOnBaseArea } from '../utils/layout';
 import { formatTime } from '../utils/math';
@@ -95,6 +96,7 @@ export class GameOverScene extends Phaser.Scene {
   private restart(): void {
     if (this.leaving) return;
     this.leaving = true;
+    AudioManager.startMusic();
     this.scene.start('GameScene');
   }
 }

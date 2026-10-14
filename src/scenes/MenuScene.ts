@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { BEST_TIME_STORAGE_KEY, GAME_HEIGHT, GAME_WIDTH, LANGUAGES, UI } from '../config';
 import { enterFullscreenLandscape, shouldShowIOSInstallHint } from '../mobile';
+import { AudioManager } from '../systems/AudioManager';
 import { getLanguage, LANGUAGE_NAMES, setLanguage, TEXTS } from '../texts';
 import { centerOnBaseArea } from '../utils/layout';
 import { formatTime } from '../utils/math';
@@ -139,6 +140,8 @@ export class MenuScene extends Phaser.Scene {
     if (this.starting) return;
     this.starting = true;
     void enterFullscreenLandscape();
+    // Dentro del gesto del usuario: necesario para que iOS permita el audio.
+    AudioManager.startMusic();
     this.scene.start('GameScene');
   }
 }

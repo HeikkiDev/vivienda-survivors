@@ -1,11 +1,14 @@
 import Phaser from 'phaser';
 import { DEFEAT_ANIM, type FallingPiecesConfig, PROMISES, UI, VICTORY_ANIM } from '../config';
+import { AudioManager } from '../systems/AudioManager';
 import { TEXTS } from '../texts';
 import { onGameResize } from '../utils/layout';
 import { formatTime } from '../utils/math';
 import { createVisual } from '../visuals';
 import type { EnemyId } from '../types';
 import type { EndingKind, GameScene, HudState } from './GameScene';
+
+type HudButton = ReturnType<typeof createVisual>;
 
 /** HUD en escena paralela (no se mueve con la cámara). */
 export class UIScene extends Phaser.Scene {
@@ -27,6 +30,8 @@ export class UIScene extends Phaser.Scene {
   private pauseButton!: Phaser.GameObjects.GameObject &
     Phaser.GameObjects.Components.Transform &
     Phaser.GameObjects.Components.Visible;
+  private muteOnButton!: HudButton;
+  private muteOffButton!: HudButton;
   private pausedByUser = false;
   private endingShown = false;
 
@@ -99,6 +104,8 @@ export class UIScene extends Phaser.Scene {
     this.promiseBanner.setX(cx);
     this.announcementText.setX(cx);
     this.pauseButton.setX(width - p.buttonMarginX);
+    this.muteOnButton.setX(width - p.buttonMarginX - p.muteOffsetX);
+    this.muteOffButton.setX(width - p.buttonMarginX - p.muteOffsetX);
     this.pauseVeil.setSize(width, height);
     this.pauseTitle.setX(cx);
     this.pauseHint.setX(cx);
@@ -110,18 +117,14 @@ export class UIScene extends Phaser.Scene {
   private createPauseControls(): void {
     const p = UI.pause;
     this.pausedByUser = false;
-    const button = createVisual(this, 'icon_pause', 0, p.buttonY);
+    const button = this.createHudButton('icon_pause', () => this.togglePause());
     this.pauseButton = button;
-    const hit = new Phaser.Geom.Rectangle(
-      -p.buttonHitPadding,
-      -p.buttonHitPadding,
-      button.width + p.buttonHitPadding * 2,
-      button.height + p.buttonHitPadding * 2,
-    );
-    button.setInteractive({ hitArea: hit, hitAreaCallback: Phaser.Geom.Rectangle.Contains, useHandCursor: true });
-    button.on('pointerdown', () => this.togglePause());
     this.input.keyboard?.on('keydown-ESC', () => this.togglePause());
     this.input.keyboard?.on('keydown-P', () => this.togglePause());
+    this.muteOnButton = this.createHudButton('icon_sound_on', () => this.toggleMute());
+    this.muteOffButton = this.createHudButton('icon_sound_off', () => this.toggleMute());
+    this.input.keyboard?.on('keydown-M', () => this.toggleMute());
+    this.refreshMuteButton();
 
     const overlay = this.add.rectangle(0, 0, this.scale.width, this.scale.height, p.overlayColor, p.overlayAlpha).setOrigin(0);
     this.pauseVeil = overlay;
@@ -143,8 +146,35 @@ export class UIScene extends Phaser.Scene {
     this.pauseTitle = title;
     this.pauseHint = hint;
     this.pauseOverlay = this.add.container(0, 0, [overlay, title, hint]).setVisible(false);
-    // El botón queda por encima del velo para poder reanudar con un toque.
+    // Los botones quedan por encima del velo para poder reanudar con un toque.
     this.children.bringToTop(button);
+    this.children.bringToTop(this.muteOnButton);
+    this.children.bringToTop(this.muteOffButton);
+  }
+
+  private createHudButton(id: 'icon_pause' | 'icon_sound_on' | 'icon_sound_off', onPress: () => void): HudButton {
+    const p = UI.pause;
+    const button = createVisual(this, id, 0, p.buttonY);
+    const hit = new Phaser.Geom.Rectangle(
+      -p.buttonHitPadding,
+      -p.buttonHitPadding,
+      button.width + p.buttonHitPadding * 2,
+      button.height + p.buttonHitPadding * 2,
+    );
+    button.setInteractive({ hitArea: hit, hitAreaCallback: Phaser.Geom.Rectangle.Contains, useHandCursor: true });
+    button.on('pointerdown', onPress);
+    return button;
+  }
+
+  private toggleMute(): void {
+    AudioManager.toggleMute();
+    this.refreshMuteButton();
+  }
+
+  private refreshMuteButton(): void {
+    const muted = AudioManager.muted;
+    this.muteOnButton.setVisible(!muted);
+    this.muteOffButton.setVisible(muted);
   }
 
   private togglePause(): void {
@@ -152,12 +182,14 @@ export class UIScene extends Phaser.Scene {
     if (this.pausedByUser) {
       this.pausedByUser = false;
       this.pauseOverlay.setVisible(false);
+      AudioManager.setMusicDucked(false);
       this.scene.resume('GameScene');
       return;
     }
     if (!game.canPause) return;
     this.pausedByUser = true;
     this.pauseOverlay.setVisible(true);
+    AudioManager.setMusicDucked(true);
     this.scene.pause('GameScene');
   }
 

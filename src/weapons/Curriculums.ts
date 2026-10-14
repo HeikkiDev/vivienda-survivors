@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { CURRICULUM, DEPTH } from '../config';
 import type { Enemy } from '../entities/Enemy';
+import { AudioManager } from '../systems/AudioManager';
 import type { WeaponId } from '../types';
 import { createVisual } from '../visuals';
 import { Weapon, type WeaponContext } from './Weapon';
@@ -85,6 +86,7 @@ export class Curriculums extends Weapon {
       const offset = s.projectiles === 1 ? 0 : -spread + (2 * spread * i) / (s.projectiles - 1);
       this.spawnProjectile(player.x, player.y, baseAngle + offset, s.speed, this.scaledDamage(s.damage), s.pierce);
     }
+    AudioManager.playSfx('shoot');
     this.cooldownTimer = this.scaledCooldown(s.cooldown);
   }
 

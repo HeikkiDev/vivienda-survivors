@@ -348,17 +348,16 @@ Pools: usa `Phaser.Physics.Arcade.Group` con `maxSize` y reutilización (`get()`
 - ✅ `<html lang>` refleja el idioma activo. Ningún texto visible fuera de `texts.ts`.
 
 **H11 — Sonido**
-- Efectos cortos y una música en bucle, en tono de humor. Sin dependencias nuevas: se usa el sistema de audio de Phaser (Web Audio con fallback a HTML5 Audio).
-- Archivos en `public/assets/audio/` (`.ogg` + `.mp3` de fallback). Las claves y rutas se definen **solo** en `src/sounds.ts` (mismo patrón que `visuals.ts`); el resto del código llama a `playSfx(scene, 'clave')`. Volúmenes y límites en `src/config.ts`.
-- Efectos mínimos: disparo de currículum, impacto en enemigo, muerte de enemigo, recoger euro, subir de nivel, daño al jugador, recoger caja electoral, promesa cumplida, promesa incumplida, aviso del boss, victoria y derrota.
-- Música: un tema del menú y otro de la partida en bucle. Al aparecer el boss puede subir de intensidad (opcional).
-- Botón 🔊/🔇 en el menú y en la pausa. La preferencia se guarda en localStorage (`viviendaSurvivors.muted`). La tecla `M` silencia o reactiva el sonido.
-- Límite de efectos simultáneos del mismo tipo (p. ej. máx. 4 impactos a la vez) para no saturar con hordas grandes.
-- ✅ El audio arranca tras la primera interacción del usuario (política de autoplay), sin errores en consola.
-- ✅ Si un archivo de audio falla, el juego sigue sin sonido para esa clave, con `console.warn` y sin errores.
-- ✅ Silenciar se mantiene al recargar. Pausa y menú de mejoras pausan los efectos de la partida, no la música.
-- ✅ Funciona en móvil (iOS Safari incluido) y en la versión de itch.io (rutas relativas).
-- ✅ Todo el audio es libre de derechos (CC0 o creado para el juego); los créditos van en `README.md`.
+- Efectos retro cortos y una música chiptune en bucle, en tono de humor. Sin dependencias nuevas: se usa el sistema de audio de Phaser.
+- `src/sounds.ts` contiene **todas** las entradas de audio (`{key, path, volume, loop?}`); ningún otro archivo tiene rutas de audio. `BootScene` las precarga automáticamente.
+- Efectos en `public/assets/sfx/` generados con `tools/gen_sfx.py` (numpy + wave): `shoot` (disparo), `hit` (golpe a enemigo), `hurt` (daño al jugador), `coin` (recoger euro), `levelup` (arpegio ascendente), `promise` (fanfarria corta), `death` (descendente). Todos < 0,5 s salvo `levelup` y `death`.
+- Música: `public/assets/music/loop.ogg` (+ `.mp3` para Safari). Si no existe, el mismo script genera un bucle chiptune de 16 compases en do mayor, alegre y algo irónico.
+- `AudioManager` con `playSfx(key)` y `startMusic()`: cada efecto se limita a 4 instancias simultáneas y a una cada 50 ms, con ±5 % de tono aleatorio. Límites en `src/config.ts`.
+- La música empieza al pulsar "Buscar piso" (gesto del usuario, necesario en iOS), baja de volumen en pausa y en el menú de mejoras y se para en el fin de partida.
+- Botón 🔊/🔇 junto al de pausa (y tecla `M`). La preferencia se guarda en localStorage (`viviendaSurvivors.muted`).
+- ✅ Si un archivo de audio falta o no se puede decodificar, el juego sigue sin ese sonido, con `console.warn` y sin errores.
+- ✅ Silenciar se mantiene al recargar.
+- ✅ Funciona en la versión de itch.io (rutas relativas).
 
 **H12 — Compartir resultado**
 - En la pantalla de fin de partida (victoria y derrota), un botón **"Compartir"** bajo el de reintentar.
