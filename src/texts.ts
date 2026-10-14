@@ -1,7 +1,47 @@
 // TODOS los textos visibles, por idioma. Ver GDD.md y NOTES.md (multi-idioma).
-import { CANA_HEAL, DEFAULT_LANGUAGE, LANGUAGE_STORAGE_KEY, PASSIVES, VICTORY_MINUTE, type Language } from './config';
+import {
+  CANA_HEAL,
+  DEFAULT_LANGUAGE,
+  LANGUAGE_STORAGE_KEY,
+  PASSIVES,
+  VICTORY_MINUTE,
+  type Language,
+  type PromiseEffect,
+} from './config';
 
 const pct = (ratio: number): number => Math.round(ratio * 100);
+
+type EffectLabels = Record<keyof PromiseEffect, string>;
+
+/** "Daño ×2, XP ×0,5": describe un efecto de promesa a partir de sus multiplicadores de config. */
+function describeEffect(effect: PromiseEffect, labels: EffectLabels, decimalSep: string): string {
+  return (Object.keys(effect) as Array<keyof PromiseEffect>)
+    .map((k) => {
+      const v = effect[k];
+      return typeof v === 'number' ? `${labels[k]} ×${String(v).replace('.', decimalSep)}` : labels[k];
+    })
+    .join(', ');
+}
+
+const ES_EFFECT_LABELS: EffectLabels = {
+  damage: 'Daño',
+  enemySpeed: 'Velocidad enemigos',
+  pickupRadius: 'Imán',
+  xpGain: 'XP',
+  cooldown: 'Recarga',
+  playerSpeed: 'Tu velocidad',
+  invulnerable: 'Invulnerable',
+};
+
+const EN_EFFECT_LABELS: EffectLabels = {
+  damage: 'Damage',
+  enemySpeed: 'Enemy speed',
+  pickupRadius: 'Magnet',
+  xpGain: 'XP',
+  cooldown: 'Cooldown',
+  playerSpeed: 'Your speed',
+  invulnerable: 'Invulnerable',
+};
 
 const ES = {
   menu: {
@@ -55,9 +95,17 @@ const ES = {
     digna: '¡Vivienda digna para todos!',
   },
   promise: {
+    spawned: '🗳️ ¡Elecciones! Ha aparecido una urna: cógela',
+    title: (promise: string) => `🗳️ ${promise}`,
+    effect: (e: PromiseEffect) => describeEffect(e, ES_EFFECT_LABELS, ','),
+    buffLine: (now: string, ifBroken: string) => `Ahora: ${now}  ·  Si se incumple: ${ifBroken}`,
+    question: (seconds: number) => `¿Se cumplirá? ${seconds} s`,
     fulfilled: '✅ ¡Promesa cumplida! (milagro)',
+    fulfilledTitle: (promise: string) => `✅ ${promise}`,
+    brokenTitle: (promise: string) => `❌ ${promise}`,
+    fulfilledDetail: 'Se acaba el efecto, sin penalización',
     broken: '❌ PROMESA INCUMPLIDA',
-    countdown: (seconds: number) => `${seconds} s`,
+    brokenDetail: (effect: string, seconds: number) => `${effect} durante ${seconds} s`,
   },
   enemies: {
     ipc: { name: 'Subida del IPC', desc: 'Sube poco a poco, pero nunca para.' },
@@ -146,9 +194,17 @@ const EN: Texts = {
     digna: 'Decent housing for everyone!',
   },
   promise: {
+    spawned: '🗳️ Elections! A ballot box has appeared: grab it',
+    title: (promise: string) => `🗳️ ${promise}`,
+    effect: (e: PromiseEffect) => describeEffect(e, EN_EFFECT_LABELS, '.'),
+    buffLine: (now: string, ifBroken: string) => `Now: ${now}  ·  If broken: ${ifBroken}`,
+    question: (seconds: number) => `Will they keep it? ${seconds} s`,
     fulfilled: '✅ Promise kept! (miracle)',
+    fulfilledTitle: (promise: string) => `✅ ${promise}`,
+    brokenTitle: (promise: string) => `❌ ${promise}`,
+    fulfilledDetail: 'Effect ends, no penalty',
     broken: '❌ PROMISE BROKEN',
-    countdown: (seconds: number) => `${seconds} s`,
+    brokenDetail: (effect: string, seconds: number) => `${effect} for ${seconds} s`,
   },
   enemies: {
     ipc: { name: 'Inflation Spike', desc: 'Rises slowly, but never stops.' },

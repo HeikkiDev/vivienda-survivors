@@ -37,7 +37,7 @@ Clon minimalista de *Vampire Survivors* y sátira (genérica) sobre la crisis de
 | 🍺 **Caña con los colegas** | Cura 30. Aparece cuando ya no quedan otras mejoras. |
 
 ## 🗳️ Promesas electorales
-Aparecen en los minutos 2, 4, 6 y 8 (una flecha indica dónde). Al cogerla tienes un **buff de 20 s**… y luego, al 50%, la promesa se cumple o se incumple y sufres un **debuff de 15 s**.
+Aparece una urna en los minutos 2, 4, 6 y 8: se avisa en pantalla y una flecha indica dónde. Al cogerla se elige una promesa al azar y tienes un **buff de 20 s**; arriba verás qué ganas, qué pasaría si se incumple y la cuenta atrás *«¿Se cumplirá?»*. Al acabar, al 50%: se cumple (el buff termina sin más) o se incumple y sufres un **debuff de 15 s**.
 
 | Promesa | Buff | Si se incumple |
 |---|---|---|

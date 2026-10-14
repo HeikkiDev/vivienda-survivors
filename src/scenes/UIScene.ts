@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { DEFEAT_ANIM, type FallingPiecesConfig, UI, VICTORY_ANIM } from '../config';
+import { DEFEAT_ANIM, type FallingPiecesConfig, PROMISES, UI, VICTORY_ANIM } from '../config';
 import { TEXTS } from '../texts';
 import { onGameResize } from '../utils/layout';
 import { formatTime } from '../utils/math';
@@ -369,17 +369,23 @@ export class UIScene extends Phaser.Scene {
       return;
     }
     const p = UI.promise;
-    const countdown = TEXTS.promise.countdown(Math.ceil(status.remaining));
+    const seconds = Math.ceil(status.remaining);
+    const promise = PROMISES[status.id];
     let text: string;
     let color: string;
     if (status.phase === 'buff') {
-      text = `${TEXTS.promises[status.id]}\n${countdown}`;
+      const t = TEXTS.promise;
+      text = [
+        t.title(TEXTS.promises[status.id]),
+        t.buffLine(t.effect(promise.buff), t.effect(promise.debuff)),
+        t.question(seconds),
+      ].join('\n');
       color = p.buffColor;
     } else if (status.phase === 'debuff') {
-      text = `${TEXTS.promise.broken}\n${countdown}`;
+      text = `${TEXTS.promise.brokenTitle(TEXTS.promises[status.id])}\n${TEXTS.promise.brokenDetail(TEXTS.promise.effect(promise.debuff), seconds)}`;
       color = p.brokenColor;
     } else {
-      text = TEXTS.promise.fulfilled;
+      text = `${TEXTS.promise.fulfilledTitle(TEXTS.promises[status.id])}\n${TEXTS.promise.fulfilledDetail}`;
       color = p.fulfilledColor;
     }
     this.promiseBanner.setText(text).setColor(color).setVisible(true);

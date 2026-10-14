@@ -373,6 +373,10 @@ export const PROMESA = {
   fulfilledChance: 0.5,
   /** Segundos que se muestra el banner "¡Promesa cumplida!". */
   fulfilledBannerSeconds: 3,
+  /** Segundos del aviso "ha aparecido una urna". */
+  spawnAnnounceSeconds: 4,
+  /** Segundos del aviso central de promesa cumplida/incumplida. */
+  resolveAnnounceSeconds: 3,
 } as const;
 
 export const PROMISES: Record<PromiseId, { buff: PromiseEffect; debuff: PromiseEffect }> = {
@@ -546,7 +550,7 @@ export const UI = {
     subtitleFadeMs: 600,
   },
   announcement: {
-    y: 150,
+    y: 180,
     size: 26,
     warningColor: '#ff5555',
     infoColor: '#ffd447',

@@ -11,6 +11,7 @@ import {
   EURO,
   MS_PER_SECOND,
   PLAYER,
+  PROMESA,
   SECONDS_PER_MINUTE,
   SPAWN,
   SPAWN_TABLE,
@@ -160,7 +161,20 @@ export class GameScene extends Phaser.Scene {
     this.enemyIntroQueue = [];
     this.spawner = new Spawner(this, (id) => this.enemyIntroQueue.push(id));
     this.gems = new XpGemPool(this);
-    this.elections = new Elections(this, this.modifiers, this.elapsed, () => this.brokenPromises++);
+    this.elections = new Elections(this, this.modifiers, this.elapsed, {
+      onSpawn: () => this.announce(TEXTS.promise.spawned, 'info', PROMESA.spawnAnnounceSeconds),
+      onPickup: () => {
+        if (this.announcement?.text === TEXTS.promise.spawned) this.announcement = null;
+      },
+      onResolve: (fulfilled) => {
+        if (!fulfilled) this.brokenPromises++;
+        this.announce(
+          fulfilled ? TEXTS.promise.fulfilled : TEXTS.promise.broken,
+          fulfilled ? 'info' : 'warning',
+          PROMESA.resolveAnnounceSeconds,
+        );
+      },
+    });
 
     this.bossGroup = this.physics.add.group({ maxSize: 1 });
     this.boss = new Boss(this);

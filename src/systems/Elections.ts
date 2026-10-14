@@ -14,6 +14,12 @@ export interface PromiseStatus {
   remaining: number;
 }
 
+export interface ElectionEvents {
+  onSpawn: () => void;
+  onPickup: () => void;
+  onResolve: (fulfilled: boolean) => void;
+}
+
 /** Sección 10: temporización de la promesa electoral, tirada 50% y buff/debuff en `Modifiers`. */
 export class Elections {
   readonly pickup: PromesaPickup;
@@ -26,7 +32,7 @@ export class Elections {
     scene: Phaser.Scene,
     private readonly modifiers: Modifiers,
     startElapsed: number,
-    private readonly onBroken: () => void,
+    private readonly events: ElectionEvents,
   ) {
     this.pickup = new PromesaPickup(scene);
     // Con `?min=N` se omiten las apariciones anteriores; la del minuto N sale al instante.
@@ -42,11 +48,13 @@ export class Elections {
       this.schedule.shift();
       randomPointInRing(px, py, PROMESA.spawnMinDistance, PROMESA.spawnMaxDistance, WORLD_WIDTH, WORLD_HEIGHT, this.point);
       this.pickup.spawn(this.point.x, this.point.y);
+      this.events.onSpawn();
     }
 
     if (this.pickup.tick(dt) && this.pickup.overlaps(px, py, playerRadius)) {
       this.pickup.despawn();
       this.start(PROMISE_IDS[Math.floor(Math.random() * PROMISE_IDS.length)]);
+      this.events.onPickup();
     }
 
     if (!this.status) return;
@@ -66,10 +74,11 @@ export class Elections {
     if (Math.random() < PROMESA.fulfilledChance) {
       this.status = { phase: 'fulfilled', id, remaining: PROMESA.fulfilledBannerSeconds };
       this.modifiers.promiseEffect = null;
+      this.events.onResolve(true);
     } else {
       this.status = { phase: 'debuff', id, remaining: PROMESA.debuffSeconds };
       this.modifiers.promiseEffect = PROMISES[id].debuff;
-      this.onBroken();
+      this.events.onResolve(false);
     }
   }
 
