@@ -1,5 +1,5 @@
 // TODOS los textos visibles, por idioma. Ver GDD.md y NOTES.md (multi-idioma).
-import { CANA_HEAL, DEFAULT_LANGUAGE, LANGUAGE_STORAGE_KEY, PASSIVES, type Language } from './config';
+import { CANA_HEAL, DEFAULT_LANGUAGE, LANGUAGE_STORAGE_KEY, PASSIVES, VICTORY_MINUTE, type Language } from './config';
 
 const pct = (ratio: number): number => Math.round(ratio * 100);
 
@@ -68,6 +68,10 @@ const ES = {
   boss: {
     warning: '⚠️ ¡Se está inflando la BURBUJA 2.0!',
     death: 'La burbuja ha pinchado… de momento.',
+  },
+  victory: {
+    title: '¡VICTORIA!',
+    subtitle: `Has aguantado ${VICTORY_MINUTE} minutos… ahora toca firmar.`,
   },
   gameOver: {
     victoryTitle: '🏠 Has firmado la hipoteca… a 40 años.',
@@ -151,6 +155,10 @@ const EN: Texts = {
   boss: {
     warning: '⚠️ BUBBLE 2.0 is inflating!',
     death: 'The bubble has burst… for now.',
+  },
+  victory: {
+    title: 'VICTORY!',
+    subtitle: `You lasted ${VICTORY_MINUTE} minutes… now it's time to sign.`,
   },
   gameOver: {
     victoryTitle: '🏠 You signed the mortgage… for 40 years.',

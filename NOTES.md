@@ -139,3 +139,11 @@
 - A petición del usuario (no estaba en el GDD original): la primera vez que aparece cada tipo de enemigo se muestra una tarjeta
   (icono + nombre + descripción) abajo al centro durante `UI.enemyIntro.seconds`. Es un elemento aparte del aviso del boss
   para no pisarse; si llegan varios a la vez, se encolan. El jefe no se presenta (ya tiene su aviso).
+
+## Celebración de victoria
+- A petición del usuario (no estaba en el GDD): al llegar a 10:00 la partida no salta directamente a `GameOverScene`.
+  `GameScene` congela la física, hace flash blanco y zoom sobre el jugador, desvanece enemigos/boss y el jugador "late";
+  `UIScene` muestra "¡VICTORIA!" con confeti (rectángulos de UI, no entidades) y un subtítulo. Tras `VICTORY_ANIM.durationMs`
+  hay un fundido y aparece la pantalla de victoria. La derrota sigue siendo inmediata.
+- Durante la celebración no se puede pausar, no se recibe daño (física pausada) y el HUD oculta banner de promesa, avisos,
+  barra del boss y tarjeta de enemigo. El récord se guarda como 10:00 exactos. Números en `VICTORY_ANIM` y `UI.victory`, textos en `TEXTS.victory`.

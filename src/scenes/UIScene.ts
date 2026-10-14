@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { UI } from '../config';
+import { UI, VICTORY_ANIM } from '../config';
 import { TEXTS } from '../texts';
 import { onGameResize } from '../utils/layout';
 import { formatTime } from '../utils/math';
@@ -24,8 +24,11 @@ export class UIScene extends Phaser.Scene {
   private pauseVeil!: Phaser.GameObjects.Rectangle;
   private pauseTitle!: Phaser.GameObjects.Text;
   private pauseHint!: Phaser.GameObjects.Text;
-  private pauseButton!: Phaser.GameObjects.GameObject & Phaser.GameObjects.Components.Transform;
+  private pauseButton!: Phaser.GameObjects.GameObject &
+    Phaser.GameObjects.Components.Transform &
+    Phaser.GameObjects.Components.Visible;
   private pausedByUser = false;
+  private victoryShown = false;
 
   constructor() {
     super('UIScene');
@@ -80,6 +83,7 @@ export class UIScene extends Phaser.Scene {
 
     this.enemyIntroCard = null;
     this.enemyIntroId = null;
+    this.victoryShown = false;
 
     this.createPauseControls();
     this.layout();
@@ -176,6 +180,78 @@ export class UIScene extends Phaser.Scene {
     this.updateBossBar(s.boss);
     this.updateAnnouncement(s.announcement);
     this.updateEnemyIntro(s.enemyIntro);
+    if (s.victory) this.showVictory();
+  }
+
+  /** Celebración de victoria: confeti, título que aparece de golpe y late, subtítulo y fundido. */
+  private showVictory(): void {
+    if (this.victoryShown) return;
+    this.victoryShown = true;
+    const v = UI.victory;
+    const h = UI.hud;
+    const { width, height } = this.scale;
+    this.pauseButton.setVisible(false).disableInteractive();
+
+    this.spawnConfetti(width, height);
+
+    const titleY = height * v.titleYRatio;
+    const title = this.add
+      .text(width / 2, titleY, TEXTS.victory.title, {
+        fontFamily: UI.fontFamily,
+        fontSize: `${v.titleSize}px`,
+        fontStyle: 'bold',
+        color: v.titleColor,
+        stroke: h.textStroke,
+        strokeThickness: v.titleStrokeThickness,
+      })
+      .setOrigin(0.5)
+      .setScale(0);
+    this.tweens.add({ targets: title, scale: 1, duration: v.popMs, ease: 'Back.easeOut' });
+    this.tweens.add({
+      targets: title,
+      scale: v.pulseScale,
+      duration: v.pulseMs,
+      delay: v.popMs,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut',
+    });
+
+    const subtitle = this.add
+      .text(width / 2, titleY + v.subtitleGap, TEXTS.victory.subtitle, {
+        fontFamily: UI.fontFamily,
+        fontSize: `${v.subtitleSize}px`,
+        fontStyle: 'bold',
+        color: v.subtitleColor,
+        stroke: h.textStroke,
+        strokeThickness: h.textStrokeThickness,
+      })
+      .setOrigin(0.5)
+      .setAlpha(0);
+    this.tweens.add({ targets: subtitle, alpha: 1, duration: v.subtitleFadeMs, delay: v.subtitleDelayMs });
+
+    this.time.delayedCall(VICTORY_ANIM.durationMs, () => this.cameras.main.fadeOut(VICTORY_ANIM.fadeOutMs));
+  }
+
+  private spawnConfetti(width: number, height: number): void {
+    const v = UI.victory;
+    for (let i = 0; i < v.confettiCount; i++) {
+      const w = Phaser.Math.Between(v.confettiMinW, v.confettiMaxW);
+      const ph = Phaser.Math.Between(v.confettiMinH, v.confettiMaxH);
+      const x = Phaser.Math.Between(0, width);
+      const color = Phaser.Utils.Array.GetRandom(v.confettiColors as number[]);
+      const piece = this.add.rectangle(x, -ph, w, ph, color).setAngle(Phaser.Math.Between(0, 360));
+      this.tweens.add({
+        targets: piece,
+        y: height + ph,
+        x: x + Phaser.Math.Between(-v.confettiDriftX, v.confettiDriftX),
+        angle: piece.angle + Phaser.Math.Between(-v.confettiSpinDeg, v.confettiSpinDeg),
+        duration: Phaser.Math.Between(v.confettiFallMinMs, v.confettiFallMaxMs),
+        delay: Phaser.Math.Between(0, v.confettiSpawnSpreadMs),
+        ease: 'Sine.easeIn',
+        onComplete: () => piece.destroy(),
+      });
+    }
   }
 
   /** Tarjeta (icono + nombre + descripción) del enemigo nuevo; se rehace solo al cambiar de enemigo. */

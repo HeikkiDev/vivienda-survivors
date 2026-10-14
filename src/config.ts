@@ -296,6 +296,20 @@ export const TOURIST_WAVE = {
 /** Sección 11 — Victoria al llegar a este minuto. */
 export const VICTORY_MINUTE = 10;
 
+/** Celebración antes de la pantalla de victoria (petición del usuario, ver NOTES.md). */
+export const VICTORY_ANIM = {
+  /** Tiempo total antes del fundido a GameOverScene. */
+  durationMs: 4000,
+  fadeOutMs: 600,
+  flashMs: 500,
+  flashColor: { r: 255, g: 255, b: 255 },
+  zoom: 1.4,
+  zoomMs: 1500,
+  enemyFadeMs: 700,
+  playerPulseScale: 1.25,
+  playerPulseMs: 300,
+} as const;
+
 // Sección 10 — Promesa electoral
 /** Multiplicadores temporales de una promesa (los ausentes valen 1). */
 export interface PromiseEffect {
@@ -447,6 +461,32 @@ export const UI = {
     nameColor: '#ffd447',
     descSize: 14,
     descColor: '#ffffff',
+  },
+  victory: {
+    titleYRatio: 0.25,
+    titleSize: 72,
+    titleColor: '#ffd447',
+    titleStrokeThickness: 8,
+    subtitleGap: 64,
+    subtitleSize: 24,
+    subtitleColor: '#ffffff',
+    subtitleDelayMs: 700,
+    subtitleFadeMs: 500,
+    popMs: 600,
+    pulseScale: 1.08,
+    pulseMs: 450,
+    confettiCount: 140,
+    confettiColors: [0xffd447, 0xff4fa3, 0x3fa9f5, 0x7cfc00, 0xffffff, 0xff8c1a] as readonly number[],
+    confettiMinW: 6,
+    confettiMaxW: 10,
+    confettiMinH: 10,
+    confettiMaxH: 16,
+    confettiDriftX: 80,
+    confettiSpinDeg: 720,
+    confettiFallMinMs: 1800,
+    confettiFallMaxMs: 3200,
+    /** Los trozos salen escalonados durante este tiempo. */
+    confettiSpawnSpreadMs: 1800,
   },
   announcement: {
     y: 150,
