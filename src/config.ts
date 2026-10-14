@@ -51,6 +51,30 @@ export const LANGUAGE_STORAGE_KEY = 'viviendaSurvivors.lang';
 /** Enlace que acompaña al texto de compartir (GDD H12). */
 export const SHARE_URL = 'https://heikkidev.github.io/vivienda-survivors/';
 
+/** Imagen para compartir: captura del final de la partida + resultado (1200×630, formato de vista previa en redes). */
+export const SHARE_CARD = {
+  width: 1200,
+  height: 630,
+  /** La franja oscura va de transparente (shadeFromY) a shadeAlpha (abajo). */
+  shadeFromY: 280,
+  shadeAlpha: 0.9,
+  marginX: 48,
+  titleY: 462,
+  titleSize: 54,
+  titleColor: '#ffffff',
+  statsY: 528,
+  statsSize: 30,
+  statsColor: '#ffd447',
+  footerY: 588,
+  footerSize: 24,
+  footerColor: '#dddddd',
+  strokeColor: '#000000',
+  strokeWidth: 6,
+  minFontSize: 16,
+  fileName: 'vivienda-survivors.png',
+  mimeType: 'image/png',
+};
+
 export const AUDIO = {
   sfxMaxInstances: 4,
   sfxMinIntervalMs: 50,

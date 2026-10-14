@@ -360,17 +360,21 @@ Pools: usa `Phaser.Physics.Arcade.Group` con `maxSize` y reutilización (`get()`
 - ✅ Funciona en la versión de itch.io (rutas relativas).
 
 **H12 — Compartir resultado**
-- En la pantalla de fin de partida (victoria y derrota), un botón **"Compartir"** bajo el de reintentar.
-- Genera un texto corto y gracioso con el resultado, en el idioma activo, desde `src/texts.ts`. Ejemplos:
-  - Victoria: *"🏠 He firmado una hipoteca a 40 años en Vivienda Survivors. Nivel 17 · 1.234 caseros derrotados · 3 promesas incumplidas. ¿Y tú? <url>"*
-  - Derrota: *"🛏️ He vuelto a casa de mis padres tras 04:12 buscando piso en Vivienda Survivors. ¿Aguantas más? <url>"*
+- En la pantalla de fin de partida (victoria y derrota), un botón **"📤 Compartir"** bajo el de reintentar.
+- **Imagen** de 1200×630 (formato de vista previa en redes): captura del último momento de la partida (tomada al morir o ganar, antes del flash de la animación final) con una franja oscura abajo y, encima, el título de victoria/derrota, una línea de estadísticas (tiempo · nivel · enemigos · promesas incumplidas) y la URL del juego. Textos en `src/texts.ts`, medidas en `src/config.ts` (`SHARE_CARD`).
+- **Texto** que acompaña a la imagen, corto y gracioso, en el idioma activo. Ejemplos:
+  - Victoria: *"🏠 He firmado una hipoteca a 40 años en Vivienda Survivors. Nivel 17 · 1532 enemigos derrotados · 3 promesas incumplidas. ¿Y tú? <url>"*
+  - Derrota: *"🛏️ He vuelto a casa de mis padres tras 04:12 buscando piso en Vivienda Survivors. Nivel 7 · … ¿Aguantas más? <url>"*
 - La URL del juego se define en `src/config.ts` (`SHARE_URL`).
-- Comportamiento: en táctil (`pointer: coarse`) con `navigator.share`, se abre el menú nativo de compartir. Si no, se copia el texto al portapapeles y el botón muestra *"¡Copiado!"* durante 2 s.
-- Sin backend ni capturas de pantalla: solo texto + enlace. La vista previa del enlace la aportan las meta etiquetas Open Graph de `index.html`.
-- ✅ En escritorio, al pulsar "Compartir" el texto queda en el portapapeles y aparece "¡Copiado!".
-- ✅ En móvil se abre el menú nativo; si el usuario cancela, no hay errores.
-- ✅ El texto refleja los datos reales de la partida (tiempo, nivel, enemigos, promesas incumplidas) y cambia según victoria o derrota.
-- ✅ Si no hay ni `navigator.share` ni portapapeles disponible, el botón muestra el texto en un `prompt` para copiarlo a mano, sin errores.
+- Comportamiento:
+  - Táctil (`pointer: coarse`) con `navigator.share`: menú nativo con la imagen y el texto (solo texto si el navegador no admite archivos).
+  - Escritorio: la imagen se copia al portapapeles y el botón muestra *"¡Imagen copiada!"* 2 s. Si no se puede (sin permiso, iframe…), se descarga el PNG (*"¡Imagen descargada!"*).
+  - Sin captura: el texto se copia al portapapeles (*"¡Copiado!"*); si tampoco hay portapapeles, se muestra en un `prompt` para copiarlo a mano.
+- Sin backend. La vista previa del enlace la aportan las meta etiquetas Open Graph de `index.html`.
+- ✅ En escritorio, al pulsar "Compartir" la imagen queda en el portapapeles (o se descarga) y el botón lo indica.
+- ✅ En móvil se abre el menú nativo con la imagen; si el usuario cancela, no hay errores.
+- ✅ Imagen y texto reflejan los datos reales de la partida y cambian según victoria o derrota.
+- ✅ Si nada de lo anterior está disponible, el texto se puede copiar a mano, sin errores.
 
 ---
 

@@ -106,6 +106,8 @@ export class GameScene extends Phaser.Scene {
   private ending: EndingKind | null = null;
   private debugStart = false;
   private debugWin = false;
+  /** Captura del último momento de la partida, para la imagen de compartir. */
+  private endSnapshot: HTMLImageElement | null = null;
 
   constructor() {
     super('GameScene');
@@ -147,6 +149,7 @@ export class GameScene extends Phaser.Scene {
     this.brokenPromises = 0;
     this.ended = false;
     this.ending = null;
+    this.endSnapshot = null;
     this.modifiers = new Modifiers();
 
     this.physics.world.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
@@ -445,8 +448,12 @@ export class GameScene extends Phaser.Scene {
     this.player.move(Phaser.Math.Vector2.ZERO, 0);
     AudioManager.stopMusic();
     AudioManager.playSfx(victory ? 'levelup' : 'death');
-    if (victory) this.playVictory();
-    else this.playDefeat();
+    // La captura se toma en el siguiente render, antes del flash y el zoom de la animación final.
+    this.game.renderer.snapshot((image) => {
+      if (image instanceof HTMLImageElement) this.endSnapshot = image;
+      if (victory) this.playVictory();
+      else this.playDefeat();
+    });
   }
 
   /** Despeja enemigos y celebra; UIScene pone el título y el confeti. */
@@ -513,6 +520,7 @@ export class GameScene extends Phaser.Scene {
       kills: this.kills,
       brokenPromises: this.brokenPromises,
       recordable: !this.debugStart,
+      snapshot: this.endSnapshot,
     };
     this.scene.start('GameOverScene', data);
   }

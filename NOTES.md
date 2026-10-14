@@ -175,7 +175,11 @@
 ## H12 — Compartir resultado
 - `navigator.share` solo se usa en dispositivos táctiles (`pointer: coarse`): Chrome y Safari de escritorio también lo tienen, pero el GDD pide portapapeles en escritorio.
 - Si el usuario cancela el menú nativo (`AbortError`), no se hace nada. Si `share` falla por otro motivo, se intenta el portapapeles.
-- Sin portapapeles (p. ej. iframe de itch.io sin permiso `clipboard-write`), el texto se muestra en un `window.prompt` para copiarlo a mano: es lo más simple y no añade UI.
+- Imagen: `renderer.snapshot` se pide en `endGame` y la animación final arranca en su callback, para que la captura no salga con el flash blanco/rojo. Incluye el HUD (temporizador, nivel), que da contexto.
+- La imagen se compone con Canvas 2D (`utils/shareCard.ts`) en "cover": la captura se recorta para llenar 1200×630. Cada línea de texto reduce su tamaño si no cabe.
+- La imagen se genera al entrar en la pantalla final y se pasa como promesa al `ClipboardItem`: Safari exige crearlo dentro del gesto del usuario.
+- En escritorio se copia solo la imagen (no imagen + texto): muchos destinos de pegado solo aceptan un tipo.
+- Sin portapapeles de imagen (p. ej. iframe de itch.io sin `clipboard-write`) se descarga el PNG. Sin captura ni portapapeles de texto, el texto se muestra en un `window.prompt`: es lo más simple y no añade UI.
 - La cifra de enemigos usa `toLocaleString`; en español no agrupa los números de 4 cifras ("1234"), que es la norma de la RAE.
 - Las partidas con `?min`/`?win` también se pueden compartir (no hay récord en juego).
 - Se reubica el botón de reintentar (y 440 → 420) para dejar sitio al de compartir en 960×540.

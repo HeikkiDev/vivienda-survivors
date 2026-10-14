@@ -153,6 +153,10 @@ const ES = {
     timeSurvived: (t: string) => `Tiempo sobrevivido: ${t}`,
     share: '📤 Compartir',
     copied: '✅ ¡Copiado!',
+    imageCopied: '✅ ¡Imagen copiada!',
+    imageDownloaded: '✅ ¡Imagen descargada!',
+    cardStats: (s: ShareStats) => `⏱ ${s.time} · ${shareStatsEs(s)}`,
+    cardFooter: (url: string) => `▶ Juega gratis en ${url.replace(/^https?:\/\//, '')}`,
     manualCopy: 'Copia este texto para compartirlo:',
     shareVictory: (s: ShareStats) =>
       `🏠 He firmado una hipoteca a 40 años en Vivienda Survivors. ${shareStatsEs(s)}. ¿Y tú? ${s.url}`,
@@ -257,6 +261,10 @@ const EN: Texts = {
     timeSurvived: (t: string) => `Time survived: ${t}`,
     share: '📤 Share',
     copied: '✅ Copied!',
+    imageCopied: '✅ Image copied!',
+    imageDownloaded: '✅ Image downloaded!',
+    cardStats: (s: ShareStats) => `⏱ ${s.time} · ${shareStatsEn(s)}`,
+    cardFooter: (url: string) => `▶ Play free at ${url.replace(/^https?:\/\//, '')}`,
     manualCopy: 'Copy this text to share it:',
     shareVictory: (s: ShareStats) =>
       `🏠 I signed a 40-year mortgage in Vivienda Survivors. ${shareStatsEn(s)}. Can you beat that? ${s.url}`,

@@ -1,10 +1,11 @@
 import Phaser from 'phaser';
-import { BEST_TIME_STORAGE_KEY, GAME_WIDTH, SHARE_URL, UI } from '../config';
+import { BEST_TIME_STORAGE_KEY, GAME_WIDTH, SHARE_CARD, SHARE_URL, UI } from '../config';
 import { AudioManager } from '../systems/AudioManager';
 import { TEXTS } from '../texts';
 import { addBaseOverlay, centerOnBaseArea } from '../utils/layout';
 import { formatTime } from '../utils/math';
-import { shareText } from '../utils/share';
+import { shareResult } from '../utils/share';
+import { createShareCard } from '../utils/shareCard';
 
 export interface GameOverData {
   victory: boolean;
@@ -14,6 +15,8 @@ export interface GameOverData {
   brokenPromises: number;
   /** false si la partida empezó con `?min=N` (no cuenta para el récord). */
   recordable: boolean;
+  /** Captura del final de la partida (null si no se pudo tomar). */
+  snapshot: HTMLImageElement | null;
 }
 
 export class GameOverScene extends Phaser.Scene {
@@ -95,6 +98,19 @@ export class GameOverScene extends Phaser.Scene {
       url: SHARE_URL,
     };
     const text = data.victory ? TEXTS.gameOver.shareVictory(stats) : TEXTS.gameOver.shareDefeat(stats);
+    // Se genera ya para que esté lista al pulsar (el portapapeles exige seguir dentro del gesto).
+    const image = data.snapshot
+      ? createShareCard(data.snapshot, {
+          title: data.victory ? TEXTS.gameOver.victoryTitle : TEXTS.gameOver.defeatTitle,
+          stats: TEXTS.gameOver.cardStats(stats),
+          footer: TEXTS.gameOver.cardFooter(SHARE_URL),
+        })
+      : null;
+    const feedback: Partial<Record<Awaited<ReturnType<typeof shareResult>>, string>> = {
+      copied: TEXTS.gameOver.copied,
+      imageCopied: TEXTS.gameOver.imageCopied,
+      imageDownloaded: TEXTS.gameOver.imageDownloaded,
+    };
     const button = this.add
       .text(cx, g.shareY, TEXTS.gameOver.share, {
         fontFamily: UI.fontFamily,
@@ -111,14 +127,15 @@ export class GameOverScene extends Phaser.Scene {
     let resetTimer: Phaser.Time.TimerEvent | null = null;
     // pointerup sigue siendo un gesto del usuario: navigator.share y el portapapeles lo exigen.
     button.on('pointerup', async () => {
-      const result = await shareText(text);
+      const result = await shareResult({ text, image, fileName: SHARE_CARD.fileName, mimeType: SHARE_CARD.mimeType });
       if (!this.scene.isActive()) return;
       if (result === 'manual') {
         window.prompt(TEXTS.gameOver.manualCopy, text);
         return;
       }
-      if (result !== 'copied') return;
-      button.setText(TEXTS.gameOver.copied);
+      const label = feedback[result];
+      if (!label) return;
+      button.setText(label);
       resetTimer?.remove();
       resetTimer = this.time.delayedCall(g.copiedMs, () => button.setText(TEXTS.gameOver.share));
     });
