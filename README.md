@@ -82,6 +82,4 @@ Todo lo visible está en [`src/visuals.ts`](src/visuals.ts):
 
 `USE_CUSTOM_ART = true` (por defecto) usa los PNG; con `false` el juego usa solo emoji. Si una imagen falla, esa entidad vuelve a su emoji.
 
-Algunos iconos se generan con scripts de Pillow en [`tools/`](tools/) (p. ej. `python tools/gen_icon_teletrabajo.py`).
-
 El diseño completo está en [`GDD.md`](GDD.md).
