@@ -126,6 +126,8 @@ export const HEALTH_BAR = {
 
 export const REGEN_FEEDBACK = {
   intervalSeconds: 2,
+  /** "+N" muestra la vida real curada en la ventana, redondeada y con este mínimo. */
+  minShownAmount: 1,
   offsetY: -30,
   risePixels: 20,
   riseMs: 600,

@@ -290,20 +290,25 @@ export class GameScene extends Phaser.Scene {
     this.regenHealed += this.player.hp - previousHp;
     this.regenFeedbackElapsed += dt;
     if (this.player.hp >= this.player.maxHp) {
+      this.showRegenText();
       this.regenFeedbackElapsed = 0;
       this.regenHealed = 0;
       return;
     }
     if (this.regenFeedbackElapsed < REGEN_FEEDBACK.intervalSeconds) return;
-    if (this.regenHealed > 0) {
-      this.regenText?.destroy();
-      this.regenText = createVisual(
-        this, 'healing', this.player.x, this.player.y + REGEN_FEEDBACK.offsetY, this.regenHealed,
-      ).setDepth(DEPTH.floatingText);
-      this.regenTextAgeMs = 0;
-    }
+    this.showRegenText();
     this.regenFeedbackElapsed %= REGEN_FEEDBACK.intervalSeconds;
     this.regenHealed = 0;
+  }
+
+  private showRegenText(): void {
+    if (this.regenHealed <= 0) return;
+    const amount = Math.max(REGEN_FEEDBACK.minShownAmount, Math.round(this.regenHealed));
+    this.regenText?.destroy();
+    this.regenText = createVisual(
+      this, 'healing', this.player.x, this.player.y + REGEN_FEEDBACK.offsetY, amount,
+    ).setDepth(DEPTH.floatingText);
+    this.regenTextAgeMs = 0;
   }
 
   private ageRegenText(deltaMs: number): void {
