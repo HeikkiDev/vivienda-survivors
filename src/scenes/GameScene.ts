@@ -100,6 +100,8 @@ export class GameScene extends Phaser.Scene {
   private elapsed = 0;
   private regenFeedbackElapsed = 0;
   private regenHealed = 0;
+  private regenText: Phaser.GameObjects.Text | null = null;
+  private regenTextAgeMs = 0;
   private kills = 0;
   private level = 1;
   private xp = 0;
@@ -146,6 +148,8 @@ export class GameScene extends Phaser.Scene {
     this.elapsed = startMinute * SECONDS_PER_MINUTE;
     this.regenFeedbackElapsed = 0;
     this.regenHealed = 0;
+    this.regenText = null;
+    this.regenTextAgeMs = 0;
     this.kills = 0;
     this.level = 1;
     this.xp = 0;
@@ -248,6 +252,7 @@ export class GameScene extends Phaser.Scene {
 
     this.player.tick(dt);
     this.applyPlayerRegen(dt);
+    this.ageRegenText(deltaMs);
     this.player.move(this.inputSystem.getDirection(), this.modifiers.playerSpeed);
     this.spawner.update(dt, this.elapsed, this.player.x, this.player.y);
     this.spawner.updateEnemies(this.player.x, this.player.y, this.modifiers.enemySpeed, dt);
@@ -291,20 +296,34 @@ export class GameScene extends Phaser.Scene {
     }
     if (this.regenFeedbackElapsed < REGEN_FEEDBACK.intervalSeconds) return;
     if (this.regenHealed > 0) {
-      const text = createVisual(
+      this.regenText?.destroy();
+      this.regenText = createVisual(
         this, 'healing', this.player.x, this.player.y + REGEN_FEEDBACK.offsetY, this.regenHealed,
       ).setDepth(DEPTH.floatingText);
-      this.tweens.chain({
-        targets: text,
-        tweens: [
-          { y: text.y - REGEN_FEEDBACK.risePixels, duration: REGEN_FEEDBACK.riseMs },
-          { alpha: 0, duration: REGEN_FEEDBACK.fadeMs },
-        ],
-        onComplete: () => text.destroy(),
-      });
+      this.regenTextAgeMs = 0;
     }
     this.regenFeedbackElapsed %= REGEN_FEEDBACK.intervalSeconds;
     this.regenHealed = 0;
+  }
+
+  private ageRegenText(deltaMs: number): void {
+    if (!this.regenText) return;
+    this.regenTextAgeMs += deltaMs;
+    if (this.regenTextAgeMs >= REGEN_FEEDBACK.riseMs + REGEN_FEEDBACK.fadeMs) {
+      this.regenText.destroy();
+      this.regenText = null;
+    }
+  }
+
+  /** El "+N" sigue al jugador: sube relativo a él y luego se desvanece. */
+  private syncRegenText(): void {
+    if (!this.regenText) return;
+    const age = this.regenTextAgeMs;
+    const rise = Math.min(1, age / REGEN_FEEDBACK.riseMs);
+    const fade = Math.min(1, Math.max(0, age - REGEN_FEEDBACK.riseMs) / REGEN_FEEDBACK.fadeMs);
+    this.regenText
+      .setPosition(this.player.x, this.player.y + REGEN_FEEDBACK.offsetY - REGEN_FEEDBACK.risePixels * rise)
+      .setAlpha(1 - fade);
   }
 
   /** Oleada turística, aviso del boss y boss. Con `?min=N` se omiten los anteriores a ese minuto. */
@@ -422,6 +441,7 @@ export class GameScene extends Phaser.Scene {
     if (this.boss.active) this.boss.syncVisual();
     this.bossBullets.syncVisuals();
     for (const w of this.weapons) w.syncVisuals();
+    this.syncRegenText();
   }
 
   private damageEnemy(enemy: Enemy, amount: number): void {
