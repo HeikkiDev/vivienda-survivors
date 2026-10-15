@@ -195,9 +195,9 @@ export const ESCUDO = {
     { damage: 10, tick: 0.35, radius: 115 },
   ] as readonly EscudoLevel[],
   auraColor: 0x3a7bff,
-  auraAlpha: 0.25,
+  auraAlpha: 0.18,
   /** Opacidad del escudo cuando su visual es un sprite estirado al radio del aura. */
-  spriteAlpha: 0.35,
+  spriteAlpha: 0.18,
 } as const;
 
 // Sección 5.3 — Grito "¡Eso es un trastero!"
