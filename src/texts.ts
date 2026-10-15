@@ -61,7 +61,7 @@ const EN_EFFECT_LABELS: EffectLabels = {
 };
 
 const ES = {
-  healing: (amount: number) => `+${Math.round(amount)}`,
+  healing: (amount: number) => `+${String(amount).replace('.', ',')}`,
   menu: {
     title: 'VIVIENDA SURVIVORS',
     subtitle: 'Sobrevive 10 minutos al mercado inmobiliario',
@@ -170,7 +170,7 @@ export type Texts = typeof ES;
 
 
 const EN: Texts = {
-  healing: ES.healing,
+  healing: (amount: number) => `+${amount}`,
   menu: {
     title: 'VIVIENDA SURVIVORS',
     subtitle: 'Survive 10 minutes of the housing market',
