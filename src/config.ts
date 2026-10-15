@@ -126,8 +126,8 @@ export const HEALTH_BAR = {
 
 export const REGEN_FEEDBACK = {
   intervalSeconds: 2,
-  offsetY: -32,
-  risePixels: 24,
+  offsetY: -30,
+  risePixels: 20,
   riseMs: 600,
   fadeMs: 200,
   fontSize: 18,
