@@ -12,6 +12,7 @@ import {
   MS_PER_SECOND,
   PLAYER,
   PROMESA,
+  REGEN_FEEDBACK,
   SECONDS_PER_MINUTE,
   SPAWN,
   SPAWN_TABLE,
@@ -35,7 +36,7 @@ import { applyNonWeaponUpgrade, generateUpgradeOptions, type UpgradeOption } fro
 import { TEXTS } from '../texts';
 import type { EnemyId, IconId, WeaponId } from '../types';
 import { randomPointInRing, xpToNext } from '../utils/math';
-import { createBackground, flashVisual } from '../visuals';
+import { createBackground, createVisual, flashVisual } from '../visuals';
 import { Curriculums } from '../weapons/Curriculums';
 import { EscudoLey } from '../weapons/EscudoLey';
 import { GritoTrastero } from '../weapons/GritoTrastero';
@@ -97,6 +98,8 @@ export class GameScene extends Phaser.Scene {
   private enemyIntroQueue: EnemyId[] = [];
   private levelUpOpen = false;
   private elapsed = 0;
+  private regenFeedbackElapsed = 0;
+  private regenHealed = 0;
   private kills = 0;
   private level = 1;
   private xp = 0;
@@ -141,6 +144,8 @@ export class GameScene extends Phaser.Scene {
     this.debugWin = new URLSearchParams(window.location.search).has(DEBUG_WIN_PARAM);
     this.debugStart = startMinute > 0 || this.debugWin;
     this.elapsed = startMinute * SECONDS_PER_MINUTE;
+    this.regenFeedbackElapsed = 0;
+    this.regenHealed = 0;
     this.kills = 0;
     this.level = 1;
     this.xp = 0;
@@ -270,8 +275,36 @@ export class GameScene extends Phaser.Scene {
 
   private applyPlayerRegen(dt: number): void {
     const regenPerSecond = this.modifiers.regenPerSecond;
-    if (regenPerSecond <= 0 || this.player.isDead || this.player.hp >= this.player.maxHp) return;
+    if (regenPerSecond <= 0 || this.player.isDead || this.player.hp >= this.player.maxHp) {
+      this.regenFeedbackElapsed = 0;
+      this.regenHealed = 0;
+      return;
+    }
+    const previousHp = this.player.hp;
     this.player.heal(regenPerSecond * dt);
+    this.regenHealed += this.player.hp - previousHp;
+    this.regenFeedbackElapsed += dt;
+    if (this.player.hp >= this.player.maxHp) {
+      this.regenFeedbackElapsed = 0;
+      this.regenHealed = 0;
+      return;
+    }
+    if (this.regenFeedbackElapsed < REGEN_FEEDBACK.intervalSeconds) return;
+    if (this.regenHealed > 0) {
+      const text = createVisual(
+        this, 'healing', this.player.x, this.player.y + REGEN_FEEDBACK.offsetY, this.regenHealed,
+      ).setDepth(DEPTH.floatingText);
+      this.tweens.chain({
+        targets: text,
+        tweens: [
+          { y: text.y - REGEN_FEEDBACK.risePixels, duration: REGEN_FEEDBACK.riseMs },
+          { alpha: 0, duration: REGEN_FEEDBACK.fadeMs },
+        ],
+        onComplete: () => text.destroy(),
+      });
+    }
+    this.regenFeedbackElapsed %= REGEN_FEEDBACK.intervalSeconds;
+    this.regenHealed = 0;
   }
 
   /** Oleada turística, aviso del boss y boss. Con `?min=N` se omiten los anteriores a ese minuto. */

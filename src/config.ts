@@ -124,6 +124,16 @@ export const HEALTH_BAR = {
   fgColor: 0x33cc33,
 } as const;
 
+export const REGEN_FEEDBACK = {
+  intervalSeconds: 2,
+  offsetY: -32,
+  risePixels: 24,
+  riseMs: 600,
+  fadeMs: 200,
+  fontSize: 18,
+  strokeThickness: 2,
+} as const;
+
 // Sección 7 — Enemigos
 
 export interface EnemyStats {

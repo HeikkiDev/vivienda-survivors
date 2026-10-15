@@ -1,6 +1,8 @@
 // TODAS las definiciones visuales del juego (sección 3.1 del GDD).
 // Cambiar el arte = editar solo este archivo + añadir archivos en public/assets/.
 import Phaser from 'phaser';
+import { REGEN_FEEDBACK } from './config';
+import { TEXTS } from './texts';
 import type {
   BackgroundVisual,
   EmojiVisual,
@@ -162,10 +164,33 @@ function createSprite(
 /** Única fábrica de visuales de entidades. */
 export function createVisual(
   scene: Phaser.Scene,
+  id: 'healing',
+  x: number,
+  y: number,
+  amount: number,
+): Phaser.GameObjects.Text;
+export function createVisual(
+  scene: Phaser.Scene,
   id: EntityVisualId,
   x: number,
   y: number,
+): Phaser.GameObjects.Text | Phaser.GameObjects.Sprite;
+export function createVisual(
+  scene: Phaser.Scene,
+  id: EntityVisualId | 'healing',
+  x: number,
+  y: number,
+  amount = 0,
 ): Phaser.GameObjects.Text | Phaser.GameObjects.Sprite {
+  if (id === 'healing') {
+    return scene.add.text(x, y, TEXTS.healing(amount), {
+      fontFamily: 'sans-serif',
+      fontSize: REGEN_FEEDBACK.fontSize,
+      color: '#33cc33',
+      stroke: '#000000',
+      strokeThickness: REGEN_FEEDBACK.strokeThickness,
+    }).setOrigin(0.5);
+  }
   const def = VISUALS[id];
   if (def.kind === 'sprite') {
     if (scene.textures.exists(def.key)) return createSprite(scene, def, x, y);
