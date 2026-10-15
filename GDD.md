@@ -95,7 +95,7 @@ Lanza un currículum hacia el enemigo **más cercano**. El proyectil desaparece 
 Varios proyectiles: abanico de ±10° alrededor del objetivo.
 
 ### 5.2 🛡️ Escudo Ley de Vivienda
-Aura circular permanente alrededor del jugador (círculo azul alpha 0.25). Daña a todo enemigo dentro cada *tick*.
+Aura circular permanente alrededor del jugador (alpha 0.18, por debajo del jugador y su barra de vida). Daña a todo enemigo dentro cada *tick*.
 
 | Nivel | Daño/tick | Tick (s) | Radio (px) |
 |---|---|---|---|
