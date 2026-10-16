@@ -302,8 +302,9 @@ export class GameScene extends Phaser.Scene {
   }
 
   private showRegenText(): void {
-    if (this.regenHealed <= 0) return;
-    const amount = Math.max(REGEN_FEEDBACK.minShownAmount, Math.round(this.regenHealed));
+    const factor = REGEN_FEEDBACK.roundingFactor;
+    const amount = Math.round(this.regenHealed * factor) / factor;
+    if (amount <= 0) return;
     this.regenText?.destroy();
     this.regenText = createVisual(
       this, 'healing', this.player.x, this.player.y + REGEN_FEEDBACK.offsetY, amount,
