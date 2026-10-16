@@ -38,6 +38,17 @@ export const FALLBACK_EMOJI: Record<EntityVisualId, EmojiVisual> = {
   icon_escudo: { kind: 'emoji', char: '🛡️', size: 24 },
   icon_grito: { kind: 'emoji', char: '📢', size: 24 },
   icon_sindicato: { kind: 'emoji', char: '✊', size: 24 },
+  // Evoluciones de armas: proyectil/efecto en el mapa e icono (HUD y tarjeta de level-up).
+  linkedin: { kind: 'emoji', char: '📇', size: 22 },
+  antidesahucios: { kind: 'emoji', char: '🏰', size: 28 },
+  manifestacion: { kind: 'emoji', char: '📣', size: 28 },
+  huelga: { kind: 'emoji', char: '👊', size: 36 },
+  icon_linkedin: { kind: 'emoji', char: '📇', size: 24 },
+  icon_antidesahucios: { kind: 'emoji', char: '🏰', size: 24 },
+  icon_manifestacion: { kind: 'emoji', char: '📣', size: 24 },
+  icon_huelga: { kind: 'emoji', char: '👊', size: 24 },
+  /** Marca de arma evolucionada en el HUD (en lugar del nivel). */
+  icon_evolved: { kind: 'emoji', char: '⭐', size: 12 },
   icon_aval: { kind: 'emoji', char: '👴', size: 24 },
   icon_piso: { kind: 'emoji', char: '🛏️', size: 24 },
   icon_bono: { kind: 'emoji', char: '🎫', size: 24 },

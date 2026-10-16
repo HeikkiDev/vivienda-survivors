@@ -28,6 +28,16 @@ Clon minimalista de *Vampire Survivors* y sátira (genérica) sobre la crisis de
 | 📢 **¡Eso es un trastero!** | Grito periódico: explosión en área que daña y empuja a los enemigos. |
 | ✊ **Sindicato de inquilinos** | Puños que orbitan a tu alrededor y golpean al pasar. Más puños por nivel. |
 
+### ⭐ Evoluciones
+Con un arma a nivel 5 y su pasiva emparejada, el siguiente menú de mejoras ofrece su evolución (tarjeta dorada «¡EVOLUCIÓN!»):
+
+| Arma + pasiva | Evolución |
+|---|---|
+| 📄 Currículums + 💼 Segundo trabajo | 📇 **LinkedIn Premium**: dispara en 8 direcciones, atraviesa a todos, +50% daño. |
+| 🛡️ Escudo + 👴 Aval de tus padres | 🏰 **Escudo Antidesahucios**: radio +60%, +50% daño y te cura al matar (máx. 5 HP/s). |
+| 📢 Grito + 🛏️ Piso compartido | 📣 **Manifestación**: el doble de seguido, radio ×2, empuje fuerte; cada 3.ª explosión llena la pantalla. |
+| ✊ Sindicato + 🎫 Bono Alquiler Joven | 👊 **Huelga general**: 8 puños más grandes, órbita +50%, +60% daño. |
+
 ## 🧩 Mejoras pasivas (máx. nivel 5)
 | Pasiva | Efecto por nivel |
 |---|---|
@@ -72,11 +82,12 @@ npm run zip      # zip listo para itch.io
 
 Cada push a `main` se publica automáticamente en GitHub Pages.
 
-Parámetros de URL para probar (las partidas con `min` o `win` no guardan récord):
+Parámetros de URL para probar (las partidas con `min`, `win` o `evo` no guardan récord):
 | Parámetro | Qué hace |
 |---|---|
 | `?min=N` | Empieza en el minuto `N` (0–9). |
 | `?win=1` | Ganas nada más empezar, para ver la animación de victoria. |
+| `?evo=1` | Empiezas con las 4 armas a nivel 5 y sus pasivas a nivel 1: las evoluciones salen en las primeras subidas. |
 | `?debug=1` | Muestra las hitboxes de la física. |
 
 ## 🎨 Cambiar el arte

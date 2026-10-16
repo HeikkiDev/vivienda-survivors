@@ -183,3 +183,18 @@
 - La cifra de enemigos usa `toLocaleString`; en español no agrupa los números de 4 cifras ("1234"), que es la norma de la RAE.
 - Las partidas con `?min`/`?win` también se pueden compartir (no hay récord en juego).
 - Se reubica el botón de reintentar (y 440 → 420) para dejar sitio al de compartir en 960×540.
+
+## Evoluciones de armas (issue #11)
+- El GDD tenía "evoluciones de armas" en *Fuera de alcance*; se implementa por petición explícita (GDD §5.5 actualizado).
+- Si hay varias evoluciones disponibles a la vez, salen todas (hasta 3) en el mismo menú, en posición aleatoria; el resto de huecos se rellena como siempre. Con `?evo=1` el primer menú tiene 3 evoluciones y el siguiente la cuarta.
+- El arma evolucionada es la misma instancia con `evolved = true` (mismo hueco, conserva pools y colisiones); al evolucionar rehace sus visuales con el id de la evolución. Su `level` se queda en 5, así que no vuelve a salir como mejora.
+- Valores en `EVOLUTIONS` (config.ts), calculados a partir del nivel 5 con `EVOLUTION_MULTIPLIERS`; los textos de efecto leen esos mismos valores.
+- LinkedIn Premium: 1 proyectil por dirección (8), el primero hacia el enemigo más cercano; perforación infinita (cada proyectil golpea una vez a cada enemigo).
+- Manifestación: "la mitad del cooldown base" = la mitad del cooldown de nivel 5 (1,25 s). La explosión gigante tiene el radio de la semidiagonal de la vista máxima (1400×720) para cubrir la pantalla. Mismo daño que el nivel 5 (el issue no pide más daño). Grito evolucionado: "¡SOMOS MILES!".
+- Escudo Antidesahucios: la cura usa una "bolsa" que se recarga a 5 HP/s (máx. 5) y se gasta al matar con el aura.
+- Huelga general: hitbox de cada puño 12 × 1,5 = 18 y emoji de 36 px.
+- Las evoluciones se muestran con emoji (📇 🏰 📣 👊; ⭐ en el HUD, `icon_evolved`). Se pueden sustituir por sprites en visuals.ts.
+- El destello dorado (círculo `Graphics` que crece y se desvanece) y la sacudida arrancan al cerrar el menú, porque GameScene está en pausa mientras está abierto.
+- `WeaponContext.damageEnemy` devuelve si el enemigo muere (lo necesita la cura del escudo).
+- Tarjeta de evolución: el efecto usa letra de 13 px para no pisar el chiste. En la pantalla final el interlineado de estadísticas baja de 8 a 4 px para que quepa la línea "Evoluciones: N".
+- Rendimiento (Chrome headless con GL por software): con las 4 evoluciones y 300 enemigos, ~0,75 ms de update + ~0,27 ms de render por frame.

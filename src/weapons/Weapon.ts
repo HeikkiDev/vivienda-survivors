@@ -13,13 +13,16 @@ export interface WeaponContext {
   enemyGroups: Phaser.Physics.Arcade.Group[];
   findNearestEnemy(x: number, y: number): Enemy | null;
   forEachEnemy(cb: (e: Enemy) => void): void;
-  damageEnemy(enemy: Enemy, amount: number): void;
+  /** Devuelve true si el enemigo muere con este golpe. */
+  damageEnemy(enemy: Enemy, amount: number): boolean;
 }
 
 /** Clase base: nivel, cooldown y update(dt). */
 export abstract class Weapon {
   abstract readonly id: WeaponId;
   level = 1;
+  /** Evolucionada: ya no sube de nivel (ver EVOLUTIONS en config.ts). */
+  evolved = false;
   protected cooldownTimer = 0;
 
   constructor(protected readonly ctx: WeaponContext) {}
@@ -36,6 +39,16 @@ export abstract class Weapon {
   }
 
   protected onLevelChanged(): void {}
+
+  /** Sustituye el arma por su evolución (mismo hueco). Solo una vez por partida. */
+  evolve(): void {
+    if (this.evolved) return;
+    this.evolved = true;
+    this.cooldownTimer = 0;
+    this.onEvolved();
+  }
+
+  protected onEvolved(): void {}
 
   /** Daño escalado por los modificadores globales. */
   protected scaledDamage(base: number): number {

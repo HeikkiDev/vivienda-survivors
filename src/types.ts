@@ -21,8 +21,12 @@ export type WeaponId = 'curriculum' | 'escudo' | 'grito' | 'sindicato';
 export type PassiveId = 'aval' | 'piso' | 'bono' | 'trabajo' | 'teletrabajo';
 export type PromiseId = 'viviendas' | 'alquiler' | 'ayudas' | 'especulacion' | 'digna';
 export type EnemyId = 'ipc' | 'casero' | 'agencia' | 'fondo';
+export type EvolutionId = 'linkedin' | 'antidesahucios' | 'manifestacion' | 'huelga';
 
-export type IconId = `icon_${WeaponId | PassiveId}` | 'icon_cana' | 'icon_pause' | 'icon_sound_on' | 'icon_sound_off';
+export type IconId =
+  | `icon_${WeaponId | PassiveId | EvolutionId}`
+  | 'icon_evolved'
+  | 'icon_cana' | 'icon_pause' | 'icon_sound_on' | 'icon_sound_off';
 
 export type EntityVisualId =
   | 'player'
@@ -32,6 +36,7 @@ export type EntityVisualId =
   | 'euro'
   | 'promesa'
   | WeaponId
+  | EvolutionId
   | IconId;
 
 export type VisualId = 'background' | EntityVisualId;

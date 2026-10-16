@@ -1,5 +1,5 @@
 // TODOS los números del juego. Ver GDD.md.
-import type { EnemyId, PassiveId, PromiseId, WeaponId } from './types';
+import type { EnemyId, EvolutionId, PassiveId, PromiseId, WeaponId } from './types';
 
 export const GAME_WIDTH = 960;
 export const GAME_HEIGHT = 540;
@@ -38,6 +38,8 @@ export const MOBILE = {
 export const DEBUG_START_MINUTE_PARAM = 'min';
 /** Parámetro de URL para ganar al empezar la partida (ver la animación de victoria): `?win=1`. */
 export const DEBUG_WIN_PARAM = 'win';
+/** Parámetro de URL para probar evoluciones: `?evo=1` (las 4 armas a nivel 5 y sus pasivas a nivel 1). */
+export const DEBUG_EVO_PARAM = 'evo';
 
 export const CANVAS_BG_COLOR = '#000000';
 
@@ -275,6 +277,86 @@ export const PASSIVES = {
   bono: { pickupRadiusPerLevel: 0.15, speedPerLevel: 0.05 },
   trabajo: { damagePerLevel: 0.1 },
   teletrabajo: { regenPerLevel: TELETRABAJO_REGEN_PER_LEVEL },
+} as const;
+
+// Evoluciones de armas (estilo Vampire Survivors). Arma a nivel 5 + su pasiva (cualquier nivel).
+// Valores derivados del nivel 5 de cada arma con los multiplicadores de EVOLUTION_MULTIPLIERS.
+const CURRICULUM_MAX = CURRICULUM.levels[MAX_UPGRADE_LEVEL - 1];
+const ESCUDO_MAX = ESCUDO.levels[MAX_UPGRADE_LEVEL - 1];
+const GRITO_MAX = GRITO.levels[MAX_UPGRADE_LEVEL - 1];
+const SINDICATO_MAX = SINDICATO.levels[MAX_UPGRADE_LEVEL - 1];
+
+export const EVOLUTION_MULTIPLIERS = {
+  linkedin: { damage: 1.5 },
+  antidesahucios: { radius: 1.6, damage: 1.5 },
+  manifestacion: { cooldown: 0.5, radius: 2 },
+  huelga: { orbitRadius: 1.5, damage: 1.6, size: 1.5 },
+} as const;
+
+const EM = EVOLUTION_MULTIPLIERS;
+
+export const EVOLUTION_IDS: readonly EvolutionId[] = ['linkedin', 'antidesahucios', 'manifestacion', 'huelga'];
+
+export const EVOLUTIONS = {
+  /** LinkedIn Premium: 8 direcciones por disparo, atraviesa a todos, +50% daño. */
+  linkedin: {
+    weapon: 'curriculum',
+    passive: 'trabajo',
+    damage: CURRICULUM_MAX.damage * EM.linkedin.damage,
+    cooldown: CURRICULUM_MAX.cooldown,
+    speed: CURRICULUM_MAX.speed,
+    directions: 8,
+    pierce: Number.POSITIVE_INFINITY,
+  },
+  /** Escudo Antidesahucios: radio +60%, +50% daño y cura por cada enemigo abatido por el aura. */
+  antidesahucios: {
+    weapon: 'escudo',
+    passive: 'aval',
+    damage: ESCUDO_MAX.damage * EM.antidesahucios.damage,
+    tick: ESCUDO_MAX.tick,
+    radius: ESCUDO_MAX.radius * EM.antidesahucios.radius,
+    healPerKill: 1,
+    maxHealPerSecond: 5,
+    auraColor: 0xffd447,
+    auraAlpha: 0.2,
+  },
+  /** Manifestación: mitad de cooldown, radio ×2, empuje fuerte; cada 3.ª explosión cubre toda la pantalla. */
+  manifestacion: {
+    weapon: 'grito',
+    passive: 'piso',
+    damage: GRITO_MAX.damage,
+    cooldown: GRITO_MAX.cooldown * EM.manifestacion.cooldown,
+    radius: GRITO_MAX.radius * EM.manifestacion.radius,
+    knockbackSpeed: 450,
+    knockbackSeconds: 0.25,
+    giantEvery: 3,
+    /** Semidiagonal de la vista máxima: cubre toda la pantalla. */
+    giantRadius: Math.ceil(Math.hypot(VIEW_MAX_WIDTH, VIEW_MAX_HEIGHT) / 2),
+    circleColor: 0xffd447,
+    circleAlpha: 0.4,
+  },
+  /** Huelga general: 8 puños, órbita +50%, +60% daño y puños 1,5× más grandes. */
+  huelga: {
+    weapon: 'sindicato',
+    passive: 'bono',
+    damage: SINDICATO_MAX.damage * EM.huelga.damage,
+    orbs: 8,
+    orbitRadius: SINDICATO_MAX.orbitRadius * EM.huelga.orbitRadius,
+    angularSpeed: SINDICATO_MAX.angularSpeed,
+    hitboxRadius: SINDICATO.hitboxRadius * EM.huelga.size,
+  },
+} as const satisfies Record<EvolutionId, { weapon: WeaponId; passive: PassiveId; [stat: string]: unknown }>;
+
+/** Feedback al evolucionar: destello dorado en el jugador, rótulo y sacudida de cámara. */
+export const EVOLUTION_FX = {
+  bannerSeconds: 1.5,
+  flashColor: 0xffd447,
+  flashAlpha: 0.8,
+  flashRadius: 40,
+  flashScale: 2.5,
+  flashMs: 600,
+  shakeMs: 250,
+  shakeIntensity: 0.01,
 } as const;
 
 // Sección 9.1 — Menú de subida de nivel
@@ -651,6 +733,14 @@ export const UI = {
     levelSize: 16,
     levelColor: '#ffd447',
     newColor: '#7CFC00',
+    /** Tarjeta de evolución: borde dorado más grueso y etiqueta "¡EVOLUCIÓN!". */
+    evolutionCardColor: 0x3d3420,
+    evolutionCardHoverColor: 0x5a4c26,
+    evolutionStrokeColor: 0xffd700,
+    evolutionStrokeWidth: 5,
+    evolutionColor: '#ffd700',
+    /** El efecto de una evolución es más largo: letra algo menor para que no pise el chiste. */
+    evolutionEffectSize: 13,
     effectY: 182,
     effectSize: 15,
     effectColor: '#9fe3ff',
@@ -670,7 +760,7 @@ export const UI = {
     subtitleColor: '#cccccc',
     statsY: 250,
     statsSize: 20,
-    statsLineSpacing: 8,
+    statsLineSpacing: 4,
     statsColor: '#ffd447',
     buttonY: 420,
     buttonSize: 28,

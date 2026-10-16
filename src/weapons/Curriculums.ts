@@ -1,25 +1,32 @@
 import Phaser from 'phaser';
-import { CURRICULUM, DEPTH } from '../config';
+import { CURRICULUM, DEPTH, EVOLUTIONS } from '../config';
 import type { Enemy } from '../entities/Enemy';
 import { AudioManager } from '../systems/AudioManager';
-import type { WeaponId } from '../types';
+import type { EntityVisualId, WeaponId } from '../types';
 import { createVisual } from '../visuals';
 import { Weapon, type WeaponContext } from './Weapon';
 
 class CurriculumProjectile extends Phaser.GameObjects.Zone {
   declare body: Phaser.Physics.Arcade.Body;
-  readonly visual: Phaser.GameObjects.Text | Phaser.GameObjects.Sprite;
+  visual: Phaser.GameObjects.Text | Phaser.GameObjects.Sprite;
   readonly hitEnemies = new Set<Enemy>();
   damage = 0;
   pierceLeft = 0;
   lifeLeft = 0;
 
-  constructor(scene: Phaser.Scene) {
+  constructor(scene: Phaser.Scene, visualId: EntityVisualId) {
     const diameter = CURRICULUM.hitboxRadius * 2;
     super(scene, 0, 0, diameter, diameter);
     scene.add.existing(this);
-    this.visual = createVisual(scene, 'curriculum', 0, 0).setDepth(DEPTH.projectiles).setVisible(false);
+    this.visual = createVisual(scene, visualId, 0, 0).setDepth(DEPTH.projectiles).setVisible(false);
     this.setActive(false);
+  }
+
+  /** Cambia el visual (al evolucionar el arma); conserva posición y visibilidad. */
+  setVisualId(visualId: EntityVisualId): void {
+    const old = this.visual;
+    this.visual = createVisual(this.scene, visualId, old.x, old.y).setDepth(DEPTH.projectiles).setVisible(old.visible);
+    old.destroy();
   }
 
   initBody(): void {
@@ -52,6 +59,7 @@ class CurriculumProjectile extends Phaser.GameObjects.Zone {
 export class Curriculums extends Weapon {
   readonly id: WeaponId = 'curriculum';
   private readonly pool: Phaser.Physics.Arcade.Group;
+  private visualId: EntityVisualId = 'curriculum';
 
   constructor(ctx: WeaponContext) {
     super(ctx);
@@ -79,8 +87,19 @@ export class Curriculums extends Weapon {
     const target = this.ctx.findNearestEnemy(player.x, player.y);
     if (!target) return;
 
-    const s = this.stats;
     const baseAngle = Math.atan2(target.y - player.y, target.x - player.x);
+    if (this.evolved) {
+      // LinkedIn Premium: un proyectil en cada dirección, empezando por la del objetivo.
+      const e = EVOLUTIONS.linkedin;
+      const damage = this.scaledDamage(e.damage);
+      for (let i = 0; i < e.directions; i++) {
+        this.spawnProjectile(player.x, player.y, baseAngle + (Math.PI * 2 * i) / e.directions, e.speed, damage, e.pierce);
+      }
+      AudioManager.playSfx('shoot');
+      this.cooldownTimer = this.scaledCooldown(e.cooldown);
+      return;
+    }
+    const s = this.stats;
     const spread = Phaser.Math.DegToRad(CURRICULUM.spreadDegrees);
     for (let i = 0; i < s.projectiles; i++) {
       const offset = s.projectiles === 1 ? 0 : -spread + (2 * spread * i) / (s.projectiles - 1);
@@ -88,6 +107,11 @@ export class Curriculums extends Weapon {
     }
     AudioManager.playSfx('shoot');
     this.cooldownTimer = this.scaledCooldown(s.cooldown);
+  }
+
+  protected onEvolved(): void {
+    this.visualId = 'linkedin';
+    for (const p of this.pool.getChildren() as CurriculumProjectile[]) p.setVisualId(this.visualId);
   }
 
   syncVisuals(): void {
@@ -99,7 +123,7 @@ export class Curriculums extends Weapon {
     let p = this.pool.getFirstDead(false) as CurriculumProjectile | null;
     if (!p) {
       if (this.pool.isFull()) return;
-      p = new CurriculumProjectile(this.ctx.scene);
+      p = new CurriculumProjectile(this.ctx.scene, this.visualId);
       this.pool.add(p);
       p.initBody();
     }

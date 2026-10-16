@@ -2,6 +2,8 @@
 import {
   CANA_HEAL,
   DEFAULT_LANGUAGE,
+  EVOLUTION_MULTIPLIERS,
+  EVOLUTIONS,
   LANGUAGE_STORAGE_KEY,
   PASSIVES,
   VICTORY_MINUTE,
@@ -10,6 +12,12 @@ import {
 } from './config';
 
 const pct = (ratio: number): number => Math.round(ratio * 100);
+/** "+50%" a partir de un multiplicador (1,5). */
+const pctUp = (multiplier: number): number => pct(multiplier - 1);
+const decimal = (n: number, sep: string): string => String(n).replace('.', sep);
+
+const EM = EVOLUTION_MULTIPLIERS;
+const EV = EVOLUTIONS;
 
 type EffectLabels = Record<keyof PromiseEffect, string>;
 
@@ -87,6 +95,14 @@ const ES = {
     newItem: '¡NUEVO!',
     levelChange: (from: number) => `Nv ${from} → ${from + 1}`,
     key: (n: number) => `[${n}]`,
+    evolution: '¡EVOLUCIÓN!',
+  },
+  evolutionBanner: (name: string) => `¡${name}!`,
+  evolutions: {
+    linkedin: { name: 'LinkedIn Premium', desc: "Ahora con insignia de 'Open to work'", effect: `Dispara en ${EV.linkedin.directions} direcciones, atraviesa a todos y +${pctUp(EM.linkedin.damage)}% daño.` },
+    antidesahucios: { name: 'Escudo Antidesahucios', desc: 'Esta vez sí se cumple', effect: `Aura +${pctUp(EM.antidesahucios.radius)}% radio y +${pctUp(EM.antidesahucios.damage)}% daño. Cura ${EV.antidesahucios.healPerKill} por enemigo abatido (máx. ${EV.antidesahucios.maxHealPerSecond}/s).` },
+    manifestacion: { name: 'Manifestación', desc: 'Somos miles y no cabemos en 20 m²', effect: `Ritmo ×${decimal(1 / EM.manifestacion.cooldown, ',')}, radio ×${decimal(EM.manifestacion.radius, ',')} y gran empuje. 1 de cada ${EV.manifestacion.giantEvery} llena la pantalla.` },
+    huelga: { name: 'Huelga general', desc: 'Hoy no paga nadie', effect: `${EV.huelga.orbs} puños, órbita +${pctUp(EM.huelga.orbitRadius)}%, +${pctUp(EM.huelga.damage)}% daño y puños ×${decimal(EM.huelga.size, ',')}.` },
   },
   weapons: {
     curriculum: { name: 'Lanzador de currículums', desc: 'Lanza currículums al enemigo más cercano.', effect: 'Dispara al enemigo más cercano. Al subir: más proyectiles y atraviesan.' },
@@ -104,6 +120,7 @@ const ES = {
   cana: { name: 'Caña con los colegas', desc: 'Lo único asequible', effect: `Cura ${CANA_HEAL} de vida.` },
   grito: {
     shout: '¡ESO ES UN TRASTERO!',
+    evolvedShout: '¡SOMOS MILES!',
   },
   promises: {
     viviendas: '¡Un millón de viviendas públicas!',
@@ -151,6 +168,7 @@ const ES = {
     level: (n: number) => `Nivel: ${n}`,
     kills: (n: number) => `Enemigos derrotados: ${n}`,
     brokenPromises: (n: number) => `Promesas incumplidas: ${n}`,
+    evolutions: (n: number) => `Evoluciones: ${n}`,
     timeSurvived: (t: string) => `Tiempo sobrevivido: ${t}`,
     share: '📤 Compartir',
     copied: '✅ ¡Copiado!',
@@ -196,6 +214,14 @@ const EN: Texts = {
     newItem: 'NEW!',
     levelChange: (from: number) => `Lv ${from} → ${from + 1}`,
     key: (n: number) => `[${n}]`,
+    evolution: 'EVOLUTION!',
+  },
+  evolutionBanner: (name: string) => `${name}!`,
+  evolutions: {
+    linkedin: { name: 'LinkedIn Premium', desc: "Now with an 'Open to work' badge", effect: `Shoots in ${EV.linkedin.directions} directions, pierces everything and +${pctUp(EM.linkedin.damage)}% damage.` },
+    antidesahucios: { name: 'Anti-Eviction Shield', desc: 'This time it is enforced', effect: `Aura +${pctUp(EM.antidesahucios.radius)}% radius and +${pctUp(EM.antidesahucios.damage)}% damage. Heals ${EV.antidesahucios.healPerKill} per enemy killed (max ${EV.antidesahucios.maxHealPerSecond}/s).` },
+    manifestacion: { name: 'Mass Protest', desc: "We are thousands and we don't fit in 20 m²", effect: `Rate ×${decimal(1 / EM.manifestacion.cooldown, '.')}, radius ×${decimal(EM.manifestacion.radius, '.')}, strong knockback. 1 in ${EV.manifestacion.giantEvery} fills the screen.` },
+    huelga: { name: 'General Strike', desc: 'Nobody pays today', effect: `${EV.huelga.orbs} fists, orbit +${pctUp(EM.huelga.orbitRadius)}%, +${pctUp(EM.huelga.damage)}% damage and fists ×${decimal(EM.huelga.size, '.')}.` },
   },
   weapons: {
     curriculum: { name: 'CV Launcher', desc: 'Throws CVs at the nearest enemy.', effect: 'Shoots the nearest enemy. Upgrades: more projectiles that pierce.' },
@@ -213,6 +239,7 @@ const EN: Texts = {
   cana: { name: 'Beer with Friends', desc: 'The only affordable thing', effect: `Heals ${CANA_HEAL} HP.` },
   grito: {
     shout: 'THAT\'S A STORAGE ROOM!',
+    evolvedShout: 'WE ARE THOUSANDS!',
   },
   promises: {
     viviendas: 'A million public homes!',
@@ -260,6 +287,7 @@ const EN: Texts = {
     level: (n: number) => `Level: ${n}`,
     kills: (n: number) => `Enemies defeated: ${n}`,
     brokenPromises: (n: number) => `Broken promises: ${n}`,
+    evolutions: (n: number) => `Evolutions: ${n}`,
     timeSurvived: (t: string) => `Time survived: ${t}`,
     share: '📤 Share',
     copied: '✅ Copied!',

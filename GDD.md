@@ -128,6 +128,18 @@ N círculos (emoji `✊`) orbitan al jugador. Dañan al tocar; cada enemigo solo
 | 4 | 14 | 4 | 105 | 3.9 |
 | 5 | 18 | 5 | 110 | 4.2 |
 
+### 5.5 ⭐ Evoluciones (petición del usuario, issue #11)
+Un arma puede evolucionar cuando está a **nivel 5** y se tiene su **pasiva emparejada** (a cualquier nivel). Mientras se cumpla, el siguiente menú de subida de nivel **siempre** incluye su tarjeta de evolución (borde dorado, etiqueta "¡EVOLUCIÓN!"). Al elegirla, el arma base se sustituye por la evolucionada en el mismo hueco; ya no tiene más niveles y la pasiva se conserva. Cada evolución, una vez por partida. Valores derivados del nivel 5 en `EVOLUTIONS` (`config.ts`).
+
+| Arma | Pasiva | Evolución | Efecto |
+|---|---|---|---|
+| 📄 Lanzador de currículums | 💼 Segundo trabajo | 📇 **LinkedIn Premium** — *"Ahora con insignia de 'Open to work'"* | 8 direcciones por disparo, atraviesa a todos, +50% daño. |
+| 🛡️ Escudo Ley de Vivienda | 👴 Aval de tus padres | 🏰 **Escudo Antidesahucios** — *"Esta vez sí se cumple"* | Radio +60%, +50% daño; cura 1 HP por enemigo abatido por el aura (máx. 5 HP/s). |
+| 📢 Grito | 🛏️ Piso compartido | 📣 **Manifestación** — *"Somos miles y no cabemos en 20 m²"* | Cooldown ×0,5, radio ×2, empuje fuerte; 1 de cada 3 explosiones cubre toda la pantalla. |
+| ✊ Sindicato de inquilinos | 🎫 Bono Alquiler Joven | 👊 **Huelga general** — *"Hoy no paga nadie"* | 8 puños, órbita +50%, +60% daño, puños 1,5× más grandes. |
+
+Teletrabajo no tiene evolución. Al evolucionar: destello dorado en el jugador, rótulo "¡{nombre}!" 1,5 s y sacudida de cámara. En el HUD el arma muestra el icono evolucionado con ⭐. Depuración: `?evo=1` empieza con las 4 armas a nivel 5 y sus 4 pasivas a nivel 1.
+
 ---
 
 ## 6. Pasivas (máx. nivel 5)
@@ -217,7 +229,7 @@ Los efectos se aplican como multiplicadores temporales en un objeto `modifiers` 
 ---
 
 ## 11. Fin de partida
-- **Victoria:** al llegar a **10:00**. Se pausa todo, fondo oscuro, texto grande: **"🏠 Has firmado la hipoteca… a 40 años."** Subtexto: *"Euribor + 1,5%. Enhorabuena (?)"*. Estadísticas: nivel, enemigos derrotados, promesas incumplidas. Botón "Volver a buscar piso" (reinicia).
+- **Victoria:** al llegar a **10:00**. Se pausa todo, fondo oscuro, texto grande: **"🏠 Has firmado la hipoteca… a 40 años."** Subtexto: *"Euribor + 1,5%. Enhorabuena (?)"*. Estadísticas: nivel, enemigos derrotados, promesas incumplidas, evoluciones. Botón "Volver a buscar piso" (reinicia).
 - **Derrota:** HP ≤ 0. Texto: **"Has vuelto a casa de tus padres."** Subtexto: *"Tu habitación sigue igual que a los 15."* Mismas estadísticas + tiempo sobrevivido. Botón "Reintentar".
 - Récord (mejor tiempo) en `localStorage` clave `viviendaSurvivors.best`.
 
@@ -228,7 +240,7 @@ Los efectos se aplican como multiplicadores temporales en un objeto `modifiers` 
 - Arriba derecha: ⏸.
 - Bajo el jugador: barra de vida 40×5 px (verde/rojo).
 - Banner promesa (si activa) bajo el temporizador.
-- Abajo izquierda: iconos de armas/pasivas con nivel.
+- Abajo izquierda: iconos de armas/pasivas con nivel (las armas evolucionadas, con ⭐ en lugar del nivel).
 - Abajo centro: tarjeta de presentación del enemigo nuevo (ver §7).
 - Todo el HUD en una escena `UIScene` paralela (no se mueve con la cámara).
 
@@ -379,7 +391,7 @@ Pools: usa `Phaser.Physics.Arcade.Group` con `maxSize` y reutilización (`get()`
 ---
 
 ## 16. Fuera de alcance (NO hacer)
-Personajes extra, varios mapas, evoluciones de armas, tienda/meta-progresión, cofres, guardado de partida, idiomas adicionales, backend, leaderboards. (Crear arte final no es tarea del agente; solo el sistema para cambiarlo.)
+Personajes extra, varios mapas, armas o pasivas nuevas, tienda/meta-progresión, cofres, guardado de partida, idiomas adicionales, backend, leaderboards. (Crear arte final no es tarea del agente; solo el sistema para cambiarlo.)
 
 ---
 

@@ -3,12 +3,16 @@ import {
   BOSS,
   CAMERA_LERP,
   CAMERA_SHAKE,
+  DEBUG_EVO_PARAM,
   DEBUG_START_MINUTE_PARAM,
   DEBUG_WIN_PARAM,
   DEFEAT_ANIM,
   DEPTH,
   ENEMY_FLASH_MS,
   EURO,
+  EVOLUTION_FX,
+  EVOLUTION_IDS,
+  EVOLUTIONS,
   MS_PER_SECOND,
   PLAYER,
   PROMESA,
@@ -20,6 +24,7 @@ import {
   UI,
   VICTORY_ANIM,
   VICTORY_MINUTE,
+  WEAPON_IDS,
   WORLD_HEIGHT,
   WORLD_WIDTH,
 } from '../config';
@@ -32,9 +37,9 @@ import { Elections, type PromiseStatus } from '../systems/Elections';
 import { InputSystem } from '../systems/Input';
 import { Modifiers } from '../systems/Modifiers';
 import { Spawner } from '../systems/Spawner';
-import { applyNonWeaponUpgrade, generateUpgradeOptions, type UpgradeOption } from '../systems/Upgrades';
+import { applyNonWeaponUpgrade, evolutionOf, generateUpgradeOptions, type UpgradeOption } from '../systems/Upgrades';
 import { TEXTS } from '../texts';
-import type { EnemyId, IconId, WeaponId } from '../types';
+import type { EnemyId, EvolutionId, IconId, WeaponId } from '../types';
 import { randomPointInRing, xpToNext } from '../utils/math';
 import { createBackground, createVisual, flashVisual } from '../visuals';
 import { Curriculums } from '../weapons/Curriculums';
@@ -50,7 +55,8 @@ export interface HudState {
   level: number;
   xp: number;
   xpToNext: number;
-  inventory: Array<{ icon: IconId; level: number }>;
+  /** `evolved`: arma evolucionada (el HUD muestra ⭐ en lugar del nivel). */
+  inventory: Array<{ icon: IconId; level: number; evolved: boolean }>;
   promise: PromiseStatus | null;
   /** Posición en pantalla del pickup de promesa, si existe. */
   promisePickup: { x: number; y: number } | null;
@@ -107,6 +113,7 @@ export class GameScene extends Phaser.Scene {
   private xp = 0;
   private pendingLevelUps = 0;
   private brokenPromises = 0;
+  private evolutions = 0;
   private ended = false;
   private ending: EndingKind | null = null;
   private debugStart = false;
@@ -119,9 +126,12 @@ export class GameScene extends Phaser.Scene {
   }
 
   get hud(): HudState {
-    const inventory: HudState['inventory'] = this.weapons.map((w) => ({ icon: `icon_${w.id}` as IconId, level: w.level }));
+    const inventory: HudState['inventory'] = this.weapons.map((w) => {
+      const evo = w.evolved ? evolutionOf(w.id) : null;
+      return { icon: evo ? `icon_${evo}` : `icon_${w.id}`, level: w.level, evolved: evo !== null };
+    });
     for (const [id, level] of Object.entries(this.modifiers.passiveLevels)) {
-      if (level > 0) inventory.push({ icon: `icon_${id}` as IconId, level });
+      if (level > 0) inventory.push({ icon: `icon_${id}` as IconId, level, evolved: false });
     }
     const pickup = this.elections.pickup;
     const cam = this.cameras.main;
@@ -143,8 +153,10 @@ export class GameScene extends Phaser.Scene {
 
   create(): void {
     const startMinute = GameScene.debugStartMinute();
-    this.debugWin = new URLSearchParams(window.location.search).has(DEBUG_WIN_PARAM);
-    this.debugStart = startMinute > 0 || this.debugWin;
+    const params = new URLSearchParams(window.location.search);
+    this.debugWin = params.has(DEBUG_WIN_PARAM);
+    const debugEvo = params.has(DEBUG_EVO_PARAM);
+    this.debugStart = startMinute > 0 || this.debugWin || debugEvo;
     this.elapsed = startMinute * SECONDS_PER_MINUTE;
     this.regenFeedbackElapsed = 0;
     this.regenHealed = 0;
@@ -156,6 +168,7 @@ export class GameScene extends Phaser.Scene {
     this.pendingLevelUps = 0;
     this.levelUpOpen = false;
     this.brokenPromises = 0;
+    this.evolutions = 0;
     this.ended = false;
     this.ending = null;
     this.endSnapshot = null;
@@ -213,6 +226,7 @@ export class GameScene extends Phaser.Scene {
       damageEnemy: (e, amount) => this.damageEnemy(e, amount),
     };
     this.weapons = [this.createWeapon('curriculum')];
+    if (debugEvo) this.setupDebugEvolutions();
 
     this.physics.add.overlap(this.player, enemyTargets, (_p, e) => this.onEnemyContact(e as Enemy));
     this.physics.add.overlap(this.player, this.bossBullets.group, (_p, b) => this.onBossBullet(b as BossBullet));
@@ -226,6 +240,23 @@ export class GameScene extends Phaser.Scene {
       this.scene.stop('UIScene');
       this.scene.stop('LevelUpScene');
     });
+  }
+
+  /** `?evo=1`: las 4 armas a nivel máximo y sus pasivas emparejadas a nivel 1. */
+  private setupDebugEvolutions(): void {
+    for (const id of WEAPON_IDS) {
+      let w = this.weapons.find((o) => o.id === id);
+      if (!w) {
+        w = this.createWeapon(id);
+        this.weapons.push(w);
+      }
+      while (!w.isMaxLevel) w.levelUp();
+    }
+    for (const evo of EVOLUTION_IDS) {
+      const passive = EVOLUTIONS[evo].passive;
+      if (this.modifiers.passiveLevels[passive] > 0) continue;
+      applyNonWeaponUpgrade({ kind: 'passive', id: passive, currentLevel: 0 }, this.player, this.modifiers);
+    }
   }
 
   /** `?min=N` (0–9) arranca el reloj en ese minuto. */
@@ -404,17 +435,11 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
-  private weaponLevels(): Partial<Record<WeaponId, number>> {
-    const levels: Partial<Record<WeaponId, number>> = {};
-    for (const w of this.weapons) levels[w.id] = w.level;
-    return levels;
-  }
-
   private openLevelUp(): void {
     this.levelUpOpen = true;
     AudioManager.playSfx('levelup');
     AudioManager.setMusicDucked(true);
-    const data: LevelUpData = { options: generateUpgradeOptions(this.weaponLevels(), this.modifiers) };
+    const data: LevelUpData = { options: generateUpgradeOptions(this.weapons, this.modifiers) };
     // scene.pause detiene update, física (physics.pause) y reloj/timers de la escena.
     this.scene.pause();
     this.scene.launch('LevelUpScene', data);
@@ -427,13 +452,45 @@ export class GameScene extends Phaser.Scene {
       else this.weapons.push(this.createWeapon(option.id));
       return;
     }
+    if (option.kind === 'evolution') {
+      this.evolveWeapon(option.id);
+      return;
+    }
     applyNonWeaponUpgrade(option, this.player, this.modifiers);
+  }
+
+  /** Sustituye el arma base por su evolución (mismo hueco) con destello dorado, rótulo y sacudida. */
+  private evolveWeapon(id: EvolutionId): void {
+    const weapon = this.weapons.find((w) => w.id === EVOLUTIONS[id].weapon);
+    if (!weapon || weapon.evolved) return;
+    weapon.evolve();
+    this.evolutions++;
+    const fx = EVOLUTION_FX;
+    this.announce(TEXTS.evolutionBanner(TEXTS.evolutions[id].name), 'info', fx.bannerSeconds);
+    this.cameras.main.shake(fx.shakeMs, fx.shakeIntensity);
+    // La escena está en pausa (menú abierto): el destello arranca al reanudar.
+    const flash = this.add
+      .graphics()
+      .fillStyle(fx.flashColor, 1)
+      .fillCircle(0, 0, fx.flashRadius)
+      .setPosition(this.player.x, this.player.y)
+      .setAlpha(fx.flashAlpha)
+      .setDepth(DEPTH.effects);
+    this.tweens.add({
+      targets: flash,
+      alpha: 0,
+      scale: fx.flashScale,
+      duration: fx.flashMs,
+      ease: 'Quad.easeOut',
+      onUpdate: () => flash.setPosition(this.player.x, this.player.y),
+      onComplete: () => flash.destroy(),
+    });
   }
 
   /** Cierra un menú de nivel; devuelve las opciones del siguiente si hay más encolados. */
   finishLevelUp(): UpgradeOption[] | null {
     this.pendingLevelUps = Math.max(0, this.pendingLevelUps - 1);
-    if (this.pendingLevelUps > 0) return generateUpgradeOptions(this.weaponLevels(), this.modifiers);
+    if (this.pendingLevelUps > 0) return generateUpgradeOptions(this.weapons, this.modifiers);
     this.levelUpOpen = false;
     AudioManager.setMusicDucked(false);
     this.scene.resume();
@@ -450,11 +507,12 @@ export class GameScene extends Phaser.Scene {
     this.syncRegenText();
   }
 
-  private damageEnemy(enemy: Enemy, amount: number): void {
-    if (!enemy.active) return;
+  /** Devuelve true si el enemigo muere. */
+  private damageEnemy(enemy: Enemy, amount: number): boolean {
+    if (!enemy.active) return false;
     flashVisual(this, enemy.visual, ENEMY_FLASH_MS);
     AudioManager.playSfx('hit');
-    if (!enemy.takeDamage(amount)) return;
+    if (!enemy.takeDamage(amount)) return false;
     const { x, y } = enemy;
     const value = enemy.stats.xp;
     if (enemy === this.boss) {
@@ -465,6 +523,7 @@ export class GameScene extends Phaser.Scene {
     }
     this.kills++;
     this.gems.drop(x, y, value);
+    return true;
   }
 
   private addXp(amount: number): void {
@@ -578,6 +637,7 @@ export class GameScene extends Phaser.Scene {
       level: this.level,
       kills: this.kills,
       brokenPromises: this.brokenPromises,
+      evolutions: this.evolutions,
       recordable: !this.debugStart,
       snapshot: this.endSnapshot,
     };
