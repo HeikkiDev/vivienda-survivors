@@ -125,9 +125,10 @@ export const HEALTH_BAR = {
 } as const;
 
 export const REGEN_FEEDBACK = {
-  intervalSeconds: 2,
-  /** "+N" muestra la vida real curada en la ventana, redondeada y con este mínimo. */
-  minShownAmount: 0.3,
+  /** Con 1 s, cada "+N" equivale a los HP/s reales. */
+  intervalSeconds: 1,
+  /** "+N" muestra la vida real curada redondeada a 1 decimal (×10, round, ÷10). */
+  roundingFactor: 10,
   offsetY: -30,
   risePixels: 20,
   riseMs: 600,
