@@ -176,7 +176,7 @@ Todos: se mueven en línea recta hacia el jugador; sin colisión entre enemigos 
 - Al morir: suelta 50 € de XP y texto *"La burbuja ha pinchado… de momento."* Si no muere, sigue viva hasta el final (no impide ganar).
 
 ### 7.2 👑 Enemigos premium y cofres (petición del usuario, issue #13)
-- Cada **60 s** desde el **1:00** (no mientras el boss está vivo) aparece **1 élite** en el anillo de spawn: un `casero`, `agencia` o `fondo` al azar (pesos en `ELITE`, `config.ts`) con **HP ×8**, **tamaño ×1,6** (hitbox incluida), **daño de contacto ×1,5** y la misma velocidad. Tinte y brillo dorados y corona 👑. Nombre con sufijo *"premium"* (p. ej. *"Fondo buitre premium"*), anunciado al aparecer.
+- Cada **60 s** desde el **1:00** (no mientras el boss está vivo) aparece **1 élite** en el anillo de spawn: un `casero`, `agencia` o `fondo` al azar (pesos en `ELITE`, `config.ts`) con **HP ×8**, **tamaño ×1,6** (hitbox incluida), **daño de contacto ×1,5** y **velocidad ×1,2** (para que se despegue de la horda). Tinte y brillo dorados y corona 👑. Nombre con sufijo *"premium"* (p. ej. *"Fondo buitre premium"*), anunciado al aparecer.
 - No cuentan para el tope de 300 ni se reposicionan al alejarse. Flecha amarilla en el borde de la pantalla si están fuera de vista (la misma que la de la urna).
 - Al morir sueltan un **cofre 🏠 "Piso de protección oficial"** en lugar de euros: no caduca, no lo atrae el imán; se coge al tocarlo.
 - Al cogerlo se pausa la partida: título *"¡Te ha tocado un piso de protección oficial!"*, subtítulo *"Solo había 40.000 solicitudes"*, ruleta ~1,5 s (se salta con un toque o una tecla) y lista de mejoras con icono y "Nv X → X+1" / "¡NUEVO!" / "¡EVOLUCIÓN!". Con 5 mejoras: *"¡Sorteo ganado! Ni te lo crees."* Botón "Continuar".

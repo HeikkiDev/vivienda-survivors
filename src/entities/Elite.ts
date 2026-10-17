@@ -4,12 +4,13 @@ import type { EnemyId } from '../types';
 import { createVisual, styleEliteVisual } from '../visuals';
 import { Enemy } from './Enemy';
 
-/** Stats de la versión "premium" de un enemigo (misma velocidad y XP). */
+/** Stats de la versión "premium" de un enemigo (misma XP). */
 export function eliteStats(id: EnemyId): EnemyStats {
   const base = ENEMIES[id];
   return {
     ...base,
     hp: base.hp * ELITE.hpMultiplier,
+    speed: base.speed * ELITE.speedMultiplier,
     damage: base.damage * ELITE.damageMultiplier,
     hitboxRadius: base.hitboxRadius * ELITE.sizeMultiplier,
   };
