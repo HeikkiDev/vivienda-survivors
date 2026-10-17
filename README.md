@@ -38,6 +38,9 @@ Con un arma a nivel 5 y su pasiva emparejada, el siguiente menú de mejoras ofre
 | 📢 Grito + 🛏️ Piso compartido | 📣 **Manifestación**: el doble de seguido, radio ×2, empuje fuerte; cada 3.ª explosión llena la pantalla. |
 | ✊ Sindicato + 🎫 Bono Alquiler Joven | 👊 **Huelga general**: 8 puños más grandes, órbita +50%, +60% daño. |
 
+### 👑 Enemigos premium y cofres
+Cada minuto (desde el 1:00, salvo con el boss vivo) aparece un enemigo **premium**: dorado, más grande, con corona y una flecha que te dice dónde está. Al morir suelta un 🏠 **Piso de protección oficial**: tócalo y te da 1, 3 o 5 mejoras automáticas (primero una evolución si la tienes disponible, luego tus armas por debajo de nivel 5).
+
 ## 🧩 Mejoras pasivas (máx. nivel 5)
 | Pasiva | Efecto por nivel |
 |---|---|
@@ -82,12 +85,13 @@ npm run zip      # zip listo para itch.io
 
 Cada push a `main` se publica automáticamente en GitHub Pages.
 
-Parámetros de URL para probar (las partidas con `min`, `win` o `evo` no guardan récord):
+Parámetros de URL para probar (las partidas con `min`, `win`, `evo` o `elite` no guardan récord):
 | Parámetro | Qué hace |
 |---|---|
 | `?min=N` | Empieza en el minuto `N` (0–9). |
 | `?win=1` | Ganas nada más empezar, para ver la animación de victoria. |
 | `?evo=1` | Empiezas con las 4 armas a nivel 5 y sus pasivas a nivel 1: las evoluciones salen en las primeras subidas. |
+| `?elite=1` | Sale un enemigo premium a los 5 s y luego cada 20 s (para probar los cofres). |
 | `?debug=1` | Muestra las hitboxes de la física. |
 
 ## 🎨 Cambiar el arte

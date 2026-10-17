@@ -40,6 +40,8 @@ export const DEBUG_START_MINUTE_PARAM = 'min';
 export const DEBUG_WIN_PARAM = 'win';
 /** Parámetro de URL para probar evoluciones: `?evo=1` (las 4 armas a nivel 5 y sus pasivas a nivel 1). */
 export const DEBUG_EVO_PARAM = 'evo';
+/** Parámetro de URL para probar élites y cofres: `?elite=1` (ver ELITE.debug). */
+export const DEBUG_ELITE_PARAM = 'elite';
 
 export const CANVAS_BG_COLOR = '#000000';
 
@@ -405,6 +407,44 @@ export const SPAWN_TABLE: readonly SpawnRow[] = [
   { interval: 0.35, count: 8, weights: { ipc: 25, casero: 25, agencia: 30, fondo: 20 } },
 ];
 
+// Sección 7.2 — Enemigos élite ("premium") y cofres (petición del usuario, issue #13)
+export const ELITE = {
+  /** Primer élite (s de partida) y cada cuánto sale otro. No salen mientras el boss está vivo. */
+  firstAtSeconds: 60,
+  intervalSeconds: 60,
+  /** `?elite=1`: el primero a los 5 s de empezar y luego cada 20 s. */
+  debug: { firstAfterSeconds: 5, intervalSeconds: 20 },
+  /** Probabilidad relativa de cada tipo base (el IPC no tiene versión premium). */
+  weights: { ipc: 0, casero: 40, agencia: 35, fondo: 25 } as Record<EnemyId, number>,
+  hpMultiplier: 8,
+  sizeMultiplier: 1.6,
+  damageMultiplier: 1.5,
+  /** Tinte y brillo dorados (el brillo solo con WebGL). */
+  tint: 0xffd447,
+  glowColor: 0xffd447,
+  glowOuterStrength: 4,
+  glowInnerStrength: 0,
+  /** Separación entre el borde superior de la hitbox y la corona. */
+  crownGap: 4,
+  /** Segundos del aviso "¡Cuidado! … premium a la vista". */
+  announceSeconds: 3,
+} as const;
+
+export const CHEST = {
+  hitboxRadius: 18,
+  /** Probabilidad relativa de cada número de mejoras del cofre. */
+  rewards: [
+    { upgrades: 1, weight: 60 },
+    { upgrades: 3, weight: 30 },
+    { upgrades: 5, weight: 10 },
+  ] as ReadonlyArray<{ upgrades: number; weight: number }>,
+  /** Con este número de mejoras sale el texto de "¡Sorteo ganado!". */
+  jackpotUpgrades: 5,
+  /** Latido del cofre en el suelo. */
+  pulseScale: 1.15,
+  pulseMs: 450,
+} as const;
+
 // Sección 7.1 — Boss: Burbuja 2.0
 export const BOSS = {
   stats: { hp: 3000, speed: 60, damage: 30, xp: 50, hitboxRadius: 45 } as EnemyStats,
@@ -749,6 +789,58 @@ export const UI = {
     descSize: 13,
     descColor: '#aaaaaa',
   },
+  /** Pantalla del cofre "Piso de protección oficial". */
+  chest: {
+    overlayColor: 0x000000,
+    overlayAlpha: 0.8,
+    titleY: 60,
+    titleSize: 30,
+    titleColor: '#ffd447',
+    subtitleY: 100,
+    subtitleSize: 18,
+    subtitleColor: '#dddddd',
+    /** Ruleta: el cofre late y debajo pasan iconos de mejoras al azar. */
+    rouletteMs: 1500,
+    rouletteTickMs: 80,
+    chestY: 220,
+    chestScale: 3,
+    chestShakeAngle: 8,
+    chestShakeMs: 90,
+    rouletteIconY: 340,
+    rouletteIconScale: 2,
+    hintY: 420,
+    hintSize: 14,
+    hintColor: '#888888',
+    /** Lista de mejoras concedidas. */
+    rowsY: 160,
+    rowHeight: 50,
+    rowGap: 8,
+    rowWidth: 520,
+    rowColor: 0x2a2a3a,
+    rowEvolutionColor: 0x3d3420,
+    rowStrokeColor: 0xffd447,
+    rowStrokeWidth: 2,
+    rowPadding: 16,
+    rowIconGap: 14,
+    rowIconScale: 1.3,
+    rowAppearMs: 200,
+    rowStaggerMs: 120,
+    nameSize: 18,
+    nameColor: '#ffffff',
+    levelSize: 16,
+    jackpotGap: 30,
+    jackpotSize: 22,
+    jackpotColor: '#7CFC00',
+    buttonY: 490,
+    buttonSize: 26,
+    buttonColor: '#1a1a1a',
+    buttonBg: '#ffd447',
+    buttonBgHover: '#ffe680',
+    buttonPadX: 24,
+    buttonPadY: 8,
+    /** Evita que el toque que salta la ruleta pulse también "Continuar". */
+    continueDelayMs: 300,
+  },
   gameOver: {
     overlayColor: 0x000000,
     overlayAlpha: 0.85,
@@ -758,7 +850,7 @@ export const UI = {
     subtitleY: 185,
     subtitleSize: 20,
     subtitleColor: '#cccccc',
-    statsY: 250,
+    statsY: 215,
     statsSize: 20,
     statsLineSpacing: 4,
     statsColor: '#ffd447',

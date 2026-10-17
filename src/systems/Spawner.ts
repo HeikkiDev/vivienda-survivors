@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import {
+  ELITE,
   ENEMIES,
   ENEMY_HP_SCALE_PER_MINUTE,
   ENEMY_IDS,
@@ -9,13 +10,16 @@ import {
   WORLD_HEIGHT,
   WORLD_WIDTH,
 } from '../config';
+import { Elite } from '../entities/Elite';
 import { Enemy } from '../entities/Enemy';
 import type { EnemyId } from '../types';
 import { randomPointInRing, weightedPick } from '../utils/math';
 
-/** Pools de enemigos (un Arcade Group por tipo) + curva de aparición por minuto. */
+/** Pools de enemigos (un Arcade Group por tipo, y otro por tipo para los élites) + curva de aparición por minuto. */
 export class Spawner {
   readonly groups: Record<EnemyId, Phaser.Physics.Arcade.Group>;
+  readonly eliteGroups: Record<EnemyId, Phaser.Physics.Arcade.Group>;
+  /** Todos los grupos (normales y élites). */
   readonly groupList: Phaser.Physics.Arcade.Group[];
   private accumulator = 0;
   private alive = 0;
@@ -29,7 +33,8 @@ export class Spawner {
   ) {
     const make = () => scene.physics.add.group({ maxSize: SPAWN.maxAlive });
     this.groups = { ipc: make(), casero: make(), agencia: make(), fondo: make() };
-    this.groupList = ENEMY_IDS.map((id) => this.groups[id]);
+    this.eliteGroups = { ipc: make(), casero: make(), agencia: make(), fondo: make() };
+    this.groupList = [...ENEMY_IDS.map((id) => this.groups[id]), ...ENEMY_IDS.map((id) => this.eliteGroups[id])];
   }
 
   get aliveCount(): number {
@@ -78,7 +83,22 @@ export class Spawner {
     return enemy;
   }
 
-  /** Persigue al jugador y reposiciona en el anillo a los que se alejan demasiado. */
+  /** Genera un élite de tipo aleatorio (pesos de ELITE) en el anillo. No cuenta para el tope de vivos. */
+  spawnElite(minute: number, px: number, py: number): Elite {
+    const id = weightedPick(ELITE.weights, ENEMY_IDS);
+    const group = this.eliteGroups[id];
+    let elite = group.getFirstDead(false) as Elite | null;
+    if (!elite) {
+      elite = new Elite(this.scene, id);
+      group.add(elite);
+      elite.initBody();
+    }
+    const p = this.ringPoint(px, py);
+    elite.spawn(p.x, p.y, 1 + ENEMY_HP_SCALE_PER_MINUTE * minute);
+    return elite;
+  }
+
+  /** Persigue al jugador y reposiciona en el anillo a los que se alejan demasiado (salvo los élites). */
   updateEnemies(px: number, py: number, speedMultiplier: number, dt: number): void {
     const maxDistSq = SPAWN.repositionDistance * SPAWN.repositionDistance;
     for (const group of this.groupList) {
@@ -87,7 +107,7 @@ export class Spawner {
         if (!e.active) continue;
         const dx = e.x - px;
         const dy = e.y - py;
-        if (dx * dx + dy * dy > maxDistSq) {
+        if (!e.elite && dx * dx + dy * dy > maxDistSq) {
           const p = this.ringPoint(px, py);
           e.relocate(p.x, p.y);
         }
@@ -99,6 +119,13 @@ export class Spawner {
   forEachActive(cb: (e: Enemy) => void): void {
     for (const group of this.groupList) {
       const children = group.getChildren() as Enemy[];
+      for (const e of children) if (e.active) cb(e);
+    }
+  }
+
+  forEachActiveElite(cb: (e: Enemy) => void): void {
+    for (const id of ENEMY_IDS) {
+      const children = this.eliteGroups[id].getChildren() as Enemy[];
       for (const e of children) if (e.active) cb(e);
     }
   }
@@ -130,7 +157,7 @@ export class Spawner {
   kill(enemy: Enemy): void {
     if (!enemy.active) return;
     enemy.deactivate();
-    this.alive--;
+    if (!enemy.elite) this.alive--;
   }
 
   private ringPoint(px: number, py: number): { x: number; y: number } {

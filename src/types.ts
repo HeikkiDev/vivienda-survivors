@@ -35,6 +35,8 @@ export type EntityVisualId =
   | 'bossBullet'
   | 'euro'
   | 'promesa'
+  | 'chest'
+  | 'eliteCrown'
   | WeaponId
   | EvolutionId
   | IconId;

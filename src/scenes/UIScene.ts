@@ -208,7 +208,9 @@ export class UIScene extends Phaser.Scene {
     this.timerText.setText(formatTime(s.elapsed));
     this.updateInventory(s.inventory);
     this.updatePromiseBanner(s.promise);
-    this.updatePromiseArrow(s.promisePickup);
+    this.promiseArrow.clear();
+    if (s.promisePickup) this.drawArrow(s.promisePickup);
+    for (const elite of s.elites) this.drawArrow(elite);
     this.updateBossBar(s.boss);
     this.updateAnnouncement(s.announcement);
     this.updateEnemyIntro(s.enemyIntro);
@@ -421,10 +423,8 @@ export class UIScene extends Phaser.Scene {
     this.promiseBanner.setText(text).setColor(color).setVisible(true);
   }
 
-  /** Flecha en el borde de la pantalla apuntando a la urna si está fuera de vista. */
-  private updatePromiseArrow(target: HudState['promisePickup']): void {
-    this.promiseArrow.clear();
-    if (!target) return;
+  /** Flecha en el borde de la pantalla apuntando al objetivo (urna o élite) si está fuera de vista. */
+  private drawArrow(target: { x: number; y: number }): void {
     const { width, height } = this.scale;
     const onScreen = target.x >= 0 && target.x <= width && target.y >= 0 && target.y <= height;
     if (onScreen) return;

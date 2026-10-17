@@ -146,6 +146,18 @@ const ES = {
     agencia: { name: 'Agencia con honorarios', desc: 'Llega la primera y te cobra por enseñarte el piso.' },
     fondo: { name: 'Fondo buitre', desc: 'Lento pero duro. Compra edificios enteros.' },
   },
+  elite: {
+    name: (base: string) => `${base} premium`,
+    spawned: (name: string) => `¡Cuidado! ${name} a la vista: suelta un cofre`,
+  },
+  chest: {
+    title: '¡Te ha tocado un piso de protección oficial!',
+    subtitle: 'Solo había 40.000 solicitudes',
+    skipHint: 'Toca o pulsa una tecla para saltar',
+    jackpot: '¡Sorteo ganado! Ni te lo crees.',
+    euros: 'Euros para subir 1 nivel',
+    continue: 'Continuar',
+  },
   boss: {
     warning: '⚠️ ¡Se está inflando la BURBUJA 2.0!',
     death: 'La burbuja ha pinchado… de momento.',
@@ -169,6 +181,7 @@ const ES = {
     kills: (n: number) => `Enemigos derrotados: ${n}`,
     brokenPromises: (n: number) => `Promesas incumplidas: ${n}`,
     evolutions: (n: number) => `Evoluciones: ${n}`,
+    chests: (n: number) => `Cofres abiertos: ${n}`,
     timeSurvived: (t: string) => `Tiempo sobrevivido: ${t}`,
     share: '📤 Compartir',
     copied: '✅ ¡Copiado!',
@@ -265,6 +278,18 @@ const EN: Texts = {
     agencia: { name: 'Agency with Fees', desc: 'Gets there first and charges you for the viewing.' },
     fondo: { name: 'Vulture Fund', desc: 'Slow but tough. Buys whole buildings.' },
   },
+  elite: {
+    name: (base: string) => `Premium ${base}`,
+    spawned: (name: string) => `Watch out! ${name} spotted: it drops a chest`,
+  },
+  chest: {
+    title: 'You won a social housing flat!',
+    subtitle: 'There were only 40,000 applications',
+    skipHint: 'Tap or press any key to skip',
+    jackpot: 'Lottery won! You can\'t believe it.',
+    euros: 'Euros for 1 level',
+    continue: 'Continue',
+  },
   boss: {
     warning: '⚠️ BUBBLE 2.0 is inflating!',
     death: 'The bubble has burst… for now.',
@@ -288,6 +313,7 @@ const EN: Texts = {
     kills: (n: number) => `Enemies defeated: ${n}`,
     brokenPromises: (n: number) => `Broken promises: ${n}`,
     evolutions: (n: number) => `Evolutions: ${n}`,
+    chests: (n: number) => `Chests opened: ${n}`,
     timeSurvived: (t: string) => `Time survived: ${t}`,
     share: '📤 Share',
     copied: '✅ Copied!',

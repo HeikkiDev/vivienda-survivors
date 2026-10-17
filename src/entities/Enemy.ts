@@ -8,6 +8,8 @@ export class Enemy extends Phaser.GameObjects.Zone {
   declare body: Phaser.Physics.Arcade.Body;
   readonly stats: EnemyStats;
   readonly visual: Phaser.GameObjects.Text | Phaser.GameObjects.Sprite;
+  /** Élite ("premium"): fuera del tope de vivos, no se reposiciona y suelta un cofre. */
+  readonly elite: boolean = false;
   hp = 0;
   maxHp = 0;
   /** Momento (reloj del Sindicato) a partir del cual una órbita puede volver a dañarle. */
