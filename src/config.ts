@@ -419,6 +419,8 @@ export const ELITE = {
   hpMultiplier: 8,
   sizeMultiplier: 1.6,
   damageMultiplier: 1.5,
+  /** Velocidad respecto a su tipo base, para que se despegue de la horda (issue #15). */
+  speedMultiplier: 1.2,
   /** Tinte y brillo dorados (el brillo solo con WebGL). */
   tint: 0xffd447,
   glowColor: 0xffd447,
