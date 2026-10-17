@@ -53,12 +53,18 @@ export class LevelUpScene extends Phaser.Scene {
     const L = UI.levelUp;
     const top = L.cardY - L.cardHeight / 2;
     const textWidth = L.cardWidth - L.cardPadding * 2;
+    const isEvolution = opt.kind === 'evolution';
+    const color = isEvolution ? L.evolutionCardColor : L.cardColor;
+    const hoverColor = isEvolution ? L.evolutionCardHoverColor : L.cardHoverColor;
     const card = this.add
-      .rectangle(cx, L.cardY, L.cardWidth, L.cardHeight, L.cardColor)
-      .setStrokeStyle(L.cardStrokeWidth, L.cardStrokeColor)
+      .rectangle(cx, L.cardY, L.cardWidth, L.cardHeight, color)
+      .setStrokeStyle(
+        isEvolution ? L.evolutionStrokeWidth : L.cardStrokeWidth,
+        isEvolution ? L.evolutionStrokeColor : L.cardStrokeColor,
+      )
       .setInteractive({ useHandCursor: true });
-    card.on('pointerover', () => card.setFillStyle(L.cardHoverColor));
-    card.on('pointerout', () => card.setFillStyle(L.cardColor));
+    card.on('pointerover', () => card.setFillStyle(hoverColor));
+    card.on('pointerout', () => card.setFillStyle(color));
     card.on('pointerup', () => this.choose(index));
 
     this.add
@@ -84,21 +90,31 @@ export class LevelUpScene extends Phaser.Scene {
       })
       .setOrigin(0.5);
 
-    const isNew = opt.kind !== 'cana' && opt.currentLevel === 0;
-    const levelLabel = opt.kind === 'cana' ? '' : isNew ? TEXTS.levelUp.newItem : TEXTS.levelUp.levelChange(opt.currentLevel);
+    const isNew = (opt.kind === 'weapon' || opt.kind === 'passive') && opt.currentLevel === 0;
+    let levelLabel = '';
+    let levelColor: string = L.levelColor;
+    if (isEvolution) {
+      levelLabel = TEXTS.levelUp.evolution;
+      levelColor = L.evolutionColor;
+    } else if (isNew) {
+      levelLabel = TEXTS.levelUp.newItem;
+      levelColor = L.newColor;
+    } else if (opt.kind === 'weapon' || opt.kind === 'passive') {
+      levelLabel = TEXTS.levelUp.levelChange(opt.currentLevel);
+    }
     this.add
       .text(cx, top + L.levelY, levelLabel, {
         fontFamily: UI.fontFamily,
         fontSize: `${L.levelSize}px`,
         fontStyle: 'bold',
-        color: isNew ? L.newColor : L.levelColor,
+        color: levelColor,
       })
       .setOrigin(0.5);
 
     this.add
       .text(cx, top + L.effectY, effect, {
         fontFamily: UI.fontFamily,
-        fontSize: `${L.effectSize}px`,
+        fontSize: `${isEvolution ? L.evolutionEffectSize : L.effectSize}px`,
         color: L.effectColor,
         align: 'center',
         wordWrap: { width: textWidth },

@@ -450,7 +450,7 @@ export class UIScene extends Phaser.Scene {
 
   /** Iconos de armas/pasivas con su nivel (abajo a la izquierda). Solo se rehace si cambia. */
   private updateInventory(inventory: HudState['inventory']): void {
-    const key = inventory.map((i) => `${i.icon}:${i.level}`).join('|');
+    const key = inventory.map((i) => `${i.icon}:${i.level}:${i.evolved}`).join('|');
     if (key === this.inventoryKey) return;
     this.inventoryKey = key;
     for (const o of this.inventoryObjects) o.destroy();
@@ -461,6 +461,11 @@ export class UIScene extends Phaser.Scene {
     inventory.forEach((item, i) => {
       const x = c.marginX + c.spacing / 2 + i * c.spacing;
       this.inventoryObjects.push(createVisual(this, item.icon, x, y));
+      // Las armas evolucionadas ya no tienen nivel: llevan una estrella.
+      if (item.evolved) {
+        this.inventoryObjects.push(createVisual(this, 'icon_evolved', x + c.levelOffsetX, y + c.levelOffsetY));
+        return;
+      }
       this.inventoryObjects.push(
         this.add
           .text(x + c.levelOffsetX, y + c.levelOffsetY, String(item.level), {

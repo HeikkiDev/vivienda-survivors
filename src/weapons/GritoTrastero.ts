@@ -1,29 +1,28 @@
 import Phaser from 'phaser';
-import { DEPTH, GRITO, UI } from '../config';
+import { DEPTH, EVOLUTIONS, GRITO, type GritoLevel, UI } from '../config';
 import { TEXTS } from '../texts';
 import type { WeaponId } from '../types';
 import { createVisual } from '../visuals';
 import { Weapon, type WeaponContext } from './Weapon';
 
-/** 5.3 Grito "¡Eso es un trastero!": explosión en área con empuje. */
+/** 5.3 Grito "¡Eso es un trastero!": explosión en área con empuje. Evoluciona a Manifestación. */
 export class GritoTrastero extends Weapon {
   readonly id: WeaponId = 'grito';
-  private readonly visual: Phaser.GameObjects.Text | Phaser.GameObjects.Sprite;
-  private readonly isSprite: boolean;
+  private visual!: Phaser.GameObjects.Text | Phaser.GameObjects.Sprite;
+  private isSprite = false;
   /** Solo si el visual es emoji: el círculo se dibuja con Graphics. */
-  private readonly circle: Phaser.GameObjects.Graphics | null;
+  private circle: Phaser.GameObjects.Graphics | null = null;
   private readonly shout: Phaser.GameObjects.Text;
   /** Segundos desde la última explosión (−1 = sin animación). */
   private effectTime = -1;
   private effectRadius = 0;
+  /** Explosiones desde la evolución (cada `giantEvery`, una gigante). */
+  private evolvedBlasts = 0;
 
   constructor(ctx: WeaponContext) {
     super(ctx);
     const { scene, player } = ctx;
-    this.visual = createVisual(scene, 'grito', player.x, player.y).setVisible(false);
-    this.isSprite = this.visual instanceof Phaser.GameObjects.Sprite;
-    this.visual.setDepth(DEPTH.effects);
-    this.circle = this.isSprite ? null : scene.add.graphics().setDepth(DEPTH.effects).setVisible(false);
+    this.createVisuals();
     this.shout = scene.add
       .text(player.x, player.y, TEXTS.grito.shout, {
         fontFamily: UI.fontFamily,
@@ -38,8 +37,25 @@ export class GritoTrastero extends Weapon {
       .setVisible(false);
   }
 
-  private get stats() {
-    return GRITO.levels[this.level - 1];
+  private createVisuals(): void {
+    const { scene, player } = this.ctx;
+    this.visual?.destroy();
+    this.circle?.destroy();
+    this.visual = createVisual(scene, this.evolved ? 'manifestacion' : 'grito', player.x, player.y).setVisible(false);
+    this.isSprite = this.visual instanceof Phaser.GameObjects.Sprite;
+    this.visual.setDepth(DEPTH.effects);
+    this.circle = this.isSprite ? null : scene.add.graphics().setDepth(DEPTH.effects).setVisible(false);
+  }
+
+  private get stats(): GritoLevel {
+    return this.evolved ? EVOLUTIONS.manifestacion : GRITO.levels[this.level - 1];
+  }
+
+  protected onEvolved(): void {
+    this.effectTime = -1;
+    this.evolvedBlasts = 0;
+    this.createVisuals();
+    this.shout.setText(TEXTS.grito.evolvedShout).setVisible(false);
   }
 
   update(dt: number): void {
@@ -52,19 +68,28 @@ export class GritoTrastero extends Weapon {
 
   private blast(): void {
     const s = this.stats;
+    const evo = EVOLUTIONS.manifestacion;
     const { player } = this.ctx;
     const damage = this.scaledDamage(s.damage);
+    let radius = s.radius;
+    if (this.evolved) {
+      this.evolvedBlasts++;
+      if (this.evolvedBlasts % evo.giantEvery === 0) radius = evo.giantRadius;
+    }
+    const knockbackSpeed = this.evolved ? evo.knockbackSpeed : GRITO.knockbackSpeed;
+    const knockbackSeconds = this.evolved ? evo.knockbackSeconds : GRITO.knockbackSeconds;
     this.ctx.forEachEnemy((e) => {
       const dx = e.x - player.x;
       const dy = e.y - player.y;
-      const reach = s.radius + e.stats.hitboxRadius;
+      const reach = radius + e.stats.hitboxRadius;
       if (dx * dx + dy * dy > reach * reach) return;
-      e.applyKnockback(dx, dy, GRITO.knockbackSpeed, GRITO.knockbackSeconds);
+      e.applyKnockback(dx, dy, knockbackSpeed, knockbackSeconds);
       this.ctx.damageEnemy(e, damage);
     });
     this.effectTime = 0;
-    this.effectRadius = s.radius;
-    this.circle?.clear().fillStyle(GRITO.circleColor, 1).fillCircle(0, 0, s.radius);
+    this.effectRadius = radius;
+    const color = this.evolved ? evo.circleColor : GRITO.circleColor;
+    this.circle?.clear().fillStyle(color, 1).fillCircle(0, 0, radius);
   }
 
   syncVisuals(): void {
@@ -83,7 +108,7 @@ export class GritoTrastero extends Weapon {
     // Círculo: crece de 0 al radio y se desvanece.
     const grow = Math.min(1, t / GRITO.growSeconds);
     const fade = t <= GRITO.growSeconds ? 1 : Math.max(0, 1 - (t - GRITO.growSeconds) / GRITO.fadeSeconds);
-    const circleAlpha = GRITO.circleAlpha * fade;
+    const circleAlpha = (this.evolved ? EVOLUTIONS.manifestacion.circleAlpha : GRITO.circleAlpha) * fade;
     if (this.circle) {
       this.circle.setVisible(t <= circleEnd).setPosition(x, y).setScale(grow).setAlpha(circleAlpha);
     } else {
