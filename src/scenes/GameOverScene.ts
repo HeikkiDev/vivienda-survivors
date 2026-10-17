@@ -14,6 +14,7 @@ export interface GameOverData {
   kills: number;
   brokenPromises: number;
   evolutions: number;
+  chestsOpened: number;
   /** false si la partida empezó con `?min=N` (no cuenta para el récord). */
   recordable: boolean;
   /** Captura del final de la partida (null si no se pudo tomar). */
@@ -59,6 +60,7 @@ export class GameOverScene extends Phaser.Scene {
       TEXTS.gameOver.kills(data.kills),
       TEXTS.gameOver.brokenPromises(data.brokenPromises),
       TEXTS.gameOver.evolutions(data.evolutions),
+      TEXTS.gameOver.chests(data.chestsOpened),
     ];
     if (!data.victory) stats.push(TEXTS.gameOver.timeSurvived(formatTime(data.timeSeconds)));
     this.add

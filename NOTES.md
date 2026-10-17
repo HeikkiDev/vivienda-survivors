@@ -198,3 +198,17 @@
 - `WeaponContext.damageEnemy` devuelve si el enemigo muere (lo necesita la cura del escudo).
 - Tarjeta de evolución: el efecto usa letra de 13 px para no pisar el chiste. En la pantalla final el interlineado de estadísticas baja de 8 a 4 px para que quepa la línea "Evoluciones: N".
 - Rendimiento (Chrome headless con GL por software): con las 4 evoluciones y 300 enemigos, ~0,75 ms de update + ~0,27 ms de render por frame.
+
+## Enemigos élite y cofres (issue #13)
+- El GDD tenía "cofres" en *Fuera de alcance*; se implementa por petición explícita (GDD §7.2 actualizado).
+- Cada élite es un `Elite` (subclase de `Enemy`) con stats propias (`eliteStats`) y su visual escalado/tintado una sola vez; viven en un pool aparte por tipo (`Spawner.eliteGroups`), incluido en `groupList` para que armas, contacto y victoria los traten como al resto. `Enemy.elite` evita el tope de 300 y el reposicionamiento.
+- HP de élite = HP base × 8 × escalado por minuto (el mismo que los normales). Los élites no muestran la tarjeta de presentación del tipo (se anuncian con "¡Cuidado! … premium a la vista: suelta un cofre"). Nombre: "<nombre> premium" en español y "Premium <name>" en inglés.
+- Si toca un élite con el boss vivo, se salta ese (no se aplaza). Con `?min=N` el primero sale 60 s después del inicio (o al 1:00).
+- "Golden tint/outline": `setTint` dorado + `preFX.addGlow` (solo WebGL; en Canvas queda el tamaño y la corona). El destello de daño de los sprites vuelve al tinte base del visual (antes hacía `clearTint`).
+- El IPC no tiene versión élite (peso 0): el issue solo menciona casero, agencia y fondo.
+- Las mejoras del cofre se eligen y aplican en `GameScene` al cogerlo (con la partida ya en pausa); `ChestScene` solo las muestra. Entre las armas propias se elige la de **mayor nivel** (empate al azar), para llegar antes al nivel 5; entre pasivas propias y entre nuevas, al azar.
+- Las mejoras nuevas muestran "¡NUEVO!" (como en el menú de nivel) en lugar de "Nv 0 → 1".
+- "Euros para 1 nivel": se suma exactamente la XP que falta del nivel actual al siguiente (sin multiplicador de promesa); el menú de nivel sale al cerrar el cofre.
+- La flecha fuera de pantalla se dibuja para la urna y para cada élite vivo; no hay flecha para el cofre (cae donde muere el élite, normalmente cerca).
+- "Continuar" se activa 300 ms después de la lista para que el toque que salta la ruleta no lo pulse también. Teclado: cualquier tecla salta la ruleta; Enter/Espacio continúan.
+- En la pantalla final las estadísticas suben (y 250 → 215) para que quepa "Cofres abiertos: N" sin pisar el botón.

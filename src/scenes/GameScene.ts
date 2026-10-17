@@ -3,11 +3,13 @@ import {
   BOSS,
   CAMERA_LERP,
   CAMERA_SHAKE,
+  DEBUG_ELITE_PARAM,
   DEBUG_EVO_PARAM,
   DEBUG_START_MINUTE_PARAM,
   DEBUG_WIN_PARAM,
   DEFEAT_ANIM,
   DEPTH,
+  ELITE,
   ENEMY_FLASH_MS,
   EURO,
   EVOLUTION_FX,
@@ -29,6 +31,7 @@ import {
   WORLD_WIDTH,
 } from '../config';
 import { Boss, BossBulletPool, type BossBullet } from '../entities/Boss';
+import { ChestPickup } from '../entities/ChestPickup';
 import type { Enemy } from '../entities/Enemy';
 import { Player } from '../entities/Player';
 import { XpGemPool } from '../entities/XpGem';
@@ -37,7 +40,15 @@ import { Elections, type PromiseStatus } from '../systems/Elections';
 import { InputSystem } from '../systems/Input';
 import { Modifiers } from '../systems/Modifiers';
 import { Spawner } from '../systems/Spawner';
-import { applyNonWeaponUpgrade, evolutionOf, generateUpgradeOptions, type UpgradeOption } from '../systems/Upgrades';
+import {
+  applyNonWeaponUpgrade,
+  type ChestReward,
+  evolutionOf,
+  generateChestRewards,
+  generateUpgradeOptions,
+  rollChestUpgradeCount,
+  type UpgradeOption,
+} from '../systems/Upgrades';
 import { TEXTS } from '../texts';
 import type { EnemyId, EvolutionId, IconId, WeaponId } from '../types';
 import { randomPointInRing, xpToNext } from '../utils/math';
@@ -47,6 +58,7 @@ import { EscudoLey } from '../weapons/EscudoLey';
 import { GritoTrastero } from '../weapons/GritoTrastero';
 import { Sindicato } from '../weapons/Sindicato';
 import type { Weapon, WeaponContext } from '../weapons/Weapon';
+import type { ChestData } from './ChestScene';
 import type { GameOverData } from './GameOverScene';
 import type { LevelUpData } from './LevelUpScene';
 
@@ -60,6 +72,8 @@ export interface HudState {
   promise: PromiseStatus | null;
   /** Posición en pantalla del pickup de promesa, si existe. */
   promisePickup: { x: number; y: number } | null;
+  /** Posición en pantalla de cada élite vivo (flecha si está fuera de vista). */
+  elites: Array<{ x: number; y: number }>;
   boss: { hp: number; maxHp: number } | null;
   announcement: Announcement | null;
   enemyIntro: EnemyIntro | null;
@@ -103,6 +117,12 @@ export class GameScene extends Phaser.Scene {
   private enemyIntro: EnemyIntro | null = null;
   private enemyIntroQueue: EnemyId[] = [];
   private levelUpOpen = false;
+  private chests: ChestPickup[] = [];
+  private chestOpen = false;
+  private chestsOpened = 0;
+  /** Instante (s de partida) del próximo élite y separación entre élites. */
+  private nextEliteAt = 0;
+  private eliteInterval: number = ELITE.intervalSeconds;
   private elapsed = 0;
   private regenFeedbackElapsed = 0;
   private regenHealed = 0;
@@ -136,6 +156,8 @@ export class GameScene extends Phaser.Scene {
     const pickup = this.elections.pickup;
     const cam = this.cameras.main;
     const c = this.ending !== null;
+    const elites: HudState['elites'] = [];
+    if (!c) this.spawner.forEachActiveElite((e) => elites.push({ x: e.x - cam.scrollX, y: e.y - cam.scrollY }));
     return {
       elapsed: this.elapsed,
       level: this.level,
@@ -144,6 +166,7 @@ export class GameScene extends Phaser.Scene {
       inventory,
       promise: c ? null : this.elections.current,
       promisePickup: !c && pickup.active ? { x: pickup.x - cam.scrollX, y: pickup.y - cam.scrollY } : null,
+      elites,
       boss: !c && this.boss.active ? { hp: Math.max(0, this.boss.hp), maxHp: this.boss.maxHp } : null,
       announcement: c ? null : this.announcement,
       enemyIntro: c ? null : this.enemyIntro,
@@ -156,8 +179,16 @@ export class GameScene extends Phaser.Scene {
     const params = new URLSearchParams(window.location.search);
     this.debugWin = params.has(DEBUG_WIN_PARAM);
     const debugEvo = params.has(DEBUG_EVO_PARAM);
-    this.debugStart = startMinute > 0 || this.debugWin || debugEvo;
+    const debugElite = params.has(DEBUG_ELITE_PARAM);
+    this.debugStart = startMinute > 0 || this.debugWin || debugEvo || debugElite;
     this.elapsed = startMinute * SECONDS_PER_MINUTE;
+    this.eliteInterval = debugElite ? ELITE.debug.intervalSeconds : ELITE.intervalSeconds;
+    this.nextEliteAt = debugElite
+      ? this.elapsed + ELITE.debug.firstAfterSeconds
+      : Math.max(ELITE.firstAtSeconds, this.elapsed + ELITE.intervalSeconds);
+    this.chests = [];
+    this.chestOpen = false;
+    this.chestsOpened = 0;
     this.regenFeedbackElapsed = 0;
     this.regenHealed = 0;
     this.regenText = null;
@@ -239,6 +270,7 @@ export class GameScene extends Phaser.Scene {
       this.events.off(Phaser.Scenes.Events.POST_UPDATE, this.lateUpdate, this);
       this.scene.stop('UIScene');
       this.scene.stop('LevelUpScene');
+      this.scene.stop('ChestScene');
     });
   }
 
@@ -294,6 +326,7 @@ export class GameScene extends Phaser.Scene {
     this.bossBullets.update(dt);
     for (const w of this.weapons) w.update(dt);
     this.elections.update(dt, this.elapsed, this.player.x, this.player.y, PLAYER.hitboxRadius);
+    this.updateElites();
 
     const collected = this.gems.update(
       this.player.x,
@@ -306,7 +339,53 @@ export class GameScene extends Phaser.Scene {
       AudioManager.playSfx('coin');
       this.addXp(collected * this.modifiers.xpGain);
     }
-    if (this.pendingLevelUps > 0 && !this.levelUpOpen) this.openLevelUp();
+    const chest = this.chests.find((ch) => ch.overlaps(this.player.x, this.player.y, PLAYER.hitboxRadius));
+    if (chest && !this.levelUpOpen && !this.chestOpen) this.openChest(chest);
+    if (this.pendingLevelUps > 0 && !this.levelUpOpen && !this.chestOpen) this.openLevelUp();
+  }
+
+  /** Un élite cada `eliteInterval` s; se salta si el boss está vivo. */
+  private updateElites(): void {
+    if (this.elapsed < this.nextEliteAt) return;
+    this.nextEliteAt += this.eliteInterval;
+    if (this.boss.active) return;
+    const elite = this.spawner.spawnElite(Spawner.minuteOf(this.elapsed), this.player.x, this.player.y);
+    const name = TEXTS.elite.name(TEXTS.enemies[elite.enemyId].name);
+    this.announce(TEXTS.elite.spawned(name), 'warning', ELITE.announceSeconds);
+  }
+
+  private dropChest(x: number, y: number): void {
+    let chest = this.chests.find((ch) => !ch.active);
+    if (!chest) {
+      chest = new ChestPickup(this);
+      this.chests.push(chest);
+    }
+    chest.spawn(x, y);
+  }
+
+  /** Recoge el cofre, aplica sus mejoras y abre su pantalla con la escena en pausa. */
+  private openChest(chest: ChestPickup): void {
+    chest.despawn();
+    this.chestOpen = true;
+    this.chestsOpened++;
+    const rewards = generateChestRewards(this.weapons, this.modifiers, rollChestUpgradeCount());
+    for (const reward of rewards) this.applyChestReward(reward);
+    AudioManager.playSfx('levelup');
+    AudioManager.setMusicDucked(true);
+    this.scene.pause();
+    this.scene.launch('ChestScene', { rewards } satisfies ChestData);
+  }
+
+  private applyChestReward(reward: ChestReward): void {
+    if (reward.kind === 'euros') this.addXp(xpToNext(this.level));
+    else this.applyUpgrade(reward);
+  }
+
+  /** Cierra la pantalla del cofre y reanuda la partida. */
+  finishChest(): void {
+    this.chestOpen = false;
+    AudioManager.setMusicDucked(false);
+    this.scene.resume();
   }
 
   private applyPlayerRegen(dt: number): void {
@@ -522,7 +601,8 @@ export class GameScene extends Phaser.Scene {
       this.spawner.kill(enemy);
     }
     this.kills++;
-    this.gems.drop(x, y, value);
+    if (enemy.elite) this.dropChest(x, y);
+    else this.gems.drop(x, y, value);
     return true;
   }
 
@@ -555,7 +635,7 @@ export class GameScene extends Phaser.Scene {
 
   /** Pausa manual (Esc/P/botón) solo si no hay menú de nivel abierto ni la partida ha terminado. */
   get canPause(): boolean {
-    return !this.levelUpOpen && !this.ended;
+    return !this.levelUpOpen && !this.chestOpen && !this.ended;
   }
 
   private endGame(victory: boolean): void {
@@ -638,6 +718,7 @@ export class GameScene extends Phaser.Scene {
       kills: this.kills,
       brokenPromises: this.brokenPromises,
       evolutions: this.evolutions,
+      chestsOpened: this.chestsOpened,
       recordable: !this.debugStart,
       snapshot: this.endSnapshot,
     };

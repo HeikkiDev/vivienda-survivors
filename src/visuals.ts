@@ -1,7 +1,7 @@
 // TODAS las definiciones visuales del juego (sección 3.1 del GDD).
 // Cambiar el arte = editar solo este archivo + añadir archivos en public/assets/.
 import Phaser from 'phaser';
-import { REGEN_FEEDBACK } from './config';
+import { ELITE, REGEN_FEEDBACK } from './config';
 import { TEXTS } from './texts';
 import type {
   BackgroundVisual,
@@ -17,6 +17,7 @@ const EMOJI_FONT_FAMILY =
 const EMOJI_PADDING_RATIO = 0.25;
 const GRID_LINE_WIDTH = 1;
 const FLASH_TINT = 0xffffff;
+const NO_TINT = 0xffffff;
 const FLASH_ALPHA = 0.3;
 
 /** Emoji por defecto de cada entidad. También se usa como fallback si un asset no carga. */
@@ -30,6 +31,10 @@ export const FALLBACK_EMOJI: Record<EntityVisualId, EmojiVisual> = {
   bossBullet: { kind: 'emoji', char: '💸', size: 20 },
   euro: { kind: 'emoji', char: '💶', size: 22 },
   promesa: { kind: 'emoji', char: '🗳️', size: 44 },
+  /** Cofre "Piso de protección oficial" que suelta un enemigo élite (también en su pantalla). */
+  chest: { kind: 'emoji', char: '🏠', size: 36 },
+  /** Marca sobre los enemigos élite ("premium"). */
+  eliteCrown: { kind: 'emoji', char: '👑', size: 18 },
   curriculum: { kind: 'emoji', char: '📄', size: 20 },
   escudo: { kind: 'emoji', char: '🛡️', size: 24 },
   grito: { kind: 'emoji', char: '📢', size: 24 },
@@ -262,6 +267,17 @@ export function setVisualAnimating(
   visual.setFrame(idle ?? current.frames[0].textureFrame);
 }
 
+/** Tinte permanente de cada visual (élites): el destello de daño vuelve a él en lugar de quitar el tinte. */
+const baseTints = new WeakMap<Phaser.GameObjects.GameObject, number>();
+
+/** Aspecto de enemigo élite: más grande, tinte dorado y brillo (si el renderer lo soporta). */
+export function styleEliteVisual(visual: Phaser.GameObjects.Text | Phaser.GameObjects.Sprite): void {
+  visual.setScale(visual.scaleX * ELITE.sizeMultiplier, visual.scaleY * ELITE.sizeMultiplier);
+  visual.setTint(ELITE.tint);
+  baseTints.set(visual, ELITE.tint);
+  visual.preFX?.addGlow(ELITE.glowColor, ELITE.glowOuterStrength, ELITE.glowInnerStrength);
+}
+
 /** Destello de daño: tint en sprites, alpha en emoji. */
 export function flashVisual(
   scene: Phaser.Scene,
@@ -270,7 +286,7 @@ export function flashVisual(
 ): void {
   if (visual instanceof Phaser.GameObjects.Sprite) {
     visual.setTintFill(FLASH_TINT);
-    scene.time.delayedCall(durationMs, () => visual.active && visual.clearTint());
+    scene.time.delayedCall(durationMs, () => visual.active && visual.setTint(baseTints.get(visual) ?? NO_TINT));
   } else {
     visual.setAlpha(FLASH_ALPHA);
     scene.time.delayedCall(durationMs, () => visual.active && visual.setAlpha(1));

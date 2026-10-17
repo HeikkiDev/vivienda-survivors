@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import {
   CANA_HEAL,
+  CHEST,
   EVOLUTION_IDS,
   EVOLUTIONS,
   LEVEL_UP_OPTIONS,
@@ -34,7 +35,10 @@ export function evolutionOf(weapon: WeaponId): EvolutionId | null {
 }
 
 /** Evoluciones disponibles: arma a nivel máximo sin evolucionar + su pasiva a cualquier nivel. */
-export function availableEvolutions(weapons: readonly OwnedWeapon[], modifiers: Modifiers): EvolutionId[] {
+export function availableEvolutions(
+  weapons: readonly OwnedWeapon[],
+  modifiers: Pick<Modifiers, 'passiveLevels'>,
+): EvolutionId[] {
   const out: EvolutionId[] = [];
   for (const w of weapons) {
     if (w.evolved || w.level < MAX_UPGRADE_LEVEL) continue;
@@ -66,6 +70,76 @@ export function generateUpgradeOptions(weapons: readonly OwnedWeapon[], modifier
   const options = Phaser.Utils.Array.Shuffle([...evolutions, ...rest]);
   if (options.length < LEVEL_UP_OPTIONS) options.push({ kind: 'cana' });
   return options;
+}
+
+/** Mejora concedida por un cofre; `euros` = XP de un nivel completo cuando ya no queda nada que mejorar. */
+export type ChestReward = Exclude<UpgradeOption, { kind: 'cana' }> | { kind: 'euros' };
+
+/** Número de mejoras del cofre según las probabilidades de CHEST.rewards. */
+export function rollChestUpgradeCount(): number {
+  const total = CHEST.rewards.reduce((sum, r) => sum + r.weight, 0);
+  let roll = Math.random() * total;
+  for (const r of CHEST.rewards) {
+    if (roll < r.weight) return r.upgrades;
+    roll -= r.weight;
+  }
+  return CHEST.rewards[0].upgrades;
+}
+
+/**
+ * Mejoras automáticas del cofre, en orden de aplicación. En cada hueco: evolución disponible; si no, el arma
+ * propia de mayor nivel por debajo del máximo; si no, una pasiva propia; si no, un arma o pasiva nueva;
+ * si no, euros. Se simula sobre una copia, así que nunca pasa del nivel máximo.
+ */
+export function generateChestRewards(
+  weapons: readonly OwnedWeapon[],
+  modifiers: Pick<Modifiers, 'passiveLevels'>,
+  count: number,
+): ChestReward[] {
+  const simWeapons: OwnedWeapon[] = weapons.map((w) => ({ ...w }));
+  const sim = { passiveLevels: { ...modifiers.passiveLevels } };
+  const levels = sim.passiveLevels;
+  const rewards: ChestReward[] = [];
+  for (let i = 0; i < count; i++) {
+    const evo = availableEvolutions(simWeapons, sim)[0];
+    if (evo) {
+      simWeapons.find((w) => w.id === EVOLUTIONS[evo].weapon)!.evolved = true;
+      rewards.push({ kind: 'evolution', id: evo });
+      continue;
+    }
+    const upgradable = simWeapons.filter((w) => !w.evolved && w.level < MAX_UPGRADE_LEVEL);
+    if (upgradable.length > 0) {
+      const top = Math.max(...upgradable.map((w) => w.level));
+      const w = Phaser.Utils.Array.GetRandom(upgradable.filter((o) => o.level === top));
+      rewards.push({ kind: 'weapon', id: w.id, currentLevel: w.level });
+      w.level++;
+      continue;
+    }
+    const ownedPassives = PASSIVE_IDS.filter((id) => levels[id] > 0 && levels[id] < MAX_UPGRADE_LEVEL);
+    if (ownedPassives.length > 0) {
+      const id = Phaser.Utils.Array.GetRandom([...ownedPassives]);
+      rewards.push({ kind: 'passive', id, currentLevel: levels[id] });
+      levels[id]++;
+      continue;
+    }
+    const fresh: Array<{ kind: 'weapon'; id: WeaponId } | { kind: 'passive'; id: PassiveId }> = [
+      ...WEAPON_IDS.filter((id) => !simWeapons.some((w) => w.id === id)).map((id) => ({ kind: 'weapon' as const, id })),
+      ...PASSIVE_IDS.filter((id) => levels[id] === 0).map((id) => ({ kind: 'passive' as const, id })),
+    ];
+    if (fresh.length === 0) {
+      rewards.push({ kind: 'euros' });
+      continue;
+    }
+    const pick = Phaser.Utils.Array.GetRandom(fresh);
+    if (pick.kind === 'weapon') {
+      simWeapons.push({ id: pick.id, level: 1, evolved: false });
+      rewards.push({ kind: 'weapon', id: pick.id, currentLevel: 0 });
+    } else {
+      levels[pick.id] = 1;
+      rewards.push({ kind: 'passive', id: pick.id, currentLevel: 0 });
+    }
+  }
+  return rewards;
 }
 
 /** Aplica pasivas y la caña. Las armas y evoluciones las gestiona GameScene. */

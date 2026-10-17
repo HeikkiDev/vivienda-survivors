@@ -175,6 +175,14 @@ Todos: se mueven en línea recta hacia el jugador; sin colisión entre enemigos 
 - Cada **5 s** dispara 8 proyectiles `💸` en anillo (daño 10, vel. 200 px/s, vida 3 s).
 - Al morir: suelta 50 € de XP y texto *"La burbuja ha pinchado… de momento."* Si no muere, sigue viva hasta el final (no impide ganar).
 
+### 7.2 👑 Enemigos premium y cofres (petición del usuario, issue #13)
+- Cada **60 s** desde el **1:00** (no mientras el boss está vivo) aparece **1 élite** en el anillo de spawn: un `casero`, `agencia` o `fondo` al azar (pesos en `ELITE`, `config.ts`) con **HP ×8**, **tamaño ×1,6** (hitbox incluida), **daño de contacto ×1,5** y la misma velocidad. Tinte y brillo dorados y corona 👑. Nombre con sufijo *"premium"* (p. ej. *"Fondo buitre premium"*), anunciado al aparecer.
+- No cuentan para el tope de 300 ni se reposicionan al alejarse. Flecha amarilla en el borde de la pantalla si están fuera de vista (la misma que la de la urna).
+- Al morir sueltan un **cofre 🏠 "Piso de protección oficial"** en lugar de euros: no caduca, no lo atrae el imán; se coge al tocarlo.
+- Al cogerlo se pausa la partida: título *"¡Te ha tocado un piso de protección oficial!"*, subtítulo *"Solo había 40.000 solicitudes"*, ruleta ~1,5 s (se salta con un toque o una tecla) y lista de mejoras con icono y "Nv X → X+1" / "¡NUEVO!" / "¡EVOLUCIÓN!". Con 5 mejoras: *"¡Sorteo ganado! Ni te lo crees."* Botón "Continuar".
+- Número de mejoras: **1 (60%)**, **3 (30%)**, **5 (10%)** (`CHEST.rewards`). En cada hueco: evolución disponible → arma propia de mayor nivel por debajo de 5 → pasiva propia → arma o pasiva nueva → euros para subir 1 nivel. Nunca pasa de nivel 5.
+- Estadística final: "Cofres abiertos: N". Depuración: `?elite=1` saca un élite a los 5 s y luego cada 20 s.
+
 ---
 
 ## 8. Curva de aparición (spawn)
@@ -229,7 +237,7 @@ Los efectos se aplican como multiplicadores temporales en un objeto `modifiers` 
 ---
 
 ## 11. Fin de partida
-- **Victoria:** al llegar a **10:00**. Se pausa todo, fondo oscuro, texto grande: **"🏠 Has firmado la hipoteca… a 40 años."** Subtexto: *"Euribor + 1,5%. Enhorabuena (?)"*. Estadísticas: nivel, enemigos derrotados, promesas incumplidas, evoluciones. Botón "Volver a buscar piso" (reinicia).
+- **Victoria:** al llegar a **10:00**. Se pausa todo, fondo oscuro, texto grande: **"🏠 Has firmado la hipoteca… a 40 años."** Subtexto: *"Euribor + 1,5%. Enhorabuena (?)"*. Estadísticas: nivel, enemigos derrotados, promesas incumplidas, evoluciones, cofres abiertos. Botón "Volver a buscar piso" (reinicia).
 - **Derrota:** HP ≤ 0. Texto: **"Has vuelto a casa de tus padres."** Subtexto: *"Tu habitación sigue igual que a los 15."* Mismas estadísticas + tiempo sobrevivido. Botón "Reintentar".
 - Récord (mejor tiempo) en `localStorage` clave `viviendaSurvivors.best`.
 
@@ -391,7 +399,7 @@ Pools: usa `Phaser.Physics.Arcade.Group` con `maxSize` y reutilización (`get()`
 ---
 
 ## 16. Fuera de alcance (NO hacer)
-Personajes extra, varios mapas, armas o pasivas nuevas, tienda/meta-progresión, cofres, guardado de partida, idiomas adicionales, backend, leaderboards. (Crear arte final no es tarea del agente; solo el sistema para cambiarlo.)
+Personajes extra, varios mapas, armas o pasivas nuevas, tienda/meta-progresión, guardado de partida, idiomas adicionales, backend, leaderboards. (Crear arte final no es tarea del agente; solo el sistema para cambiarlo.)
 
 ---
 
