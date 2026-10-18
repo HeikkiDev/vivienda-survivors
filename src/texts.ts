@@ -90,6 +90,14 @@ const ES = {
     title: 'PAUSA',
     hint: 'Esc / P o ⏸ para continuar',
   },
+  legend: {
+    title: 'Leyenda',
+    close: '✕ Cerrar',
+    tabs: { weapons: 'Armas', passives: 'Pasivas', evolutions: 'Evoluciones' },
+    plus: '+',
+    arrow: '→',
+    recipe: (weapon: string, level: string, passive: string) => `${weapon} (${level}) + ${passive}`,
+  },
   levelUp: {
     title: '¡Ascenso! (de sueldo no)',
     newItem: '¡NUEVO!',
@@ -148,11 +156,12 @@ const ES = {
   },
   elite: {
     name: (base: string) => `${base} premium`,
-    spawned: (name: string) => `¡Cuidado! ${name} a la vista: suelta un cofre`,
+    spawned: (name: string) => `¡Cuidado! ${name} a la vista: suelta un cofre con mejoras`,
   },
   chest: {
-    title: '¡Te ha tocado un piso de protección oficial!',
-    subtitle: 'Solo había 40.000 solicitudes',
+    title: (n: number) => (n === 1 ? '¡Te ha tocado 1 mejora en la ruleta!' : `¡Te han tocado ${n} mejoras en la ruleta!`),
+    subtitle: 'Como el sorteo de vivienda, pero esta vez sí toca',
+    firstHint: '¡Recoge el cofre: mejoras gratis!',
     skipHint: 'Toca o pulsa una tecla para saltar',
     jackpot: '¡Sorteo ganado! Ni te lo crees.',
     euros: 'Euros para subir 1 nivel',
@@ -222,6 +231,14 @@ const EN: Texts = {
     title: 'PAUSED',
     hint: 'Esc / P or ⏸ to resume',
   },
+  legend: {
+    title: 'Legend',
+    close: '✕ Close',
+    tabs: { weapons: 'Weapons', passives: 'Passives', evolutions: 'Evolutions' },
+    plus: '+',
+    arrow: '→',
+    recipe: (weapon: string, level: string, passive: string) => `${weapon} (${level}) + ${passive}`,
+  },
   levelUp: {
     title: 'Promotion! (not a pay rise)',
     newItem: 'NEW!',
@@ -280,11 +297,12 @@ const EN: Texts = {
   },
   elite: {
     name: (base: string) => `Premium ${base}`,
-    spawned: (name: string) => `Watch out! ${name} spotted: it drops a chest`,
+    spawned: (name: string) => `Watch out! ${name} spotted: it drops a chest with upgrades`,
   },
   chest: {
-    title: 'You won a social housing flat!',
-    subtitle: 'There were only 40,000 applications',
+    title: (n: number) => (n === 1 ? 'You won 1 upgrade on the wheel!' : `You won ${n} upgrades on the wheel!`),
+    subtitle: 'Like the housing lottery, but this time you actually win',
+    firstHint: 'Grab the chest: free upgrades!',
     skipHint: 'Tap or press any key to skip',
     jackpot: 'Lottery won! You can\'t believe it.',
     euros: 'Euros for 1 level',

@@ -15,6 +15,7 @@ Clon minimalista de *Vampire Survivors* y sátira (genérica) sobre la crisis de
 - **Subir de nivel:** recoge 💶 y elige 1 de 3 mejoras (clic, tap o `1` `2` `3`).
 - **Promesas electorales 🗳️:** cada 2 minutos. ¿Se cumplirá? Spoiler: probablemente no.
 - **Pausa:** `Esc` / `P` o el botón ⏸.
+- **Leyenda:** botón ❓ (o tecla `H`): pausa y muestra armas, pasivas y evoluciones (con su receta).
 - **Compartir:** al acabar la partida, "📤 Compartir" crea una imagen con la captura de tu final y tu resultado (menú nativo en móvil; en escritorio se copia al portapapeles o se descarga).
 - **Sonido:** botón 🔊/🔇 junto a la pausa, o la tecla `M`. Se recuerda entre partidas.
 - **Idioma:** inglés o español, se elige en el menú principal.
@@ -49,7 +50,7 @@ Cada minuto (desde el 1:00, salvo con el boss vivo) aparece un enemigo **premium
 | 🎫 **Bono Alquiler Joven** | +15% radio para recoger 💶 y +5% velocidad |
 | 💼 **Segundo trabajo** | +10% daño de todas las armas |
 | 💻 **Teletrabajo** | Regenera +0,3 de vida por segundo |
-| 🍺 **Caña con los colegas** | Cura 30. Aparece cuando ya no quedan otras mejoras. |
+| 🍺 **Caña con los colegas** | Cura 30. Aparece cuando ya no quedan otras mejoras; con todo al máximo se aplica sola (sin menú) y cada nivel pide el doble de 💶. |
 
 ## 🗳️ Promesas electorales
 Aparece una urna en los minutos 2, 4, 6 y 8: se avisa en pantalla y una flecha indica dónde. Al cogerla se elige una promesa al azar y tienes un **buff de 20 s**; arriba verás qué ganas, qué pasaría si se incumple y la cuenta atrás *«¿Se cumplirá?»*. Al acabar, al 50%: se cumple (el buff termina sin más) o se incumple y sufres un **debuff de 15 s**.

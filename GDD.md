@@ -25,8 +25,8 @@ Eres un **Joven de 30 años buscando piso**. Te persiguen oleadas de problemas i
 ## 2. Controles
 | Plataforma | Movimiento | Pausa |
 |---|---|---|
-| Teclado | WASD y flechas (diagonal normalizada) | `Esc` / `P` |
-| Móvil/táctil | Joystick virtual: tocar en cualquier punto de la mitad inferior crea el joystick ahí; radio 60 px | Botón ⏸ arriba a la derecha |
+| Teclado | WASD y flechas (diagonal normalizada) | `Esc` / `P` (leyenda: `H`) |
+| Móvil/táctil | Joystick virtual: tocar en cualquier punto de la mitad inferior crea el joystick ahí; radio 60 px | Botón ⏸ arriba a la derecha (leyenda: botón ❓) |
 
 No hay botón de ataque. Elección de mejora: clic/tap, o teclas `1`, `2`, `3`.
 
@@ -166,6 +166,8 @@ Todos: se mueven en línea recta hacia el jugador; sin colisión entre enemigos 
 
 **Escalado:** HP de enemigos ×(1 + 0.10 × minuto actual). Velocidad no escala.
 
+**Escalado por evoluciones (issue #19):** por cada evolución que tenga el jugador (0–4), HP de enemigos, élites y boss ×(1 + 0.25 × evoluciones) (se acumula con el de minuto) y enemigos por tanda ×(1 + 0.10 × evoluciones) (`EVOLUTION_DIFFICULTY`). Con 2+ evoluciones la música se acelera (`AUDIO.musicRateByEvolutions`: ×1 / ×1 / ×1,1 / ×1,15 / ×1,2) con un cambio suave; vuelve a ×1 al acabar o empezar partida.
+
 **Presentación:** la primera vez que aparece cada tipo de enemigo en la partida se muestra durante 4 s una tarjeta abajo al centro con su icono, nombre y una mini descripción (textos en `texts.ts`). Si coinciden varios, salen en cola, uno tras otro.
 
 ### 7.1 Boss: 🫧 Burbuja 2.0
@@ -178,8 +180,8 @@ Todos: se mueven en línea recta hacia el jugador; sin colisión entre enemigos 
 ### 7.2 👑 Enemigos premium y cofres (petición del usuario, issue #13)
 - Cada **60 s** desde el **1:00** (no mientras el boss está vivo) aparece **1 élite** en el anillo de spawn: un `casero`, `agencia` o `fondo` al azar (pesos en `ELITE`, `config.ts`) con **HP ×8**, **tamaño ×1,6** (hitbox incluida), **daño de contacto ×1,5** y **velocidad ×1,2** (para que se despegue de la horda). Tinte y brillo dorados y corona 👑. Nombre con sufijo *"premium"* (p. ej. *"Fondo buitre premium"*), anunciado al aparecer.
 - No cuentan para el tope de 300 ni se reposicionan al alejarse. Flecha amarilla en el borde de la pantalla si están fuera de vista (la misma que la de la urna).
-- Al morir sueltan un **cofre 🏠 "Piso de protección oficial"** en lugar de euros: no caduca, no lo atrae el imán; se coge al tocarlo.
-- Al cogerlo se pausa la partida: título *"¡Te ha tocado un piso de protección oficial!"*, subtítulo *"Solo había 40.000 solicitudes"*, ruleta ~1,5 s (se salta con un toque o una tecla) y lista de mejoras con icono y "Nv X → X+1" / "¡NUEVO!" / "¡EVOLUCIÓN!". Con 5 mejoras: *"¡Sorteo ganado! Ni te lo crees."* Botón "Continuar".
+- Al morir sueltan un **cofre del tesoro** (`chest.png`, generado con `tools/gen_chest.py`; fallback 🧰) en lugar de euros: no caduca, no lo atrae el imán; se coge al tocarlo. Aviso al aparecer: *"¡Cuidado! {nombre} a la vista: suelta un cofre con mejoras"*. El primer cofre de cada partida muestra *"¡Recoge el cofre: mejoras gratis!"*.
+- Al cogerlo se pausa la partida: título según el número de mejoras *"¡Te han tocado 3 mejoras en la ruleta!"* / *"¡Te ha tocado 1 mejora en la ruleta!"*, subtítulo *"Como el sorteo de vivienda, pero esta vez sí toca"*, ruleta ~1,5 s (se salta con un toque o una tecla) y lista de mejoras con icono y "Nv X → X+1" / "¡NUEVO!" / "¡EVOLUCIÓN!". Con 5 mejoras: *"¡Sorteo ganado! Ni te lo crees."* Botón "Continuar".
 - Número de mejoras: **1 (60%)**, **3 (30%)**, **5 (10%)** (`CHEST.rewards`). En cada hueco: evolución disponible → arma propia de mayor nivel por debajo de 5 → pasiva propia → arma o pasiva nueva → euros para subir 1 nivel. Nunca pasa de nivel 5.
 - Estadística final: "Cofres abiertos: N". Depuración: `?elite=1` saca un élite a los 5 s y luego cada 20 s.
 
@@ -209,12 +211,14 @@ Un temporizador genera enemigos cada `intervalo` segundos, `cantidad` por tanda,
 - Euro = círculo amarillo r=5 (o emoji `💶` 14 px). Valor según enemigo. No desaparecen. Si hay >400 euros en el suelo, el nuevo se suma al más cercano existente.
 - XP necesaria para pasar del nivel *n* al *n+1*: **`xpToNext(n) = 5 + (n − 1) × 6`** (nivel 1→2: 5; 2→3: 11; 3→4: 17; …).
 - Barra de XP en la parte superior. Si en una recogida se sube varios niveles, se encolan los menús.
+- Con todo al máximo o evolucionado (la única opción sería la Caña), la XP de cada nivel se multiplica por `XP_CURVE.maxedMultiplier` (2).
 
 ### 9.1 Menú de subida de nivel
 - Pausa el juego (`physics.pause()` + timers pausados).
 - Muestra **3 opciones aleatorias distintas** del conjunto: armas no máximas (las no poseídas también) + pasivas no máximas.
 - Cada tarjeta: emoji, nombre, "Nv X → X+1" o "¡NUEVO!", descripción corta.
 - Si quedan <3 opciones válidas, rellena con **"Caña con los colegas"** (cura 30 HP, *"Lo único asequible"*).
+- Si la Caña es la **única** opción, no se abre el menú: cura sola, sin pausar, con un texto flotante *"+30 🍺"* sobre el jugador. Los cofres en ese estado tampoco abren pantalla (dan euros que se convierten en cañas).
 - Título del menú: *"¡Ascenso! (de sueldo no)"*.
 
 ---
@@ -245,7 +249,7 @@ Los efectos se aplican como multiplicadores temporales en un objeto `modifiers` 
 
 ## 12. HUD
 - Arriba: barra XP (ancho completo), debajo nivel `Nv 7` a la izquierda y temporizador `MM:SS` centrado.
-- Arriba derecha: ⏸.
+- Arriba derecha: ⏸, 🔊/🔇 y ❓ (leyenda). La leyenda (también con `H`) pausa la partida y muestra tres pestañas: **Armas**, **Pasivas** y **Evoluciones** (icono, nombre y efecto; las evoluciones con su receta: arma Nv 5 + pasiva → evolución). Se cierra con su botón, `Esc`/`H`/`P` o tocando fuera, y reanuda como la pausa. No se abre durante el menú de nivel ni el cofre.
 - Bajo el jugador: barra de vida 40×5 px (verde/rojo).
 - Banner promesa (si activa) bajo el temporizador.
 - Abajo izquierda: iconos de armas/pasivas con nivel (las armas evolucionadas, con ⭐ en lugar del nivel).
@@ -258,7 +262,7 @@ Los efectos se aplican como multiplicadores temporales en un objeto `modifiers` 
 1. `BootScene` → pasa directo a `MenuScene`.
 2. `MenuScene`: título **"VIVIENDA SURVIVORS"**, subtítulo *"Sobrevive 10 minutos al mercado inmobiliario"*, botón "Buscar piso" (Enter/clic), récord. Pie: *"Parodia. Cualquier parecido con la realidad es pura coincidencia (no)."*
 3. `GameScene` + `UIScene` (paralela).
-4. `LevelUpScene` (overlay modal).
+4. `LevelUpScene` (overlay modal). `ChestScene` (cofre) y `LegendScene` (leyenda "?") también son overlays modales.
 5. `GameOverScene` (victoria/derrota, recibe datos).
 
 ---

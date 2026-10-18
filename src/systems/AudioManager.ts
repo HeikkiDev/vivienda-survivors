@@ -9,6 +9,7 @@ class AudioManagerImpl {
   private game: Phaser.Game | null = null;
   private music: VolumeSound | null = null;
   private ducked = false;
+  private rateTween: Phaser.Tweens.Tween | null = null;
   // Estado propio: en Web Audio, sound.mute se lee de un nodo de ganancia y no cambia al instante.
   private isMuted = false;
   private readonly lastPlayed = new Map<SfxKey, number>();
@@ -58,8 +59,30 @@ class AudioManagerImpl {
     this.ducked = false;
     if (!sound || !this.isLoaded(entry.key)) return;
     if (!this.music) this.music = sound.add(entry.key, { loop: entry.loop ?? false }) as VolumeSound;
+    this.resetMusicRate();
     this.applyMusicVolume();
     if (!this.music.isPlaying) this.music.play();
+  }
+
+  /** Cambia la velocidad de la música de forma suave con un tween de la escena dada (se congela si se pausa). */
+  setMusicRate(rate: number, tweens: Phaser.Tweens.TweenManager): void {
+    const music = this.music;
+    if (!music || music.rate === rate) return;
+    this.rateTween?.stop();
+    this.rateTween = tweens.addCounter({
+      from: music.rate,
+      to: rate,
+      duration: AUDIO.musicRateTweenMs,
+      ease: 'Sine.easeInOut',
+      onUpdate: (tween) => music.setRate(tween.getValue() ?? rate),
+    });
+  }
+
+  /** Vuelve a la velocidad normal al instante (nueva partida o fin de partida). */
+  resetMusicRate(): void {
+    this.rateTween?.stop();
+    this.rateTween = null;
+    this.music?.setRate(1);
   }
 
   /** Baja la música (pausa, menú de mejoras) o la devuelve a su volumen. */
@@ -69,6 +92,7 @@ class AudioManagerImpl {
   }
 
   stopMusic(): void {
+    this.resetMusicRate();
     this.music?.stop();
   }
 

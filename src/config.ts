@@ -86,6 +86,10 @@ export const AUDIO = {
   sfxPitchVariation: 0.05,
   /** Volumen de la música en pausa y en el menú de mejoras (fracción del normal). */
   musicDuckedFactor: 0.3,
+  /** Velocidad de la música según las evoluciones que se tienen (índice = nº de evoluciones, 0–4). */
+  musicRateByEvolutions: [1, 1, 1.1, 1.15, 1.2] as readonly number[],
+  /** Duración del cambio suave de velocidad de la música. */
+  musicRateTweenMs: 1500,
   mutedStorageKey: 'viviendaSurvivors.muted',
 };
 
@@ -139,6 +143,8 @@ export const REGEN_FEEDBACK = {
   fadeMs: 200,
   fontSize: 18,
   strokeThickness: 2,
+  /** El "+N 🍺" de la caña automática sale algo más arriba para no pisar el de la regeneración. */
+  canaOffsetY: -50,
 } as const;
 
 // Sección 7 — Enemigos
@@ -349,6 +355,16 @@ export const EVOLUTIONS = {
   },
 } as const satisfies Record<EvolutionId, { weapon: WeaponId; passive: PassiveId; [stat: string]: unknown }>;
 
+/**
+ * Dificultad según las evoluciones que se tienen (0–4), para que el jugador no se vuelva intocable (issue #19).
+ * HP de enemigos y élites × (1 + enemyHpPerEvolution × evoluciones), acumulado con el escalado por minuto;
+ * enemigos por tanda × (1 + spawnCountPerEvolution × evoluciones). El boss también escala su HP.
+ */
+export const EVOLUTION_DIFFICULTY = {
+  enemyHpPerEvolution: 0.25,
+  spawnCountPerEvolution: 0.1,
+} as const;
+
 /** Feedback al evolucionar: destello dorado en el jugador, rótulo y sacudida de cámara. */
 export const EVOLUTION_FX = {
   bannerSeconds: 1.5,
@@ -375,6 +391,8 @@ export const EURO = {
 export const XP_CURVE = {
   base: 5,
   step: 6,
+  /** Con todo al máximo (solo queda la caña), la XP de cada nivel se multiplica por este valor. */
+  maxedMultiplier: 2,
 } as const;
 
 // Sección 3 y 8 — Spawn
@@ -445,6 +463,8 @@ export const CHEST = {
   /** Latido del cofre en el suelo. */
   pulseScale: 1.15,
   pulseMs: 450,
+  /** Segundos del aviso "¡Recoge el cofre!" la primera vez que cae uno en la partida. */
+  firstHintSeconds: 3,
 } as const;
 
 // Sección 7.1 — Boss: Burbuja 2.0
@@ -639,8 +659,9 @@ export const UI = {
     buttonMarginX: 24,
     buttonY: 26,
     buttonHitPadding: 8,
-    /** El botón de silencio va a la izquierda del de pausa. */
+    /** El botón de silencio va a la izquierda del de pausa, y el de la leyenda a la izquierda del de silencio. */
     muteOffsetX: 44,
+    helpOffsetX: 88,
     overlayColor: 0x000000,
     overlayAlpha: 0.6,
     titleY: 150,
@@ -791,7 +812,7 @@ export const UI = {
     descSize: 13,
     descColor: '#aaaaaa',
   },
-  /** Pantalla del cofre "Piso de protección oficial". */
+  /** Pantalla del cofre. */
   chest: {
     overlayColor: 0x000000,
     overlayAlpha: 0.8,
@@ -842,6 +863,74 @@ export const UI = {
     buttonPadY: 8,
     /** Evita que el toque que salta la ruleta pulse también "Continuar". */
     continueDelayMs: 300,
+  },
+  /** Leyenda "?" (armas, pasivas y evoluciones). Maquetada en coordenadas base 960×540. */
+  legend: {
+    overlayColor: 0x000000,
+    overlayAlpha: 0.75,
+    panelX: 60,
+    panelY: 20,
+    panelWidth: 840,
+    panelHeight: 500,
+    panelColor: 0x1e1e2a,
+    panelAlpha: 0.97,
+    panelStroke: 0xffd447,
+    panelStrokeWidth: 2,
+    panelRadius: 12,
+    titleY: 46,
+    titleSize: 26,
+    titleColor: '#ffd447',
+    closeMarginX: 16,
+    closeSize: 20,
+    closeColor: '#1a1a1a',
+    closeBg: '#ffd447',
+    closeBgHover: '#ffe680',
+    closePadX: 14,
+    closePadY: 6,
+    tabsY: 96,
+    tabSize: 20,
+    tabGap: 12,
+    tabPadX: 18,
+    tabPadY: 8,
+    tabColor: '#dddddd',
+    tabBg: '#333344',
+    tabBgHover: '#4a4a60',
+    tabActiveColor: '#1a1a1a',
+    tabActiveBg: '#ffd447',
+    /** Zona de contenido con scroll (arrastrando o con la rueda). */
+    contentTop: 126,
+    contentBottomMargin: 14,
+    contentPadX: 24,
+    rowGap: 10,
+    rowPadY: 10,
+    rowColor: 0x2a2a3a,
+    rowEvolutionColor: 0x3d3420,
+    rowRadius: 8,
+    iconX: 40,
+    iconScale: 1.6,
+    /** Columna de la receta de las evoluciones: arma Nv 5 + pasiva → evolución. */
+    recipeIconScale: 1.3,
+    recipeStep: 40,
+    recipeSymbolSize: 20,
+    recipeSymbolColor: '#ffffff',
+    recipeLevelSize: 13,
+    recipeLevelOffsetY: 22,
+    recipeWidth: 210,
+    textGap: 20,
+    nameSize: 20,
+    nameColor: '#ffffff',
+    recipeTextSize: 16,
+    recipeTextColor: '#ffd447',
+    effectSize: 17,
+    effectColor: '#9fe3ff',
+    lineGap: 4,
+    wheelFactor: 0.5,
+    /** Desplazamiento mínimo (px) para que un arrastre no cuente como toque. */
+    dragThreshold: 8,
+    scrollbarWidth: 4,
+    scrollbarColor: 0xffd447,
+    scrollbarAlpha: 0.6,
+    scrollbarMarginX: 8,
   },
   gameOver: {
     overlayColor: 0x000000,
