@@ -70,6 +70,7 @@ const EN_EFFECT_LABELS: EffectLabels = {
 
 const ES = {
   healing: (amount: number) => `+${String(amount).replace('.', ',')}`,
+  canaHealing: (amount: number) => `+${String(amount).replace('.', ',')} 🍺`,
   menu: {
     title: 'VIVIENDA SURVIVORS',
     subtitle: 'Sobrevive 10 minutos al mercado inmobiliario',
@@ -211,6 +212,7 @@ export type Texts = typeof ES;
 
 const EN: Texts = {
   healing: (amount: number) => `+${amount}`,
+  canaHealing: (amount: number) => `+${amount} 🍺`,
   menu: {
     title: 'VIVIENDA SURVIVORS',
     subtitle: 'Survive 10 minutes of the housing market',

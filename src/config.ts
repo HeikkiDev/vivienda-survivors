@@ -749,6 +749,8 @@ export const UI = {
   announcement: {
     y: 180,
     size: 26,
+    /** Margen total (izquierda + derecha) que se resta al ancho de pantalla para el ajuste de línea. */
+    wrapMargin: 80,
     warningColor: '#ff5555',
     infoColor: '#ffd447',
   },

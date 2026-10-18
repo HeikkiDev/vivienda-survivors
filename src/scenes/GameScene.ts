@@ -104,6 +104,7 @@ interface FloatingHeal {
   text: Phaser.GameObjects.Text;
   ageMs: number;
   offsetY: number;
+  amount: number;
 }
 
 /** Eventos únicos de la partida (instante en segundos). */
@@ -384,8 +385,9 @@ export class GameScene extends Phaser.Scene {
     this.pendingLevelUps = 0;
     for (let i = 0; i < count; i++) applyNonWeaponUpgrade({ kind: 'cana' }, this.player, this.modifiers);
     AudioManager.playSfx('levelup');
+    const total = (this.canaText?.amount ?? 0) + CANA_HEAL * count;
     this.canaText?.text.destroy();
-    this.canaText = this.createFloatingHeal('canaHealing', CANA_HEAL * count, REGEN_FEEDBACK.canaOffsetY);
+    this.canaText = this.createFloatingHeal('canaHealing', total, REGEN_FEEDBACK.canaOffsetY);
   }
 
   /** Un élite cada `eliteInterval` s; se salta si el boss está vivo. */
@@ -474,7 +476,7 @@ export class GameScene extends Phaser.Scene {
 
   private createFloatingHeal(id: HealingVisualId, amount: number, offsetY: number): FloatingHeal {
     const text = createVisual(this, id, this.player.x, this.player.y + offsetY, amount).setDepth(DEPTH.floatingText);
-    return { text, ageMs: 0, offsetY };
+    return { text, ageMs: 0, offsetY, amount };
   }
 
   /** Envejece un texto flotante; devuelve null (y lo destruye) cuando ha terminado. */
@@ -543,7 +545,7 @@ export class GameScene extends Phaser.Scene {
       WORLD_HEIGHT,
       { x: 0, y: 0 },
     );
-    this.boss.spawn(p.x, p.y, this.spawner.evolutionHpMultiplier);
+    this.boss.spawn(p.x, p.y, 1);
   }
 
   private findNearestEnemy(x: number, y: number): Enemy | null {

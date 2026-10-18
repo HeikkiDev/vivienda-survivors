@@ -166,7 +166,7 @@ Todos: se mueven en línea recta hacia el jugador; sin colisión entre enemigos 
 
 **Escalado:** HP de enemigos ×(1 + 0.10 × minuto actual). Velocidad no escala.
 
-**Escalado por evoluciones (issue #19):** por cada evolución que tenga el jugador (0–4), HP de enemigos, élites y boss ×(1 + 0.25 × evoluciones) (se acumula con el de minuto) y enemigos por tanda ×(1 + 0.10 × evoluciones) (`EVOLUTION_DIFFICULTY`). Con 2+ evoluciones la música se acelera (`AUDIO.musicRateByEvolutions`: ×1 / ×1 / ×1,1 / ×1,15 / ×1,2) con un cambio suave; vuelve a ×1 al acabar o empezar partida.
+**Escalado por evoluciones (issue #19):** por cada evolución que tenga el jugador (0–4), HP de enemigos y élites (no del boss) ×(1 + 0.25 × evoluciones) (se acumula con el de minuto) y enemigos por tanda ×(1 + 0.10 × evoluciones) (`EVOLUTION_DIFFICULTY`). Con 2+ evoluciones la música se acelera (`AUDIO.musicRateByEvolutions`: ×1 / ×1 / ×1,1 / ×1,15 / ×1,2) con un cambio suave; vuelve a ×1 al acabar o empezar partida.
 
 **Presentación:** la primera vez que aparece cada tipo de enemigo en la partida se muestra durante 4 s una tarjeta abajo al centro con su icono, nombre y una mini descripción (textos en `texts.ts`). Si coinciden varios, salen en cola, uno tras otro.
 

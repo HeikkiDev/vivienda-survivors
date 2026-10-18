@@ -205,8 +205,8 @@ export function createVisual(
   amount = 0,
 ): Phaser.GameObjects.Text | Phaser.GameObjects.Sprite {
   if (id === 'healing' || id === 'canaHealing') {
-    const label = TEXTS.healing(amount);
-    return scene.add.text(x, y, id === 'canaHealing' ? `${label} ${FALLBACK_EMOJI.icon_cana.char}` : label, {
+    const label = id === 'canaHealing' ? TEXTS.canaHealing(amount) : TEXTS.healing(amount);
+    return scene.add.text(x, y, label, {
       fontFamily: 'sans-serif',
       fontSize: REGEN_FEEDBACK.fontSize,
       color: '#33cc33',

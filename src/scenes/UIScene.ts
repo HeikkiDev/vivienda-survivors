@@ -104,7 +104,7 @@ export class UIScene extends Phaser.Scene {
     const p = UI.pause;
     this.timerText.setX(cx);
     this.promiseBanner.setX(cx);
-    this.announcementText.setX(cx);
+    this.announcementText.setX(cx).setWordWrapWidth(width - UI.announcement.wrapMargin);
     this.pauseButton.setX(width - p.buttonMarginX);
     this.muteOnButton.setX(width - p.buttonMarginX - p.muteOffsetX);
     this.muteOffButton.setX(width - p.buttonMarginX - p.muteOffsetX);
