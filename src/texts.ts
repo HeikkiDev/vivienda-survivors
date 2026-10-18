@@ -165,6 +165,7 @@ const ES = {
     name: 'Euríbor disparado',
     effect: 'No se puede destruir: solo esquivarlo. Entra por un borde de la pantalla y la cruza en línea recta hacia donde estabas. Un "!" rojo avisa por dónde va a entrar.',
     warning: '!',
+    firstWave: '¡Cuidado! Euríbor disparado: no se puede destruir, ¡esquívalo!',
   },
   elite: {
     name: (base: string) => `${base} premium`,
@@ -312,6 +313,7 @@ const EN: Texts = {
     name: 'Soaring Euribor',
     effect: 'Cannot be destroyed: only dodged. It enters from a screen edge and crosses in a straight line towards where you were. A red "!" warns where it will come in.',
     warning: '!',
+    firstWave: "Watch out! Soaring Euribor: can't be destroyed, dodge it!",
   },
   elite: {
     name: (base: string) => `Premium ${base}`,

@@ -271,7 +271,9 @@ export class GameScene extends Phaser.Scene {
     this.bossGroup.add(this.boss);
     this.boss.initBody();
     this.bossBullets = new BossBulletPool(this);
-    this.missiles = new Missiles(this, this.elapsed, debugMissile);
+    this.missiles = new Missiles(this, this.elapsed, debugMissile, () =>
+      this.announce(TEXTS.missile.firstWave, 'warning', MISSILE.announceSeconds),
+    );
     this.announcement = null;
     this.timedEvents = this.buildTimedEvents(this.elapsed);
     const enemyTargets = [...this.spawner.groupList, this.bossGroup];
