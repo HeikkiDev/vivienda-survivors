@@ -31,8 +31,8 @@ export const FALLBACK_EMOJI: Record<EntityVisualId, EmojiVisual> = {
   bossBullet: { kind: 'emoji', char: '💸', size: 20 },
   euro: { kind: 'emoji', char: '💶', size: 22 },
   promesa: { kind: 'emoji', char: '🗳️', size: 44 },
-  /** Cofre "Piso de protección oficial" que suelta un enemigo élite (también en su pantalla). */
-  chest: { kind: 'emoji', char: '🏠', size: 36 },
+  /** Cofre del tesoro que suelta un enemigo élite (también en su pantalla). */
+  chest: { kind: 'emoji', char: '🧰', size: 36 },
   /** Marca sobre los enemigos élite ("premium"). */
   eliteCrown: { kind: 'emoji', char: '👑', size: 18 },
   curriculum: { kind: 'emoji', char: '📄', size: 20 },
@@ -63,6 +63,8 @@ export const FALLBACK_EMOJI: Record<EntityVisualId, EmojiVisual> = {
   icon_pause: { kind: 'emoji', char: '⏸️', size: 24 },
   icon_sound_on: { kind: 'emoji', char: '🔊', size: 22 },
   icon_sound_off: { kind: 'emoji', char: '🔇', size: 22 },
+  /** Botón de la leyenda (armas, pasivas y evoluciones). */
+  icon_help: { kind: 'emoji', char: '❓', size: 22 },
 };
 
 export const FALLBACK_BACKGROUND: BackgroundVisual = {
@@ -113,6 +115,7 @@ const CUSTOM_ART: Partial<VisualsTable> = {
   bossBullet: png('bossBullet'),
   euro: png('euro'),
   promesa: png('promesa'),
+  chest: png('chest'),
   curriculum: png('curriculum'),
   escudo: png('escudo'),
   grito: png('grito'),
@@ -177,10 +180,13 @@ function createSprite(
   return sprite;
 }
 
+/** Texto flotante de curación: regeneración ("+N") o caña automática ("+N 🍺"). */
+export type HealingVisualId = 'healing' | 'canaHealing';
+
 /** Única fábrica de visuales de entidades. */
 export function createVisual(
   scene: Phaser.Scene,
-  id: 'healing',
+  id: HealingVisualId,
   x: number,
   y: number,
   amount: number,
@@ -193,13 +199,14 @@ export function createVisual(
 ): Phaser.GameObjects.Text | Phaser.GameObjects.Sprite;
 export function createVisual(
   scene: Phaser.Scene,
-  id: EntityVisualId | 'healing',
+  id: EntityVisualId | HealingVisualId,
   x: number,
   y: number,
   amount = 0,
 ): Phaser.GameObjects.Text | Phaser.GameObjects.Sprite {
-  if (id === 'healing') {
-    return scene.add.text(x, y, TEXTS.healing(amount), {
+  if (id === 'healing' || id === 'canaHealing') {
+    const label = id === 'canaHealing' ? TEXTS.canaHealing(amount) : TEXTS.healing(amount);
+    return scene.add.text(x, y, label, {
       fontFamily: 'sans-serif',
       fontSize: REGEN_FEEDBACK.fontSize,
       color: '#33cc33',

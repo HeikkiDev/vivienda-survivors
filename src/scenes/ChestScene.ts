@@ -17,7 +17,7 @@ const CONTINUE_KEYS: readonly string[] = ['Enter', 'NumpadEnter', 'Space'];
 
 type Phase = 'roulette' | 'results' | 'done';
 
-/** Pantalla del cofre "Piso de protección oficial": ruleta (saltable) y lista de mejoras. GameScene está en pausa. */
+/** Pantalla del cofre: ruleta (saltable) y lista de mejoras. GameScene está en pausa. */
 export class ChestScene extends Phaser.Scene {
   private rewards: ChestReward[] = [];
   private phase: Phase = 'roulette';
@@ -41,7 +41,7 @@ export class ChestScene extends Phaser.Scene {
     centerOnBaseArea(this);
     addBaseOverlay(this, C.overlayColor, C.overlayAlpha).setInteractive();
     this.add
-      .text(cx, C.titleY, TEXTS.chest.title, {
+      .text(cx, C.titleY, TEXTS.chest.title(this.rewards.length), {
         fontFamily: UI.fontFamily,
         fontSize: `${C.titleSize}px`,
         fontStyle: 'bold',

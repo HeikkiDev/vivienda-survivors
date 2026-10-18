@@ -13,6 +13,7 @@ import { BootScene } from './scenes/BootScene';
 import { ChestScene } from './scenes/ChestScene';
 import { GameOverScene } from './scenes/GameOverScene';
 import { GameScene } from './scenes/GameScene';
+import { LegendScene } from './scenes/LegendScene';
 import { LevelUpScene } from './scenes/LevelUpScene';
 import { MenuScene } from './scenes/MenuScene';
 import { UIScene } from './scenes/UIScene';
@@ -37,7 +38,7 @@ const game = new Phaser.Game({
     arcade: { gravity: { x: 0, y: 0 }, debug },
   },
   input: { activePointers: 3 },
-  scene: [BootScene, MenuScene, GameScene, UIScene, LevelUpScene, ChestScene, GameOverScene],
+  scene: [BootScene, MenuScene, GameScene, UIScene, LevelUpScene, ChestScene, LegendScene, GameOverScene],
 });
 
 setupMobile(game);

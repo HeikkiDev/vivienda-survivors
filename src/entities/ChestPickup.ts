@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { CHEST, DEPTH } from '../config';
 import { createVisual } from '../visuals';
 
-/** Cofre "Piso de protección oficial" en el suelo. No caduca ni le afecta el imán: se coge al tocarlo. */
+/** Cofre del tesoro en el suelo. No caduca ni le afecta el imán: se coge al tocarlo. */
 export class ChestPickup extends Phaser.GameObjects.Zone {
   readonly visual: Phaser.GameObjects.Text | Phaser.GameObjects.Sprite;
   private readonly baseScale: number;

@@ -56,6 +56,15 @@ export function generateUpgradeOptions(weapons: readonly OwnedWeapon[], modifier
   const evolutions: UpgradeOption[] = Phaser.Utils.Array.Shuffle(availableEvolutions(weapons, modifiers))
     .slice(0, LEVEL_UP_OPTIONS)
     .map((id) => ({ kind: 'evolution', id }));
+  const pool = upgradePool(weapons, modifiers);
+  const rest = Phaser.Utils.Array.Shuffle(pool).slice(0, LEVEL_UP_OPTIONS - evolutions.length);
+  const options = Phaser.Utils.Array.Shuffle([...evolutions, ...rest]);
+  if (options.length < LEVEL_UP_OPTIONS) options.push({ kind: 'cana' });
+  return options;
+}
+
+/** Armas (no evolucionadas) y pasivas por debajo del nivel máximo. */
+function upgradePool(weapons: readonly OwnedWeapon[], modifiers: Pick<Modifiers, 'passiveLevels'>): UpgradeOption[] {
   const pool: UpgradeOption[] = [];
   for (const id of WEAPON_IDS) {
     const w = weapons.find((o) => o.id === id);
@@ -66,10 +75,12 @@ export function generateUpgradeOptions(weapons: readonly OwnedWeapon[], modifier
     const lvl = modifiers.passiveLevels[id];
     if (lvl < MAX_UPGRADE_LEVEL) pool.push({ kind: 'passive', id, currentLevel: lvl });
   }
-  const rest = Phaser.Utils.Array.Shuffle(pool).slice(0, LEVEL_UP_OPTIONS - evolutions.length);
-  const options = Phaser.Utils.Array.Shuffle([...evolutions, ...rest]);
-  if (options.length < LEVEL_UP_OPTIONS) options.push({ kind: 'cana' });
-  return options;
+  return pool;
+}
+
+/** Todo al máximo o evolucionado: la única opción posible de level-up sería la caña. */
+export function isFullyUpgraded(weapons: readonly OwnedWeapon[], modifiers: Pick<Modifiers, 'passiveLevels'>): boolean {
+  return availableEvolutions(weapons, modifiers).length === 0 && upgradePool(weapons, modifiers).length === 0;
 }
 
 /** Mejora concedida por un cofre; `euros` = XP de un nivel completo cuando ya no queda nada que mejorar. */

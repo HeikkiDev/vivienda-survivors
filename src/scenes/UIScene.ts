@@ -32,7 +32,9 @@ export class UIScene extends Phaser.Scene {
     Phaser.GameObjects.Components.Visible;
   private muteOnButton!: HudButton;
   private muteOffButton!: HudButton;
-  private pausedByUser = false;
+  private helpButton!: HudButton;
+  /** `pause`: pausa manual con velo; `legend`: leyenda "?" abierta (también pausa la partida). */
+  private pauseMode: 'none' | 'pause' | 'legend' = 'none';
   private endingShown = false;
 
   constructor() {
@@ -102,10 +104,11 @@ export class UIScene extends Phaser.Scene {
     const p = UI.pause;
     this.timerText.setX(cx);
     this.promiseBanner.setX(cx);
-    this.announcementText.setX(cx);
+    this.announcementText.setX(cx).setWordWrapWidth(width - UI.announcement.wrapMargin);
     this.pauseButton.setX(width - p.buttonMarginX);
     this.muteOnButton.setX(width - p.buttonMarginX - p.muteOffsetX);
     this.muteOffButton.setX(width - p.buttonMarginX - p.muteOffsetX);
+    this.helpButton.setX(width - p.buttonMarginX - p.helpOffsetX);
     this.pauseVeil.setSize(width, height);
     this.pauseTitle.setX(cx);
     this.pauseHint.setX(cx);
@@ -116,7 +119,7 @@ export class UIScene extends Phaser.Scene {
 
   private createPauseControls(): void {
     const p = UI.pause;
-    this.pausedByUser = false;
+    this.pauseMode = 'none';
     const button = this.createHudButton('icon_pause', () => this.togglePause());
     this.pauseButton = button;
     this.input.keyboard?.on('keydown-ESC', () => this.togglePause());
@@ -125,6 +128,8 @@ export class UIScene extends Phaser.Scene {
     this.muteOffButton = this.createHudButton('icon_sound_off', () => this.toggleMute());
     this.input.keyboard?.on('keydown-M', () => this.toggleMute());
     this.refreshMuteButton();
+    this.helpButton = this.createHudButton('icon_help', () => this.toggleLegend());
+    this.input.keyboard?.on('keydown-H', () => this.toggleLegend());
 
     const overlay = this.add.rectangle(0, 0, this.scale.width, this.scale.height, p.overlayColor, p.overlayAlpha).setOrigin(0);
     this.pauseVeil = overlay;
@@ -150,9 +155,10 @@ export class UIScene extends Phaser.Scene {
     this.children.bringToTop(button);
     this.children.bringToTop(this.muteOnButton);
     this.children.bringToTop(this.muteOffButton);
+    this.children.bringToTop(this.helpButton);
   }
 
-  private createHudButton(id: 'icon_pause' | 'icon_sound_on' | 'icon_sound_off', onPress: () => void): HudButton {
+  private createHudButton(id: 'icon_pause' | 'icon_sound_on' | 'icon_sound_off' | 'icon_help', onPress: () => void): HudButton {
     const p = UI.pause;
     const button = createVisual(this, id, 0, p.buttonY);
     const hit = new Phaser.Geom.Rectangle(
@@ -177,20 +183,50 @@ export class UIScene extends Phaser.Scene {
     this.muteOffButton.setVisible(muted);
   }
 
+  /** Esc / P / ⏸: pausa, o reanuda si está en pausa o con la leyenda abierta. */
   private togglePause(): void {
-    const game = this.scene.get('GameScene') as GameScene;
-    if (this.pausedByUser) {
-      this.pausedByUser = false;
-      this.pauseOverlay.setVisible(false);
-      AudioManager.setMusicDucked(false);
-      this.scene.resume('GameScene');
+    if (this.pauseMode !== 'none') {
+      this.resumeGame();
       return;
     }
-    if (!game.canPause) return;
-    this.pausedByUser = true;
-    this.pauseOverlay.setVisible(true);
+    if (!(this.scene.get('GameScene') as GameScene).canPause) return;
+    this.pauseGame('pause');
+  }
+
+  /** "?" / H: abre la leyenda (también desde la pausa) o la cierra y reanuda. */
+  private toggleLegend(): void {
+    if (this.pauseMode === 'legend') {
+      this.resumeGame();
+      return;
+    }
+    if (this.pauseMode === 'none') {
+      if (!(this.scene.get('GameScene') as GameScene).canPause) return;
+      this.pauseGame('legend');
+    } else {
+      this.pauseMode = 'legend';
+      this.pauseOverlay.setVisible(false);
+    }
+    this.scene.launch('LegendScene');
+  }
+
+  /** Lo llama LegendScene (botón cerrar o toque fuera del panel): reanuda igual que la pausa. */
+  closeLegend(): void {
+    if (this.pauseMode === 'legend') this.resumeGame();
+  }
+
+  private pauseGame(mode: 'pause' | 'legend'): void {
+    this.pauseMode = mode;
+    this.pauseOverlay.setVisible(mode === 'pause');
     AudioManager.setMusicDucked(true);
     this.scene.pause('GameScene');
+  }
+
+  private resumeGame(): void {
+    this.pauseMode = 'none';
+    this.pauseOverlay.setVisible(false);
+    this.scene.stop('LegendScene');
+    AudioManager.setMusicDucked(false);
+    this.scene.resume('GameScene');
   }
 
   update(): void {
@@ -221,6 +257,7 @@ export class UIScene extends Phaser.Scene {
     if (this.endingShown) return;
     this.endingShown = true;
     this.pauseButton.setVisible(false).disableInteractive();
+    this.helpButton.setVisible(false).disableInteractive();
     if (kind === 'victory') this.showVictory();
     else this.showDefeat();
   }

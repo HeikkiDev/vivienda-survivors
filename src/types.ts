@@ -26,7 +26,7 @@ export type EvolutionId = 'linkedin' | 'antidesahucios' | 'manifestacion' | 'hue
 export type IconId =
   | `icon_${WeaponId | PassiveId | EvolutionId}`
   | 'icon_evolved'
-  | 'icon_cana' | 'icon_pause' | 'icon_sound_on' | 'icon_sound_off';
+  | 'icon_cana' | 'icon_pause' | 'icon_sound_on' | 'icon_sound_off' | 'icon_help';
 
 export type EntityVisualId =
   | 'player'

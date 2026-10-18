@@ -4,6 +4,7 @@ import {
   ENEMIES,
   ENEMY_HP_SCALE_PER_MINUTE,
   ENEMY_IDS,
+  EVOLUTION_DIFFICULTY,
   SECONDS_PER_MINUTE,
   SPAWN,
   SPAWN_TABLE,
@@ -21,7 +22,11 @@ export class Spawner {
   readonly eliteGroups: Record<EnemyId, Phaser.Physics.Arcade.Group>;
   /** Todos los grupos (normales y élites). */
   readonly groupList: Phaser.Physics.Arcade.Group[];
+  /** Evoluciones que tiene el jugador (0–4): suben el HP y el número de enemigos por tanda. */
+  evolutions = 0;
   private accumulator = 0;
+  /** Parte fraccionaria de enemigos por tanda que se arrastra a la siguiente (escalado por evoluciones). */
+  private countCarry = 0;
   private alive = 0;
   private readonly point = { x: 0, y: 0 };
   private readonly seen = new Set<EnemyId>();
@@ -45,13 +50,25 @@ export class Spawner {
     return Math.min(SPAWN_TABLE.length - 1, Math.max(0, Math.floor(elapsedSeconds / SECONDS_PER_MINUTE)));
   }
 
+  /** Multiplicador de HP por las evoluciones del jugador (se acumula con el escalado por minuto). */
+  get evolutionHpMultiplier(): number {
+    return 1 + EVOLUTION_DIFFICULTY.enemyHpPerEvolution * this.evolutions;
+  }
+
+  private hpMultiplier(minute: number): number {
+    return (1 + ENEMY_HP_SCALE_PER_MINUTE * minute) * this.evolutionHpMultiplier;
+  }
+
   update(dt: number, elapsedSeconds: number, px: number, py: number): void {
     const minute = Spawner.minuteOf(elapsedSeconds);
     const row = SPAWN_TABLE[minute];
     this.accumulator += dt;
     while (this.accumulator >= row.interval) {
       this.accumulator -= row.interval;
-      for (let i = 0; i < row.count; i++) {
+      this.countCarry += row.count * (1 + EVOLUTION_DIFFICULTY.spawnCountPerEvolution * this.evolutions);
+      const count = Math.floor(this.countCarry);
+      this.countCarry -= count;
+      for (let i = 0; i < count; i++) {
         if (this.alive >= SPAWN.maxAlive) break;
         this.spawn(weightedPick(row.weights, ENEMY_IDS), minute, px, py);
       }
@@ -74,7 +91,7 @@ export class Spawner {
       group.add(enemy);
       enemy.initBody();
     }
-    enemy.spawn(x, y, 1 + ENEMY_HP_SCALE_PER_MINUTE * minute);
+    enemy.spawn(x, y, this.hpMultiplier(minute));
     this.alive++;
     if (!this.seen.has(id)) {
       this.seen.add(id);
@@ -94,7 +111,7 @@ export class Spawner {
       elite.initBody();
     }
     const p = this.ringPoint(px, py);
-    elite.spawn(p.x, p.y, 1 + ENEMY_HP_SCALE_PER_MINUTE * minute);
+    elite.spawn(p.x, p.y, this.hpMultiplier(minute));
     return elite;
   }
 

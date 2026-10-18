@@ -1,8 +1,11 @@
 import Phaser from 'phaser';
 import {
+  AUDIO,
   BOSS,
+  CANA_HEAL,
   CAMERA_LERP,
   CAMERA_SHAKE,
+  CHEST,
   DEBUG_ELITE_PARAM,
   DEBUG_EVO_PARAM,
   DEBUG_START_MINUTE_PARAM,
@@ -29,6 +32,7 @@ import {
   WEAPON_IDS,
   WORLD_HEIGHT,
   WORLD_WIDTH,
+  XP_CURVE,
 } from '../config';
 import { Boss, BossBulletPool, type BossBullet } from '../entities/Boss';
 import { ChestPickup } from '../entities/ChestPickup';
@@ -46,13 +50,14 @@ import {
   evolutionOf,
   generateChestRewards,
   generateUpgradeOptions,
+  isFullyUpgraded,
   rollChestUpgradeCount,
   type UpgradeOption,
 } from '../systems/Upgrades';
 import { TEXTS } from '../texts';
 import type { EnemyId, EvolutionId, IconId, WeaponId } from '../types';
 import { randomPointInRing, xpToNext } from '../utils/math';
-import { createBackground, createVisual, flashVisual } from '../visuals';
+import { createBackground, createVisual, flashVisual, type HealingVisualId } from '../visuals';
 import { Curriculums } from '../weapons/Curriculums';
 import { EscudoLey } from '../weapons/EscudoLey';
 import { GritoTrastero } from '../weapons/GritoTrastero';
@@ -94,6 +99,14 @@ export interface Announcement {
   remaining: number;
 }
 
+/** Texto flotante de curación que sigue al jugador ("+N" de la regeneración o "+N 🍺" de la caña automática). */
+interface FloatingHeal {
+  text: Phaser.GameObjects.Text;
+  ageMs: number;
+  offsetY: number;
+  amount: number;
+}
+
 /** Eventos únicos de la partida (instante en segundos). */
 interface TimedEvent {
   at: number;
@@ -120,14 +133,18 @@ export class GameScene extends Phaser.Scene {
   private chests: ChestPickup[] = [];
   private chestOpen = false;
   private chestsOpened = 0;
+  /** El aviso "¡Recoge el cofre!" solo sale con el primer cofre de la partida. */
+  private chestHintShown = false;
+  /** Todo al máximo o evolucionado: sin menú de nivel (caña automática) y XP × XP_CURVE.maxedMultiplier. */
+  private fullyUpgraded = false;
   /** Instante (s de partida) del próximo élite y separación entre élites. */
   private nextEliteAt = 0;
   private eliteInterval: number = ELITE.intervalSeconds;
   private elapsed = 0;
   private regenFeedbackElapsed = 0;
   private regenHealed = 0;
-  private regenText: Phaser.GameObjects.Text | null = null;
-  private regenTextAgeMs = 0;
+  private regenText: FloatingHeal | null = null;
+  private canaText: FloatingHeal | null = null;
   private kills = 0;
   private level = 1;
   private xp = 0;
@@ -162,7 +179,7 @@ export class GameScene extends Phaser.Scene {
       elapsed: this.elapsed,
       level: this.level,
       xp: this.xp,
-      xpToNext: xpToNext(this.level),
+      xpToNext: this.xpForNextLevel(),
       inventory,
       promise: c ? null : this.elections.current,
       promisePickup: !c && pickup.active ? { x: pickup.x - cam.scrollX, y: pickup.y - cam.scrollY } : null,
@@ -189,10 +206,12 @@ export class GameScene extends Phaser.Scene {
     this.chests = [];
     this.chestOpen = false;
     this.chestsOpened = 0;
+    this.chestHintShown = false;
+    this.fullyUpgraded = false;
     this.regenFeedbackElapsed = 0;
     this.regenHealed = 0;
     this.regenText = null;
-    this.regenTextAgeMs = 0;
+    this.canaText = null;
     this.kills = 0;
     this.level = 1;
     this.xp = 0;
@@ -204,6 +223,7 @@ export class GameScene extends Phaser.Scene {
     this.ending = null;
     this.endSnapshot = null;
     this.modifiers = new Modifiers();
+    AudioManager.resetMusicRate();
 
     this.physics.world.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
     this.cameras.main.setBounds(0, 0, WORLD_WIDTH, WORLD_HEIGHT);
@@ -258,6 +278,7 @@ export class GameScene extends Phaser.Scene {
     };
     this.weapons = [this.createWeapon('curriculum')];
     if (debugEvo) this.setupDebugEvolutions();
+    this.refreshFullyUpgraded();
 
     this.physics.add.overlap(this.player, enemyTargets, (_p, e) => this.onEnemyContact(e as Enemy));
     this.physics.add.overlap(this.player, this.bossBullets.group, (_p, b) => this.onBossBullet(b as BossBullet));
@@ -271,6 +292,7 @@ export class GameScene extends Phaser.Scene {
       this.scene.stop('UIScene');
       this.scene.stop('LevelUpScene');
       this.scene.stop('ChestScene');
+      this.scene.stop('LegendScene');
     });
   }
 
@@ -315,7 +337,8 @@ export class GameScene extends Phaser.Scene {
 
     this.player.tick(dt);
     this.applyPlayerRegen(dt);
-    this.ageRegenText(deltaMs);
+    this.regenText = this.ageFloatingHeal(this.regenText, deltaMs);
+    this.canaText = this.ageFloatingHeal(this.canaText, deltaMs);
     this.player.move(this.inputSystem.getDirection(), this.modifiers.playerSpeed);
     this.spawner.update(dt, this.elapsed, this.player.x, this.player.y);
     this.spawner.updateEnemies(this.player.x, this.player.y, this.modifiers.enemySpeed, dt);
@@ -341,7 +364,30 @@ export class GameScene extends Phaser.Scene {
     }
     const chest = this.chests.find((ch) => ch.overlaps(this.player.x, this.player.y, PLAYER.hitboxRadius));
     if (chest && !this.levelUpOpen && !this.chestOpen) this.openChest(chest);
-    if (this.pendingLevelUps > 0 && !this.levelUpOpen && !this.chestOpen) this.openLevelUp();
+    if (this.pendingLevelUps > 0 && !this.levelUpOpen && !this.chestOpen) {
+      if (this.fullyUpgraded) this.autoCana();
+      else this.openLevelUp();
+    }
+  }
+
+  /** XP para el siguiente nivel; con todo al máximo, multiplicada por XP_CURVE.maxedMultiplier. */
+  private xpForNextLevel(): number {
+    return xpToNext(this.level) * (this.fullyUpgraded ? XP_CURVE.maxedMultiplier : 1);
+  }
+
+  private refreshFullyUpgraded(): void {
+    this.fullyUpgraded = isFullyUpgraded(this.weapons, this.modifiers);
+  }
+
+  /** Solo queda la caña: se cura sin abrir el menú ni pausar, con un "+N 🍺" sobre el jugador. */
+  private autoCana(): void {
+    const count = this.pendingLevelUps;
+    this.pendingLevelUps = 0;
+    for (let i = 0; i < count; i++) applyNonWeaponUpgrade({ kind: 'cana' }, this.player, this.modifiers);
+    AudioManager.playSfx('levelup');
+    const total = (this.canaText?.amount ?? 0) + CANA_HEAL * count;
+    this.canaText?.text.destroy();
+    this.canaText = this.createFloatingHeal('canaHealing', total, REGEN_FEEDBACK.canaOffsetY);
   }
 
   /** Un élite cada `eliteInterval` s; se salta si el boss está vivo. */
@@ -361,14 +407,23 @@ export class GameScene extends Phaser.Scene {
       this.chests.push(chest);
     }
     chest.spawn(x, y);
+    if (!this.chestHintShown) {
+      this.chestHintShown = true;
+      this.announce(TEXTS.chest.firstHint, 'info', CHEST.firstHintSeconds);
+    }
   }
 
   /** Recoge el cofre, aplica sus mejoras y abre su pantalla con la escena en pausa. */
   private openChest(chest: ChestPickup): void {
     chest.despawn();
-    this.chestOpen = true;
     this.chestsOpened++;
     const rewards = generateChestRewards(this.weapons, this.modifiers, rollChestUpgradeCount());
+    // Con todo al máximo el cofre solo da euros: se suman sin pantalla y los niveles se curan con la caña automática.
+    if (this.fullyUpgraded) {
+      for (const reward of rewards) this.applyChestReward(reward);
+      return;
+    }
+    this.chestOpen = true;
     for (const reward of rewards) this.applyChestReward(reward);
     AudioManager.playSfx('levelup');
     AudioManager.setMusicDucked(true);
@@ -377,7 +432,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   private applyChestReward(reward: ChestReward): void {
-    if (reward.kind === 'euros') this.addXp(xpToNext(this.level));
+    if (reward.kind === 'euros') this.addXp(this.xpForNextLevel());
     else this.applyUpgrade(reward);
   }
 
@@ -415,30 +470,31 @@ export class GameScene extends Phaser.Scene {
     const factor = REGEN_FEEDBACK.roundingFactor;
     const amount = Math.round(this.regenHealed * factor) / factor;
     if (amount <= 0) return;
-    this.regenText?.destroy();
-    this.regenText = createVisual(
-      this, 'healing', this.player.x, this.player.y + REGEN_FEEDBACK.offsetY, amount,
-    ).setDepth(DEPTH.floatingText);
-    this.regenTextAgeMs = 0;
+    this.regenText?.text.destroy();
+    this.regenText = this.createFloatingHeal('healing', amount, REGEN_FEEDBACK.offsetY);
   }
 
-  private ageRegenText(deltaMs: number): void {
-    if (!this.regenText) return;
-    this.regenTextAgeMs += deltaMs;
-    if (this.regenTextAgeMs >= REGEN_FEEDBACK.riseMs + REGEN_FEEDBACK.fadeMs) {
-      this.regenText.destroy();
-      this.regenText = null;
-    }
+  private createFloatingHeal(id: HealingVisualId, amount: number, offsetY: number): FloatingHeal {
+    const text = createVisual(this, id, this.player.x, this.player.y + offsetY, amount).setDepth(DEPTH.floatingText);
+    return { text, ageMs: 0, offsetY, amount };
+  }
+
+  /** Envejece un texto flotante; devuelve null (y lo destruye) cuando ha terminado. */
+  private ageFloatingHeal(heal: FloatingHeal | null, deltaMs: number): FloatingHeal | null {
+    if (!heal) return null;
+    heal.ageMs += deltaMs;
+    if (heal.ageMs < REGEN_FEEDBACK.riseMs + REGEN_FEEDBACK.fadeMs) return heal;
+    heal.text.destroy();
+    return null;
   }
 
   /** El "+N" sigue al jugador: sube relativo a él y luego se desvanece. */
-  private syncRegenText(): void {
-    if (!this.regenText) return;
-    const age = this.regenTextAgeMs;
-    const rise = Math.min(1, age / REGEN_FEEDBACK.riseMs);
-    const fade = Math.min(1, Math.max(0, age - REGEN_FEEDBACK.riseMs) / REGEN_FEEDBACK.fadeMs);
-    this.regenText
-      .setPosition(this.player.x, this.player.y + REGEN_FEEDBACK.offsetY - REGEN_FEEDBACK.risePixels * rise)
+  private syncFloatingHeal(heal: FloatingHeal | null): void {
+    if (!heal) return;
+    const rise = Math.min(1, heal.ageMs / REGEN_FEEDBACK.riseMs);
+    const fade = Math.min(1, Math.max(0, heal.ageMs - REGEN_FEEDBACK.riseMs) / REGEN_FEEDBACK.fadeMs);
+    heal.text
+      .setPosition(this.player.x, this.player.y + heal.offsetY - REGEN_FEEDBACK.risePixels * rise)
       .setAlpha(1 - fade);
   }
 
@@ -529,13 +585,12 @@ export class GameScene extends Phaser.Scene {
       const owned = this.weapons.find((w) => w.id === option.id);
       if (owned) owned.levelUp();
       else this.weapons.push(this.createWeapon(option.id));
-      return;
-    }
-    if (option.kind === 'evolution') {
+    } else if (option.kind === 'evolution') {
       this.evolveWeapon(option.id);
-      return;
+    } else {
+      applyNonWeaponUpgrade(option, this.player, this.modifiers);
     }
-    applyNonWeaponUpgrade(option, this.player, this.modifiers);
+    this.refreshFullyUpgraded();
   }
 
   /** Sustituye el arma base por su evolución (mismo hueco) con destello dorado, rótulo y sacudida. */
@@ -544,6 +599,9 @@ export class GameScene extends Phaser.Scene {
     if (!weapon || weapon.evolved) return;
     weapon.evolve();
     this.evolutions++;
+    this.spawner.evolutions = this.evolutions;
+    const rates = AUDIO.musicRateByEvolutions;
+    AudioManager.setMusicRate(rates[Math.min(this.evolutions, rates.length - 1)], this.tweens);
     const fx = EVOLUTION_FX;
     this.announce(TEXTS.evolutionBanner(TEXTS.evolutions[id].name), 'info', fx.bannerSeconds);
     this.cameras.main.shake(fx.shakeMs, fx.shakeIntensity);
@@ -569,7 +627,8 @@ export class GameScene extends Phaser.Scene {
   /** Cierra un menú de nivel; devuelve las opciones del siguiente si hay más encolados. */
   finishLevelUp(): UpgradeOption[] | null {
     this.pendingLevelUps = Math.max(0, this.pendingLevelUps - 1);
-    if (this.pendingLevelUps > 0) return generateUpgradeOptions(this.weapons, this.modifiers);
+    // Si ya solo queda la caña, los niveles pendientes se curan solos al reanudar (sin más menús).
+    if (this.pendingLevelUps > 0 && !this.fullyUpgraded) return generateUpgradeOptions(this.weapons, this.modifiers);
     this.levelUpOpen = false;
     AudioManager.setMusicDucked(false);
     this.scene.resume();
@@ -583,7 +642,8 @@ export class GameScene extends Phaser.Scene {
     if (this.boss.active) this.boss.syncVisual();
     this.bossBullets.syncVisuals();
     for (const w of this.weapons) w.syncVisuals();
-    this.syncRegenText();
+    this.syncFloatingHeal(this.regenText);
+    this.syncFloatingHeal(this.canaText);
   }
 
   /** Devuelve true si el enemigo muere. */
@@ -608,8 +668,8 @@ export class GameScene extends Phaser.Scene {
 
   private addXp(amount: number): void {
     this.xp += amount;
-    while (this.xp >= xpToNext(this.level)) {
-      this.xp -= xpToNext(this.level);
+    while (this.xp >= this.xpForNextLevel()) {
+      this.xp -= this.xpForNextLevel();
       this.level++;
       this.pendingLevelUps++;
     }
