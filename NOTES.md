@@ -203,7 +203,7 @@
 - El GDD tenía "cofres" en *Fuera de alcance*; se implementa por petición explícita (GDD §7.2 actualizado).
 - Cada élite es un `Elite` (subclase de `Enemy`) con stats propias (`eliteStats`) y su visual escalado/tintado una sola vez; viven en un pool aparte por tipo (`Spawner.eliteGroups`), incluido en `groupList` para que armas, contacto y victoria los traten como al resto. `Enemy.elite` evita el tope de 300 y el reposicionamiento.
 - HP de élite = HP base × 8 × escalado por minuto (el mismo que los normales). Los élites no muestran la tarjeta de presentación del tipo (se anuncian con "¡Cuidado! … premium a la vista: suelta un cofre"). Nombre: "<nombre> premium" en español y "Premium <name>" en inglés.
-- Si toca un élite con el boss vivo, se salta ese (no se aplaza). Con `?min=N` el primero sale 60 s después del inicio (o al 1:00).
+- Si toca un élite con el boss vivo, se salta ese (no se aplaza). Con `?min=N` el primero sale 60 s + `ELITE.offsetSeconds` después del inicio (o al 1:15).
 - "Golden tint/outline": `setTint` dorado + `preFX.addGlow` (solo WebGL; en Canvas queda el tamaño y la corona). El destello de daño de los sprites vuelve al tinte base del visual (antes hacía `clearTint`).
 - El IPC no tiene versión élite (peso 0): el issue solo menciona casero, agencia y fondo.
 - Las mejoras del cofre se eligen y aplican en `GameScene` al cogerlo (con la partida ya en pausa); `ChestScene` solo las muestra. Entre las armas propias se elige la de **mayor nivel** (empate al azar), para llegar antes al nivel 5; entre pasivas propias y entre nuevas, al azar.
@@ -237,3 +237,8 @@
 ## Velocidad fija de élites y aviso del primer Euríbor (issue #23)
 - **Élites:** `ELITE.speed` (150 px/s) sustituye a `ELITE.speedMultiplier`; vale para cualquier tipo base. Los modificadores globales de velocidad enemiga (`modifiers.enemySpeed`, pasado a `chase`) se siguen aplicando encima.
 - **Primer Euríbor:** `Missiles` llama a `onFirstWave` una sola vez, `MISSILE.announceSeconds` antes de la primera tanda, así que el anuncio acaba justo cuando salen los "!" de borde ("o un poco antes", según el issue). Se adelanta para no chocar con el élite del 3:00 (élites cada 60 s): si salieran a la vez, el aviso del élite taparía el del Euríbor. Con `?missile=1` el anuncio sale a los 2 s y los "!" a los 5 s; con `?min=N` (N ≥ 3) sale nada más empezar. Como `Missiles` se crea de nuevo en cada `create()` de `GameScene`, se reinicia al volver a jugar. Usa `announce(...)` como el aviso de élite (tipo `warning`, `MISSILE.announceSeconds`); si coincide con otro anuncio, el último sustituye al anterior.
+
+## Élites desfasados 15 s (issue #25)
+- Los élites salen en X:15 (`ELITE.firstAtSeconds + ELITE.offsetSeconds`, luego cada `intervalSeconds`) para no coincidir con los tipos nuevos de enemigo del cambio de minuto. `?elite=1` mantiene 5 s / 20 s sin desfase.
+- Si al tocar un élite hay otro anuncio en pantalla (cualquier `announce(...)`), espera a que termine y sale `ELITE.announceGapSeconds` después; si aparece otro anuncio durante el hueco, vuelve a esperar. El retraso no mueve el calendario (el siguiente sigue en su X:15). Se aplica también con `?elite=1`. La tarjeta de enemigo nuevo no cuenta como anuncio.
+- Si el boss está vivo cuando toca (o aparece mientras el élite espera), ese élite se salta como antes.
