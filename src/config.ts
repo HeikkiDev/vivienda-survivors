@@ -444,8 +444,8 @@ export const ELITE = {
   hpMultiplier: 20,
   sizeMultiplier: 1.6,
   damageMultiplier: 1.5,
-  /** Velocidad respecto a su tipo base, para que se despegue de la horda (issue #15). */
-  speedMultiplier: 1.2,
+  /** Velocidad fija (px/s) sea cual sea su tipo base: más que cualquier enemigo normal y menos que el jugador, para que se despegue de la horda (issue #23). */
+  speed: 150,
   /** Tinte y brillo dorados (el brillo solo con WebGL). */
   tint: 0xffd447,
   glowColor: 0xffd447,
@@ -507,6 +507,8 @@ export const MISSILE = {
   hitboxRadius: 10,
   /** El "!" sale en el borde por el que entrará, estos segundos antes del lanzamiento. */
   warningSeconds: 1,
+  /** Segundos del aviso "¡Cuidado! Euríbor disparado…" de la primera tanda de la partida; sale estos segundos antes de la tanda y acaba cuando aparecen los "!". */
+  announceSeconds: 3,
   /** Posición a lo largo del borde (fracción), lejos de las esquinas del HUD. */
   edgeMinFraction: 0.1,
   edgeMaxFraction: 0.9,

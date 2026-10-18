@@ -10,7 +10,7 @@ export function eliteStats(id: EnemyId): EnemyStats {
   return {
     ...base,
     hp: base.hp * ELITE.hpMultiplier,
-    speed: base.speed * ELITE.speedMultiplier,
+    speed: ELITE.speed,
     damage: base.damage * ELITE.damageMultiplier,
     hitboxRadius: base.hitboxRadius * ELITE.sizeMultiplier,
   };

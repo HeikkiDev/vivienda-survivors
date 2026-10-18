@@ -233,3 +233,7 @@
 - El "!" es texto del HUD (UIScene, texto en `texts.ts`), no una entidad del mundo. Parpadea `blinkPerSecond` veces por segundo.
 - Sprite: `tools/gen_missile.py` (128×40, mira a la derecha, `scale 0.5`) con llama y estela de humo dibujadas en el propio PNG. El emoji 🚀 de fallback mira a −45°: `setVisualHeading` (visuals.ts) corrige ese ángulo.
 - Leyenda: nueva pestaña "Peligros"/"Hazards". Los iconos alargados se reducen para caber en la columna del icono.
+
+## Velocidad fija de élites y aviso del primer Euríbor (issue #23)
+- **Élites:** `ELITE.speed` (150 px/s) sustituye a `ELITE.speedMultiplier`; vale para cualquier tipo base. Los modificadores globales de velocidad enemiga (`modifiers.enemySpeed`, pasado a `chase`) se siguen aplicando encima.
+- **Primer Euríbor:** `Missiles` llama a `onFirstWave` una sola vez, `MISSILE.announceSeconds` antes de la primera tanda, así que el anuncio acaba justo cuando salen los "!" de borde ("o un poco antes", según el issue). Se adelanta para no chocar con el élite del 3:00 (élites cada 60 s): si salieran a la vez, el aviso del élite taparía el del Euríbor. Con `?missile=1` el anuncio sale a los 2 s y los "!" a los 5 s; con `?min=N` (N ≥ 3) sale nada más empezar. Como `Missiles` se crea de nuevo en cada `create()` de `GameScene`, se reinicia al volver a jugar. Usa `announce(...)` como el aviso de élite (tipo `warning`, `MISSILE.announceSeconds`); si coincide con otro anuncio, el último sustituye al anterior.

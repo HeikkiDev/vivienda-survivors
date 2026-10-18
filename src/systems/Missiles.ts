@@ -17,13 +17,24 @@ export class Missiles {
   readonly group: Phaser.Physics.Arcade.Group;
   private readonly pending: MissileWarning[] = [];
   private nextWaveAt: number;
+  /** Momento de la primera tanda; su anuncio sale `MISSILE.announceSeconds` antes (null cuando ya ha salido). */
+  private firstWaveAt: number | null;
 
-  /** Con `debug` (`?missile=1`) la primera tanda sale a los `debugStartSeconds` de empezar. */
-  constructor(private readonly scene: Phaser.Scene, startElapsed: number, debug: boolean) {
+  /**
+   * Con `debug` (`?missile=1`) la primera tanda sale a los `debugStartSeconds` de empezar.
+   * `onFirstWave` se llama una vez (por partida), `MISSILE.announceSeconds` antes de la primera tanda.
+   */
+  constructor(
+    private readonly scene: Phaser.Scene,
+    startElapsed: number,
+    debug: boolean,
+    private readonly onFirstWave: () => void,
+  ) {
     this.group = scene.physics.add.group({ maxSize: MISSILE.poolSize });
     const start = MISSILE.startMinute * SECONDS_PER_MINUTE;
     if (debug) this.nextWaveAt = startElapsed + MISSILE.debugStartSeconds;
     else this.nextWaveAt = startElapsed <= start ? start : startElapsed + Missiles.intervalAt(startElapsed);
+    this.firstWaveAt = this.nextWaveAt;
   }
 
   get warnings(): readonly MissileWarning[] {
@@ -46,6 +57,10 @@ export class Missiles {
   }
 
   update(dt: number, elapsed: number, evolutions: number, view: Phaser.Geom.Rectangle, px: number, py: number): void {
+    if (this.firstWaveAt !== null && elapsed >= this.firstWaveAt - MISSILE.announceSeconds) {
+      this.firstWaveAt = null;
+      this.onFirstWave();
+    }
     while (elapsed >= this.nextWaveAt) {
       const count = Missiles.countAt(this.nextWaveAt, evolutions);
       for (let i = 0; i < count; i++) {
