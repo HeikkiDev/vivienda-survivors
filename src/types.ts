@@ -33,6 +33,7 @@ export type EntityVisualId =
   | EnemyId
   | 'boss'
   | 'bossBullet'
+  | 'missile'
   | 'euro'
   | 'promesa'
   | 'chest'

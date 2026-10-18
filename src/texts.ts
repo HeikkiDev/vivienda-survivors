@@ -18,6 +18,12 @@ const decimal = (n: number, sep: string): string => String(n).replace('.', sep);
 
 const EM = EVOLUTION_MULTIPLIERS;
 const EV = EVOLUTIONS;
+/** "Ritmo ×2, radio ×2" de la Manifestación; el ritmo se omite si es el del Grito a nivel 5 (×1). */
+const manifestacionStats = (rate: string, radius: string, sep: string): string => {
+  const r = `×${decimal(EM.manifestacion.radius, sep)}`;
+  if (EM.manifestacion.cooldown === 1) return `${radius.charAt(0).toUpperCase()}${radius.slice(1)} ${r}`;
+  return `${rate} ×${decimal(1 / EM.manifestacion.cooldown, sep)}, ${radius} ${r}`;
+};
 
 type EffectLabels = Record<keyof PromiseEffect, string>;
 
@@ -94,7 +100,7 @@ const ES = {
   legend: {
     title: 'Leyenda',
     close: '✕ Cerrar',
-    tabs: { weapons: 'Armas', passives: 'Pasivas', evolutions: 'Evoluciones' },
+    tabs: { weapons: 'Armas', passives: 'Pasivas', evolutions: 'Evoluciones', hazards: 'Peligros' },
     plus: '+',
     arrow: '→',
     recipe: (weapon: string, level: string, passive: string) => `${weapon} (${level}) + ${passive}`,
@@ -110,7 +116,7 @@ const ES = {
   evolutions: {
     linkedin: { name: 'LinkedIn Premium', desc: "Ahora con insignia de 'Open to work'", effect: `Dispara en ${EV.linkedin.directions} direcciones, atraviesa a todos y +${pctUp(EM.linkedin.damage)}% daño.` },
     antidesahucios: { name: 'Escudo Antidesahucios', desc: 'Esta vez sí se cumple', effect: `Aura +${pctUp(EM.antidesahucios.radius)}% radio y +${pctUp(EM.antidesahucios.damage)}% daño. Cura ${EV.antidesahucios.healPerKill} por enemigo abatido (máx. ${EV.antidesahucios.maxHealPerSecond}/s).` },
-    manifestacion: { name: 'Manifestación', desc: 'Somos miles y no cabemos en 20 m²', effect: `Ritmo ×${decimal(1 / EM.manifestacion.cooldown, ',')}, radio ×${decimal(EM.manifestacion.radius, ',')} y gran empuje. 1 de cada ${EV.manifestacion.giantEvery} llena la pantalla.` },
+    manifestacion: { name: 'Manifestación', desc: 'Por una vivienda digna, no 20 m²', effect: `${manifestacionStats('Ritmo', 'radio', ',')} y gran empuje. 1 de cada ${EV.manifestacion.giantEvery} llena la pantalla.` },
     huelga: { name: 'Huelga general', desc: 'Hoy no paga nadie', effect: `${EV.huelga.orbs} puños, órbita +${pctUp(EM.huelga.orbitRadius)}%, +${pctUp(EM.huelga.damage)}% daño y puños ×${decimal(EM.huelga.size, ',')}.` },
   },
   weapons: {
@@ -129,7 +135,7 @@ const ES = {
   cana: { name: 'Caña con los colegas', desc: 'Lo único asequible', effect: `Cura ${CANA_HEAL} de vida.` },
   grito: {
     shout: '¡ESO ES UN TRASTERO!',
-    evolvedShout: '¡SOMOS MILES!',
+    evolvedShout: '¡VIVIENDA DIGNA!',
   },
   promises: {
     viviendas: '¡Un millón de viviendas públicas!',
@@ -154,6 +160,11 @@ const ES = {
     casero: { name: 'Casero de contrato de 11 meses', desc: 'Te renueva cada año… subiendo el precio.' },
     agencia: { name: 'Agencia con honorarios', desc: 'Llega la primera y te cobra por enseñarte el piso.' },
     fondo: { name: 'Fondo buitre', desc: 'Lento pero duro. Compra edificios enteros.' },
+  },
+  missile: {
+    name: 'Euríbor disparado',
+    effect: 'No se puede destruir: solo esquivarlo. Entra por un borde de la pantalla y la cruza en línea recta hacia donde estabas. Un "!" rojo avisa por dónde va a entrar.',
+    warning: '!',
   },
   elite: {
     name: (base: string) => `${base} premium`,
@@ -236,7 +247,7 @@ const EN: Texts = {
   legend: {
     title: 'Legend',
     close: '✕ Close',
-    tabs: { weapons: 'Weapons', passives: 'Passives', evolutions: 'Evolutions' },
+    tabs: { weapons: 'Weapons', passives: 'Passives', evolutions: 'Evolutions', hazards: 'Hazards' },
     plus: '+',
     arrow: '→',
     recipe: (weapon: string, level: string, passive: string) => `${weapon} (${level}) + ${passive}`,
@@ -252,7 +263,7 @@ const EN: Texts = {
   evolutions: {
     linkedin: { name: 'LinkedIn Premium', desc: "Now with an 'Open to work' badge", effect: `Shoots in ${EV.linkedin.directions} directions, pierces everything and +${pctUp(EM.linkedin.damage)}% damage.` },
     antidesahucios: { name: 'Anti-Eviction Shield', desc: 'This time it is enforced', effect: `Aura +${pctUp(EM.antidesahucios.radius)}% radius and +${pctUp(EM.antidesahucios.damage)}% damage. Heals ${EV.antidesahucios.healPerKill} per enemy killed (max ${EV.antidesahucios.maxHealPerSecond}/s).` },
-    manifestacion: { name: 'Mass Protest', desc: "We are thousands and we don't fit in 20 m²", effect: `Rate ×${decimal(1 / EM.manifestacion.cooldown, '.')}, radius ×${decimal(EM.manifestacion.radius, '.')}, strong knockback. 1 in ${EV.manifestacion.giantEvery} fills the screen.` },
+    manifestacion: { name: 'Mass Protest', desc: 'For decent housing, not 20 m²', effect: `${manifestacionStats('Rate', 'radius', '.')}, strong knockback. 1 in ${EV.manifestacion.giantEvery} fills the screen.` },
     huelga: { name: 'General Strike', desc: 'Nobody pays today', effect: `${EV.huelga.orbs} fists, orbit +${pctUp(EM.huelga.orbitRadius)}%, +${pctUp(EM.huelga.damage)}% damage and fists ×${decimal(EM.huelga.size, '.')}.` },
   },
   weapons: {
@@ -271,7 +282,7 @@ const EN: Texts = {
   cana: { name: 'Beer with Friends', desc: 'The only affordable thing', effect: `Heals ${CANA_HEAL} HP.` },
   grito: {
     shout: 'THAT\'S A STORAGE ROOM!',
-    evolvedShout: 'WE ARE THOUSANDS!',
+    evolvedShout: 'DECENT HOUSING!',
   },
   promises: {
     viviendas: 'A million public homes!',
@@ -296,6 +307,11 @@ const EN: Texts = {
     casero: { name: '11-Month-Lease Landlord', desc: 'Renews your contract every year… at a higher price.' },
     agencia: { name: 'Agency with Fees', desc: 'Gets there first and charges you for the viewing.' },
     fondo: { name: 'Vulture Fund', desc: 'Slow but tough. Buys whole buildings.' },
+  },
+  missile: {
+    name: 'Soaring Euribor',
+    effect: 'Cannot be destroyed: only dodged. It enters from a screen edge and crosses in a straight line towards where you were. A red "!" warns where it will come in.',
+    warning: '!',
   },
   elite: {
     name: (base: string) => `Premium ${base}`,

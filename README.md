@@ -15,7 +15,7 @@ Clon minimalista de *Vampire Survivors* y sátira (genérica) sobre la crisis de
 - **Subir de nivel:** recoge 💶 y elige 1 de 3 mejoras (clic, tap o `1` `2` `3`).
 - **Promesas electorales 🗳️:** cada 2 minutos. ¿Se cumplirá? Spoiler: probablemente no.
 - **Pausa:** `Esc` / `P` o el botón ⏸.
-- **Leyenda:** botón ❓ (o tecla `H`): pausa y muestra armas, pasivas y evoluciones (con su receta).
+- **Leyenda:** botón ❓ (o tecla `H`): pausa y muestra armas, pasivas, evoluciones (con su receta) y peligros.
 - **Compartir:** al acabar la partida, "📤 Compartir" crea una imagen con la captura de tu final y tu resultado (menú nativo en móvil; en escritorio se copia al portapapeles o se descarga).
 - **Sonido:** botón 🔊/🔇 junto a la pausa, o la tecla `M`. Se recuerda entre partidas.
 - **Idioma:** inglés o español, se elige en el menú principal.
@@ -36,7 +36,7 @@ Con un arma a nivel 5 y su pasiva emparejada, el siguiente menú de mejoras ofre
 |---|---|
 | 📄 Currículums + 💼 Segundo trabajo | 📇 **LinkedIn Premium**: dispara en 8 direcciones, atraviesa a todos, +50% daño. |
 | 🛡️ Escudo + 👴 Aval de tus padres | 🏰 **Escudo Antidesahucios**: radio +60%, +50% daño y te cura al matar (máx. 5 HP/s). |
-| 📢 Grito + 🛏️ Piso compartido | 📣 **Manifestación**: el doble de seguido, radio ×2, empuje fuerte; cada 3.ª explosión llena la pantalla. |
+| 📢 Grito + 🛏️ Piso compartido | 📣 **Manifestación**: radio ×2, empuje fuerte; cada 5.ª explosión llena la pantalla. |
 | ✊ Sindicato + 🎫 Bono Alquiler Joven | 👊 **Huelga general**: 8 puños más grandes, órbita +50%, +60% daño. |
 
 ### 👑 Enemigos premium y cofres
@@ -70,11 +70,12 @@ Aparece una urna en los minutos 2, 4, 6 y 8: se avisa en pantalla y una flecha i
 | 🤑 **Casero de contrato de 11 meses** | 01:00 | Lento pero aguanta. |
 | 🏢 **Agencia con honorarios** | 02:00 | Rápida. En el **05:00** llega la *temporada turística*: 40 agencias te rodean. |
 | 🦅 **Fondo buitre** | 04:00 | Grande, duro y pega fuerte. Cada vez hay más. |
-| 🫧 **Burbuja 2.0** (boss) | 08:00 | 3000 de vida; cada 5 s dispara un anillo de 💸. Se avisa 3 s antes. No hace falta matarla para ganar. |
+| 🫧 **Burbuja 2.0** (boss) | 08:00 | 8000 de vida (más cuantas más evoluciones tengas); cada 3 s dispara un anillo de 12 💸. Se avisa 3 s antes. No hace falta matarla para ganar. |
+| 🚀 **Euríbor disparado** | 03:00 | Indestructible: solo se esquiva. Un "!" rojo avisa por qué borde entra; cruza la pantalla hacia ti. Cada vez salen más y más seguido. |
 
 Cada enemigo nuevo se presenta con un cartel la primera vez que aparece.
 
-Los enemigos se hacen más resistentes cada minuto. Aguanta hasta el **10:00** para ganar… y si caes antes, también hay animación de derrota.
+Los enemigos se hacen más resistentes y pegan más fuerte cada minuto (y aún más resistentes con cada evolución). Aguanta hasta el **10:00** para ganar… y si caes antes, también hay animación de derrota.
 
 ## 🛠️ Desarrollo
 ```bash
@@ -86,13 +87,14 @@ npm run zip      # zip listo para itch.io
 
 Cada push a `main` se publica automáticamente en GitHub Pages.
 
-Parámetros de URL para probar (las partidas con `min`, `win`, `evo` o `elite` no guardan récord):
+Parámetros de URL para probar (las partidas con `min`, `win`, `evo`, `elite` o `missile` no guardan récord):
 | Parámetro | Qué hace |
 |---|---|
 | `?min=N` | Empieza en el minuto `N` (0–9). |
 | `?win=1` | Ganas nada más empezar, para ver la animación de victoria. |
 | `?evo=1` | Empiezas con las 4 armas a nivel 5 y sus pasivas a nivel 1: las evoluciones salen en las primeras subidas. |
 | `?elite=1` | Sale un enemigo premium a los 5 s y luego cada 20 s (para probar los cofres). |
+| `?missile=1` | La primera tanda de Euríbor disparado sale a los 5 s. |
 | `?debug=1` | Muestra las hitboxes de la física. |
 
 ## 🎨 Cambiar el arte

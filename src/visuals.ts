@@ -19,6 +19,8 @@ const GRID_LINE_WIDTH = 1;
 const FLASH_TINT = 0xffffff;
 const NO_TINT = 0xffffff;
 const FLASH_ALPHA = 0.3;
+/** El emoji 🚀 apunta arriba a la derecha (−45°); los sprites de proyectil se dibujan mirando a la derecha (0°). */
+const EMOJI_HEADING_OFFSET: Partial<Record<EntityVisualId, number>> = { missile: Math.PI / 4 };
 
 /** Emoji por defecto de cada entidad. También se usa como fallback si un asset no carga. */
 export const FALLBACK_EMOJI: Record<EntityVisualId, EmojiVisual> = {
@@ -29,6 +31,8 @@ export const FALLBACK_EMOJI: Record<EntityVisualId, EmojiVisual> = {
   fondo: { kind: 'emoji', char: '🦅', size: 40 },
   boss: { kind: 'emoji', char: '🫧', size: 96 },
   bossBullet: { kind: 'emoji', char: '💸', size: 20 },
+  /** Euríbor disparado (peligro invulnerable). */
+  missile: { kind: 'emoji', char: '🚀', size: 30 },
   euro: { kind: 'emoji', char: '💶', size: 22 },
   promesa: { kind: 'emoji', char: '🗳️', size: 44 },
   /** Cofre del tesoro que suelta un enemigo élite (también en su pantalla). */
@@ -113,6 +117,7 @@ const CUSTOM_ART: Partial<VisualsTable> = {
   },
   boss: png('boss'),
   bossBullet: png('bossBullet'),
+  missile: png('missile'),
   euro: png('euro'),
   promesa: png('promesa'),
   chest: png('chest'),
@@ -272,6 +277,16 @@ export function setVisualAnimating(
   const def = VISUALS[id];
   const idle = def.kind === 'sprite' ? def.anim?.idleFrame : undefined;
   visual.setFrame(idle ?? current.frames[0].textureFrame);
+}
+
+/** Orienta un visual según su dirección de movimiento (rad), corrigiendo la orientación del emoji de fallback. */
+export function setVisualHeading(
+  visual: Phaser.GameObjects.Text | Phaser.GameObjects.Sprite,
+  id: EntityVisualId,
+  angle: number,
+): void {
+  const offset = visual instanceof Phaser.GameObjects.Sprite ? 0 : (EMOJI_HEADING_OFFSET[id] ?? 0);
+  visual.setRotation(angle + offset);
 }
 
 /** Tinte permanente de cada visual (élites): el destello de daño vuelve a él en lugar de quitar el tinte. */

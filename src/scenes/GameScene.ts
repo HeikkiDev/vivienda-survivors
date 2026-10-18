@@ -8,16 +8,20 @@ import {
   CHEST,
   DEBUG_ELITE_PARAM,
   DEBUG_EVO_PARAM,
+  DEBUG_MISSILE_PARAM,
   DEBUG_START_MINUTE_PARAM,
   DEBUG_WIN_PARAM,
   DEFEAT_ANIM,
   DEPTH,
   ELITE,
+  ENEMY_DAMAGE_SCALE_PER_MINUTE,
   ENEMY_FLASH_MS,
   EURO,
+  EVOLUTION_DIFFICULTY,
   EVOLUTION_FX,
   EVOLUTION_IDS,
   EVOLUTIONS,
+  MISSILE,
   MS_PER_SECOND,
   PLAYER,
   PROMESA,
@@ -37,11 +41,13 @@ import {
 import { Boss, BossBulletPool, type BossBullet } from '../entities/Boss';
 import { ChestPickup } from '../entities/ChestPickup';
 import type { Enemy } from '../entities/Enemy';
+import type { Missile } from '../entities/Missile';
 import { Player } from '../entities/Player';
 import { XpGemPool } from '../entities/XpGem';
 import { AudioManager } from '../systems/AudioManager';
 import { Elections, type PromiseStatus } from '../systems/Elections';
 import { InputSystem } from '../systems/Input';
+import { Missiles, type MissileWarning } from '../systems/Missiles';
 import { Modifiers } from '../systems/Modifiers';
 import { Spawner } from '../systems/Spawner';
 import {
@@ -80,6 +86,8 @@ export interface HudState {
   /** Posición en pantalla de cada élite vivo (flecha si está fuera de vista). */
   elites: Array<{ x: number; y: number }>;
   boss: { hp: number; maxHp: number } | null;
+  /** Avisos "!" del Euríbor disparado (borde de la pantalla y tiempo hasta el lanzamiento). */
+  missileWarnings: readonly MissileWarning[];
   announcement: Announcement | null;
   enemyIntro: EnemyIntro | null;
   /** Secuencia de fin en curso (antes de GameOverScene). */
@@ -125,6 +133,7 @@ export class GameScene extends Phaser.Scene {
   private boss!: Boss;
   private bossGroup!: Phaser.Physics.Arcade.Group;
   private bossBullets!: BossBulletPool;
+  private missiles!: Missiles;
   private timedEvents: TimedEvent[] = [];
   private announcement: Announcement | null = null;
   private enemyIntro: EnemyIntro | null = null;
@@ -185,6 +194,7 @@ export class GameScene extends Phaser.Scene {
       promisePickup: !c && pickup.active ? { x: pickup.x - cam.scrollX, y: pickup.y - cam.scrollY } : null,
       elites,
       boss: !c && this.boss.active ? { hp: Math.max(0, this.boss.hp), maxHp: this.boss.maxHp } : null,
+      missileWarnings: c ? [] : this.missiles.warnings,
       announcement: c ? null : this.announcement,
       enemyIntro: c ? null : this.enemyIntro,
       ending: this.ending,
@@ -197,7 +207,8 @@ export class GameScene extends Phaser.Scene {
     this.debugWin = params.has(DEBUG_WIN_PARAM);
     const debugEvo = params.has(DEBUG_EVO_PARAM);
     const debugElite = params.has(DEBUG_ELITE_PARAM);
-    this.debugStart = startMinute > 0 || this.debugWin || debugEvo || debugElite;
+    const debugMissile = params.has(DEBUG_MISSILE_PARAM);
+    this.debugStart = startMinute > 0 || this.debugWin || debugEvo || debugElite || debugMissile;
     this.elapsed = startMinute * SECONDS_PER_MINUTE;
     this.eliteInterval = debugElite ? ELITE.debug.intervalSeconds : ELITE.intervalSeconds;
     this.nextEliteAt = debugElite
@@ -260,6 +271,7 @@ export class GameScene extends Phaser.Scene {
     this.bossGroup.add(this.boss);
     this.boss.initBody();
     this.bossBullets = new BossBulletPool(this);
+    this.missiles = new Missiles(this, this.elapsed, debugMissile);
     this.announcement = null;
     this.timedEvents = this.buildTimedEvents(this.elapsed);
     const enemyTargets = [...this.spawner.groupList, this.bossGroup];
@@ -282,6 +294,7 @@ export class GameScene extends Phaser.Scene {
 
     this.physics.add.overlap(this.player, enemyTargets, (_p, e) => this.onEnemyContact(e as Enemy));
     this.physics.add.overlap(this.player, this.bossBullets.group, (_p, b) => this.onBossBullet(b as BossBullet));
+    this.physics.add.overlap(this.player, this.missiles.group, (_p, m) => this.onMissile(m as Missile));
 
     this.scene.launch('UIScene');
 
@@ -347,6 +360,7 @@ export class GameScene extends Phaser.Scene {
       if (this.boss.tickShoot(dt)) this.bossBullets.fireRing(this.boss.x, this.boss.y);
     }
     this.bossBullets.update(dt);
+    this.missiles.update(dt, this.elapsed, this.evolutions, this.cameras.main.worldView, this.player.x, this.player.y);
     for (const w of this.weapons) w.update(dt);
     this.elections.update(dt, this.elapsed, this.player.x, this.player.y, PLAYER.hitboxRadius);
     this.updateElites();
@@ -545,7 +559,7 @@ export class GameScene extends Phaser.Scene {
       WORLD_HEIGHT,
       { x: 0, y: 0 },
     );
-    this.boss.spawn(p.x, p.y, 1);
+    this.boss.spawn(p.x, p.y, 1 + EVOLUTION_DIFFICULTY.bossHpPerEvolution * this.evolutions);
   }
 
   private findNearestEnemy(x: number, y: number): Enemy | null {
@@ -641,6 +655,7 @@ export class GameScene extends Phaser.Scene {
     this.gems.syncVisuals();
     if (this.boss.active) this.boss.syncVisual();
     this.bossBullets.syncVisuals();
+    this.missiles.syncVisuals();
     for (const w of this.weapons) w.syncVisuals();
     this.syncFloatingHeal(this.regenText);
     this.syncFloatingHeal(this.canaText);
@@ -677,7 +692,16 @@ export class GameScene extends Phaser.Scene {
 
   private onEnemyContact(enemy: Enemy): void {
     if (this.ended || !enemy.active) return;
-    this.hurtPlayer(enemy.stats.damage);
+    // El daño de enemigos y élites sube con el minuto (el del boss no).
+    const scale = enemy === this.boss ? 1 : 1 + ENEMY_DAMAGE_SCALE_PER_MINUTE * Spawner.minuteOf(this.elapsed);
+    this.hurtPlayer(enemy.stats.damage * scale);
+  }
+
+  /** Un solo golpe por misil (respeta la invulnerabilidad del jugador); sigue volando. */
+  private onMissile(missile: Missile): void {
+    if (this.ended || !missile.active || missile.spent) return;
+    missile.spent = true;
+    this.hurtPlayer(MISSILE.damage);
   }
 
   private onBossBullet(bullet: BossBullet): void {
@@ -729,6 +753,7 @@ export class GameScene extends Phaser.Scene {
     this.spawner.forEachActive((e) => vanish(e.visual, () => this.spawner.kill(e)));
     if (this.boss.active) vanish(this.boss.visual, () => this.boss.deactivate());
     for (const b of this.bossBullets.group.getChildren() as BossBullet[]) if (b.active) b.deactivate();
+    this.missiles.clear();
 
     const pv = this.player.visual.setAlpha(1);
     this.tweens.add({
@@ -752,6 +777,7 @@ export class GameScene extends Phaser.Scene {
     cam.flash(d.flashMs, d.flashColor.r, d.flashColor.g, d.flashColor.b);
     cam.zoomTo(d.zoom, d.zoomMs, 'Sine.easeOut');
     for (const b of this.bossBullets.group.getChildren() as BossBullet[]) if (b.active) b.deactivate();
+    this.missiles.clear();
     this.tweens.add({
       targets: this.player.visual,
       angle: d.playerFallAngle,
