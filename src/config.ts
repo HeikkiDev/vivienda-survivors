@@ -437,7 +437,11 @@ export const ELITE = {
   /** Primer élite (s de partida) y cada cuánto sale otro. No salen mientras el boss está vivo. */
   firstAtSeconds: 60,
   intervalSeconds: 60,
-  /** `?elite=1`: el primero a los 5 s de empezar y luego cada 20 s. */
+  /** Retraso tras el cambio de minuto (1:15, 2:15…) para no coincidir con los tipos nuevos de enemigo (issue #25). */
+  offsetSeconds: 15,
+  /** Si hay otro anuncio en pantalla, el élite espera a que acabe y sale estos segundos después. */
+  announceGapSeconds: 2,
+  /** `?elite=1`: el primero a los 5 s de empezar y luego cada 20 s (sin `offsetSeconds`). */
   debug: { firstAfterSeconds: 5, intervalSeconds: 20 },
   /** Probabilidad relativa de cada tipo base (el IPC no tiene versión premium). */
   weights: { ipc: 0, casero: 40, agencia: 35, fondo: 25 } as Record<EnemyId, number>,

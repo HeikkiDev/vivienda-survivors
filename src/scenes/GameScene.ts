@@ -148,6 +148,8 @@ export class GameScene extends Phaser.Scene {
   private fullyUpgraded = false;
   /** Instante (s de partida) del próximo élite y separación entre élites. */
   private nextEliteAt = 0;
+  /** El élite pendiente no sale antes de este instante (hueco tras otro anuncio). */
+  private eliteHoldUntil = 0;
   private eliteInterval: number = ELITE.intervalSeconds;
   private elapsed = 0;
   private regenFeedbackElapsed = 0;
@@ -213,7 +215,8 @@ export class GameScene extends Phaser.Scene {
     this.eliteInterval = debugElite ? ELITE.debug.intervalSeconds : ELITE.intervalSeconds;
     this.nextEliteAt = debugElite
       ? this.elapsed + ELITE.debug.firstAfterSeconds
-      : Math.max(ELITE.firstAtSeconds, this.elapsed + ELITE.intervalSeconds);
+      : Math.max(ELITE.firstAtSeconds, this.elapsed + ELITE.intervalSeconds) + ELITE.offsetSeconds;
+    this.eliteHoldUntil = 0;
     this.chests = [];
     this.chestOpen = false;
     this.chestsOpened = 0;
@@ -406,11 +409,22 @@ export class GameScene extends Phaser.Scene {
     this.canaText = this.createFloatingHeal('canaHealing', total, REGEN_FEEDBACK.canaOffsetY);
   }
 
-  /** Un élite cada `eliteInterval` s; se salta si el boss está vivo. */
+  /**
+   * Un élite cada `eliteInterval` s; se salta si el boss está vivo. Si hay otro anuncio en pantalla,
+   * espera a que acabe y sale `ELITE.announceGapSeconds` después.
+   */
   private updateElites(): void {
     if (this.elapsed < this.nextEliteAt) return;
+    if (this.boss.active) {
+      this.nextEliteAt += this.eliteInterval;
+      return;
+    }
+    if (this.announcement) {
+      this.eliteHoldUntil = this.elapsed + ELITE.announceGapSeconds;
+      return;
+    }
+    if (this.elapsed < this.eliteHoldUntil) return;
     this.nextEliteAt += this.eliteInterval;
-    if (this.boss.active) return;
     const elite = this.spawner.spawnElite(Spawner.minuteOf(this.elapsed), this.player.x, this.player.y);
     const name = TEXTS.elite.name(TEXTS.enemies[elite.enemyId].name);
     this.announce(TEXTS.elite.spawned(name), 'warning', ELITE.announceSeconds);
