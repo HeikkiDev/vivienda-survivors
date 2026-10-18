@@ -135,7 +135,7 @@ Un arma puede evolucionar cuando está a **nivel 5** y se tiene su **pasiva empa
 |---|---|---|---|
 | 📄 Lanzador de currículums | 💼 Segundo trabajo | 📇 **LinkedIn Premium** — *"Ahora con insignia de 'Open to work'"* | 8 direcciones por disparo, atraviesa a todos, +50% daño. |
 | 🛡️ Escudo Ley de Vivienda | 👴 Aval de tus padres | 🏰 **Escudo Antidesahucios** — *"Esta vez sí se cumple"* | Radio +60%, +50% daño; cura 1 HP por enemigo abatido por el aura (máx. 5 HP/s). |
-| 📢 Grito | 🛏️ Piso compartido | 📣 **Manifestación** — *"Somos miles y no cabemos en 20 m²"* | Cooldown ×0,5, radio ×2, empuje fuerte; 1 de cada 3 explosiones cubre toda la pantalla. |
+| 📢 Grito | 🛏️ Piso compartido | 📣 **Manifestación** — *"Por una vivienda digna, no 20 m²"* (grito *"¡VIVIENDA DIGNA!"*) | Mismo ritmo que el Grito a nivel 5, radio ×2, empuje fuerte; 1 de cada 5 explosiones cubre toda la pantalla. |
 | ✊ Sindicato de inquilinos | 🎫 Bono Alquiler Joven | 👊 **Huelga general** — *"Hoy no paga nadie"* | 8 puños, órbita +50%, +60% daño, puños 1,5× más grandes. |
 
 Teletrabajo no tiene evolución. Al evolucionar: destello dorado en el jugador, rótulo "¡{nombre}!" 1,5 s y sacudida de cámara. En el HUD el arma muestra el icono evolucionado con ⭐. Depuración: `?evo=1` empieza con las 4 armas a nivel 5 y sus 4 pasivas a nivel 1.
@@ -164,26 +164,35 @@ Todos: se mueven en línea recta hacia el jugador; sin colisión entre enemigos 
 | `agencia` | Agencia con honorarios | `🏢` 30 px | 20 | 130 | 8 | 2 | 14 |
 | `fondo` | Fondo buitre | `🦅` 40 px | 120 | 55 | 20 | 10 | 20 |
 
-**Escalado:** HP de enemigos ×(1 + 0.10 × minuto actual). Velocidad no escala.
+**Escalado:** HP de enemigos ×(1 + 0.20 × minuto actual); daño de contacto de enemigos y élites (no del boss) ×(1 + 0.05 × minuto actual). Velocidad no escala.
 
-**Escalado por evoluciones (issue #19):** por cada evolución que tenga el jugador (0–4), HP de enemigos y élites (no del boss) ×(1 + 0.25 × evoluciones) (se acumula con el de minuto) y enemigos por tanda ×(1 + 0.10 × evoluciones) (`EVOLUTION_DIFFICULTY`). Con 2+ evoluciones la música se acelera (`AUDIO.musicRateByEvolutions`: ×1 / ×1 / ×1,1 / ×1,15 / ×1,2) con un cambio suave; vuelve a ×1 al acabar o empezar partida.
+**Escalado por evoluciones (issues #19 y #21):** por cada evolución que tenga el jugador (0–4), HP de enemigos y élites ×(1 + 0.6 × evoluciones) (se acumula con el de minuto), HP del boss ×(1 + 0.3 × evoluciones) al aparecer y enemigos por tanda ×(1 + 0.10 × evoluciones) (`EVOLUTION_DIFFICULTY`). Con 2+ evoluciones la música se acelera (`AUDIO.musicRateByEvolutions`: ×1 / ×1 / ×1,1 / ×1,15 / ×1,2) con un cambio suave; vuelve a ×1 al acabar o empezar partida.
 
 **Presentación:** la primera vez que aparece cada tipo de enemigo en la partida se muestra durante 4 s una tarjeta abajo al centro con su icono, nombre y una mini descripción (textos en `texts.ts`). Si coinciden varios, salen en cola, uno tras otro.
 
 ### 7.1 Boss: 🫧 Burbuja 2.0
 - Aparece en el **minuto 8:00** (aviso en pantalla 3 s antes: *"⚠️ ¡Se está inflando la BURBUJA 2.0!"*).
-- HP **3000**, velocidad **60 px/s**, daño contacto **30**, emoji 96 px, hitbox r=45, inmune a knockback.
+- HP **8000** (×(1 + 0.3 × evoluciones) al aparecer), velocidad **60 px/s**, daño contacto **30**, emoji 96 px, hitbox r=45, inmune a knockback.
 - Barra de vida arriba en pantalla.
-- Cada **5 s** dispara 8 proyectiles `💸` en anillo (daño 10, vel. 200 px/s, vida 3 s).
+- Cada **3 s** dispara 12 proyectiles `💸` en anillo (daño 10, vel. 200 px/s, vida 3 s).
 - Al morir: suelta 50 € de XP y texto *"La burbuja ha pinchado… de momento."* Si no muere, sigue viva hasta el final (no impide ganar).
 
 ### 7.2 👑 Enemigos premium y cofres (petición del usuario, issue #13)
-- Cada **60 s** desde el **1:00** (no mientras el boss está vivo) aparece **1 élite** en el anillo de spawn: un `casero`, `agencia` o `fondo` al azar (pesos en `ELITE`, `config.ts`) con **HP ×8**, **tamaño ×1,6** (hitbox incluida), **daño de contacto ×1,5** y **velocidad ×1,2** (para que se despegue de la horda). Tinte y brillo dorados y corona 👑. Nombre con sufijo *"premium"* (p. ej. *"Fondo buitre premium"*), anunciado al aparecer.
+- Cada **60 s** desde el **1:00** (no mientras el boss está vivo) aparece **1 élite** en el anillo de spawn: un `casero`, `agencia` o `fondo` al azar (pesos en `ELITE`, `config.ts`) con **HP ×20**, **tamaño ×1,6** (hitbox incluida), **daño de contacto ×1,5** y **velocidad ×1,2** (para que se despegue de la horda). Tinte y brillo dorados y corona 👑. Nombre con sufijo *"premium"* (p. ej. *"Fondo buitre premium"*), anunciado al aparecer.
 - No cuentan para el tope de 300 ni se reposicionan al alejarse. Flecha amarilla en el borde de la pantalla si están fuera de vista (la misma que la de la urna).
 - Al morir sueltan un **cofre del tesoro** (`chest.png`, generado con `tools/gen_chest.py`; fallback 🧰) en lugar de euros: no caduca, no lo atrae el imán; se coge al tocarlo. Aviso al aparecer: *"¡Cuidado! {nombre} a la vista: suelta un cofre con mejoras"*. El primer cofre de cada partida muestra *"¡Recoge el cofre: mejoras gratis!"*.
 - Al cogerlo se pausa la partida: título según el número de mejoras *"¡Te han tocado 3 mejoras en la ruleta!"* / *"¡Te ha tocado 1 mejora en la ruleta!"*, subtítulo *"Como el sorteo de vivienda, pero esta vez sí toca"*, ruleta ~1,5 s (se salta con un toque o una tecla) y lista de mejoras con icono y "Nv X → X+1" / "¡NUEVO!" / "¡EVOLUCIÓN!". Con 5 mejoras: *"¡Sorteo ganado! Ni te lo crees."* Botón "Continuar".
 - Número de mejoras: **1 (60%)**, **3 (30%)**, **5 (10%)** (`CHEST.rewards`). En cada hueco: evolución disponible → arma propia de mayor nivel por debajo de 5 → pasiva propia → arma o pasiva nueva → euros para subir 1 nivel. Nunca pasa de nivel 5.
 - Estadística final: "Cofres abiertos: N". Depuración: `?elite=1` saca un élite a los 5 s y luego cada 20 s.
+
+### 7.3 🚀 Peligro: Euríbor disparado (issue #21)
+- Misil **invulnerable**: no se puede matar, solo esquivar. Las armas no lo ven ni lo empujan (los currículums lo atraviesan), no da XP ni cuenta como enemigo derrotado.
+- Sale justo fuera de un borde al azar de la vista (izquierda, derecha, arriba o abajo) y cruza la pantalla en línea recta a **400 px/s** hacia la posición del jugador en el momento del lanzamiento; desaparece al salir por el lado contrario.
+- Daño de contacto **25** (respeta la invulnerabilidad tras un golpe); un solo golpe por misil.
+- Aviso: un **"!" rojo** parpadeante en el borde por el que entrará, **1 s** antes del lanzamiento.
+- Tandas desde el **3:00**: intervalo de **8 s** a **3 s** (lineal hasta el 10:00); misiles por tanda de **1** a **3** en el mismo tramo, **+1 por evolución**. Cada misil de la tanda sale de un borde al azar. Nada avanza con la partida en pausa (nivel, cofre, leyenda). Valores en `MISSILE` (`config.ts`).
+- Sprite `missile.png` (generado con `tools/gen_missile.py`, mirando en la dirección de vuelo, con llama y estela); fallback 🚀. Sale en la leyenda, pestaña **Peligros**.
+- Depuración: `?missile=1` lanza la primera tanda a los 5 s.
 
 ---
 
@@ -249,7 +258,7 @@ Los efectos se aplican como multiplicadores temporales en un objeto `modifiers` 
 
 ## 12. HUD
 - Arriba: barra XP (ancho completo), debajo nivel `Nv 7` a la izquierda y temporizador `MM:SS` centrado.
-- Arriba derecha: ⏸, 🔊/🔇 y ❓ (leyenda). La leyenda (también con `H`) pausa la partida y muestra tres pestañas: **Armas**, **Pasivas** y **Evoluciones** (icono, nombre y efecto; las evoluciones con su receta: arma Nv 5 + pasiva → evolución). Se cierra con su botón, `Esc`/`H`/`P` o tocando fuera, y reanuda como la pausa. No se abre durante el menú de nivel ni el cofre.
+- Arriba derecha: ⏸, 🔊/🔇 y ❓ (leyenda). La leyenda (también con `H`) pausa la partida y muestra cuatro pestañas: **Armas**, **Pasivas**, **Evoluciones** y **Peligros** (icono, nombre y efecto; las evoluciones con su receta: arma Nv 5 + pasiva → evolución). Se cierra con su botón, `Esc`/`H`/`P` o tocando fuera, y reanuda como la pausa. No se abre durante el menú de nivel ni el cofre.
 - Bajo el jugador: barra de vida 40×5 px (verde/rojo).
 - Banner promesa (si activa) bajo el temporizador.
 - Abajo izquierda: iconos de armas/pasivas con nivel (las armas evolucionadas, con ⭐ en lugar del nivel).

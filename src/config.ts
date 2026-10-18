@@ -42,6 +42,8 @@ export const DEBUG_WIN_PARAM = 'win';
 export const DEBUG_EVO_PARAM = 'evo';
 /** Parámetro de URL para probar élites y cofres: `?elite=1` (ver ELITE.debug). */
 export const DEBUG_ELITE_PARAM = 'elite';
+/** Parámetro de URL para probar el Euríbor disparado: `?missile=1` (ver MISSILE.debugStartSeconds). */
+export const DEBUG_MISSILE_PARAM = 'missile';
 
 export const CANVAS_BG_COLOR = '#000000';
 
@@ -101,6 +103,7 @@ export const DEPTH = {
   enemies: 5,
   boss: 6,
   bossBullets: 7,
+  missiles: 7,
   projectiles: 8,
   effects: 9,
   player: 10,
@@ -169,7 +172,9 @@ export const WEAPON_IDS: readonly WeaponId[] = ['curriculum', 'escudo', 'grito',
 export const PASSIVE_IDS: readonly PassiveId[] = ['aval', 'piso', 'bono', 'trabajo', 'teletrabajo'];
 
 /** HP × (1 + hpScalePerMinute × minuto actual). */
-export const ENEMY_HP_SCALE_PER_MINUTE = 0.1;
+export const ENEMY_HP_SCALE_PER_MINUTE = 0.2;
+/** Daño de contacto de enemigos y élites (no del boss) × (1 + damageScalePerMinute × minuto actual). */
+export const ENEMY_DAMAGE_SCALE_PER_MINUTE = 0.05;
 
 /** Destello al recibir daño (ms). */
 export const ENEMY_FLASH_MS = 80;
@@ -297,7 +302,7 @@ const SINDICATO_MAX = SINDICATO.levels[MAX_UPGRADE_LEVEL - 1];
 export const EVOLUTION_MULTIPLIERS = {
   linkedin: { damage: 1.5 },
   antidesahucios: { radius: 1.6, damage: 1.5 },
-  manifestacion: { cooldown: 0.5, radius: 2 },
+  manifestacion: { cooldown: 1, radius: 2 },
   huelga: { orbitRadius: 1.5, damage: 1.6, size: 1.5 },
 } as const;
 
@@ -328,7 +333,7 @@ export const EVOLUTIONS = {
     auraColor: 0xffd447,
     auraAlpha: 0.2,
   },
-  /** Manifestación: mitad de cooldown, radio ×2, empuje fuerte; cada 3.ª explosión cubre toda la pantalla. */
+  /** Manifestación: ritmo del Grito a nivel 5, radio ×2, empuje fuerte; cada 5.ª explosión cubre toda la pantalla. */
   manifestacion: {
     weapon: 'grito',
     passive: 'piso',
@@ -337,7 +342,7 @@ export const EVOLUTIONS = {
     radius: GRITO_MAX.radius * EM.manifestacion.radius,
     knockbackSpeed: 450,
     knockbackSeconds: 0.25,
-    giantEvery: 3,
+    giantEvery: 5,
     /** Semidiagonal de la vista máxima: cubre toda la pantalla. */
     giantRadius: Math.ceil(Math.hypot(VIEW_MAX_WIDTH, VIEW_MAX_HEIGHT) / 2),
     circleColor: 0xffd447,
@@ -358,11 +363,13 @@ export const EVOLUTIONS = {
 /**
  * Dificultad según las evoluciones que se tienen (0–4), para que el jugador no se vuelva intocable (issue #19).
  * HP de enemigos y élites × (1 + enemyHpPerEvolution × evoluciones), acumulado con el escalado por minuto;
- * enemigos por tanda × (1 + spawnCountPerEvolution × evoluciones). El boss también escala su HP.
+ * enemigos por tanda × (1 + spawnCountPerEvolution × evoluciones);
+ * HP del boss × (1 + bossHpPerEvolution × evoluciones) al aparecer (issue #21).
  */
 export const EVOLUTION_DIFFICULTY = {
-  enemyHpPerEvolution: 0.25,
+  enemyHpPerEvolution: 0.6,
   spawnCountPerEvolution: 0.1,
+  bossHpPerEvolution: 0.3,
 } as const;
 
 /** Feedback al evolucionar: destello dorado en el jugador, rótulo y sacudida de cámara. */
@@ -434,7 +441,7 @@ export const ELITE = {
   debug: { firstAfterSeconds: 5, intervalSeconds: 20 },
   /** Probabilidad relativa de cada tipo base (el IPC no tiene versión premium). */
   weights: { ipc: 0, casero: 40, agencia: 35, fondo: 25 } as Record<EnemyId, number>,
-  hpMultiplier: 8,
+  hpMultiplier: 20,
   sizeMultiplier: 1.6,
   damageMultiplier: 1.5,
   /** Velocidad respecto a su tipo base, para que se despegue de la horda (issue #15). */
@@ -469,16 +476,44 @@ export const CHEST = {
 
 // Sección 7.1 — Boss: Burbuja 2.0
 export const BOSS = {
-  stats: { hp: 3000, speed: 60, damage: 30, xp: 50, hitboxRadius: 45 } as EnemyStats,
+  stats: { hp: 8000, speed: 60, damage: 30, xp: 50, hitboxRadius: 45 } as EnemyStats,
   spawnMinute: 8,
   /** Segundos de aviso antes de aparecer. */
   warningSeconds: 3,
-  shootInterval: 5,
-  bulletCount: 8,
+  shootInterval: 3,
+  bulletCount: 12,
   bullet: { damage: 10, speed: 200, lifetime: 3, hitboxRadius: 8 },
   bulletPoolSize: 32,
   /** Segundos que se muestra el texto al morir. */
   deathTextSeconds: 3,
+} as const;
+
+// Sección 7.3 — Peligro invulnerable "Euríbor disparado" (issue #21): no se puede matar, solo esquivar.
+export const MISSILE = {
+  /** Primera tanda (aviso) en este minuto. */
+  startMinute: 3,
+  /** `?missile=1`: la primera tanda sale a los 5 s de empezar. */
+  debugStartSeconds: 5,
+  /** Segundos entre tandas: de intervalStart (en startMinute) a intervalEnd (en intervalEndMinute), lineal. */
+  intervalStart: 8,
+  intervalEnd: 3,
+  intervalEndMinute: 10,
+  /** Misiles por tanda: de countStart a countEnd en el mismo tramo (redondeado) + countPerEvolution × evoluciones. */
+  countStart: 1,
+  countEnd: 3,
+  countPerEvolution: 1,
+  speed: 400,
+  damage: 25,
+  hitboxRadius: 10,
+  /** El "!" sale en el borde por el que entrará, estos segundos antes del lanzamiento. */
+  warningSeconds: 1,
+  /** Posición a lo largo del borde (fracción), lejos de las esquinas del HUD. */
+  edgeMinFraction: 0.1,
+  edgeMaxFraction: 0.9,
+  /** Distancia fuera de la vista a la que aparece y a partir de la cual desaparece (alejándose). */
+  spawnMargin: 30,
+  despawnMargin: 60,
+  poolSize: 24,
 } as const;
 
 // Sección 8 — Oleada especial "Temporada turística"
@@ -745,6 +780,17 @@ export const UI = {
     subtitleColor: '#dddddd',
     subtitleDelayMs: 1300,
     subtitleFadeMs: 600,
+  },
+  /** Aviso "!" del Euríbor disparado en el borde de la pantalla. */
+  missileWarning: {
+    margin: 22,
+    size: 34,
+    color: '#ff2222',
+    stroke: '#000000',
+    strokeThickness: 5,
+    /** Parpadeos por segundo (alpha entre blinkMinAlpha y 1). */
+    blinkPerSecond: 4,
+    blinkMinAlpha: 0.35,
   },
   announcement: {
     y: 180,

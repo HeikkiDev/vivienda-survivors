@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { DEFEAT_ANIM, type FallingPiecesConfig, PROMISES, UI, VICTORY_ANIM } from '../config';
+import { DEFEAT_ANIM, type FallingPiecesConfig, MISSILE, PROMISES, UI, VICTORY_ANIM } from '../config';
 import { AudioManager } from '../systems/AudioManager';
 import { TEXTS } from '../texts';
 import { onGameResize } from '../utils/layout';
@@ -21,6 +21,8 @@ export class UIScene extends Phaser.Scene {
   private promiseArrow!: Phaser.GameObjects.Graphics;
   private bossBar!: Phaser.GameObjects.Graphics;
   private announcementText!: Phaser.GameObjects.Text;
+  /** Pool de "!" del Euríbor disparado (uno por aviso pendiente). */
+  private missileWarningTexts: Phaser.GameObjects.Text[] = [];
   private enemyIntroCard: Phaser.GameObjects.Container | null = null;
   private enemyIntroId: EnemyId | null = null;
   private pauseOverlay!: Phaser.GameObjects.Container;
@@ -88,6 +90,7 @@ export class UIScene extends Phaser.Scene {
       .setOrigin(0.5)
       .setVisible(false);
 
+    this.missileWarningTexts = [];
     this.enemyIntroCard = null;
     this.enemyIntroId = null;
     this.endingShown = false;
@@ -248,6 +251,7 @@ export class UIScene extends Phaser.Scene {
     if (s.promisePickup) this.drawArrow(s.promisePickup);
     for (const elite of s.elites) this.drawArrow(elite);
     this.updateBossBar(s.boss);
+    this.updateMissileWarnings(s.missileWarnings);
     this.updateAnnouncement(s.announcement);
     this.updateEnemyIntro(s.enemyIntro);
     if (s.ending) this.showEnding(s.ending);
@@ -422,6 +426,41 @@ export class UIScene extends Phaser.Scene {
       .fillRect(x, b.barY, b.barWidth * ratio, b.barHeight)
       .lineStyle(b.barStrokeWidth, b.barStroke, 1)
       .strokeRect(x, b.barY, b.barWidth, b.barHeight);
+  }
+
+  /** "!" rojo parpadeante en el borde por el que entrará cada misil avisado. */
+  private updateMissileWarnings(warnings: HudState['missileWarnings']): void {
+    const w = UI.missileWarning;
+    const { width, height } = this.scale;
+    while (this.missileWarningTexts.length < warnings.length) {
+      const text = this.add
+        .text(0, 0, TEXTS.missile.warning, {
+          fontFamily: UI.fontFamily,
+          fontSize: `${w.size}px`,
+          fontStyle: 'bold',
+          color: w.color,
+          stroke: w.stroke,
+          strokeThickness: w.strokeThickness,
+        })
+        .setOrigin(0.5);
+      this.missileWarningTexts.push(text);
+    }
+    this.missileWarningTexts.forEach((text, i) => {
+      const warning = warnings[i];
+      if (!warning) {
+        text.setVisible(false);
+        return;
+      }
+      let x = warning.along * width;
+      let y = warning.along * height;
+      if (warning.edge === 'left') x = w.margin;
+      else if (warning.edge === 'right') x = width - w.margin;
+      else if (warning.edge === 'top') y = w.margin;
+      else y = height - w.margin;
+      const shown = MISSILE.warningSeconds - warning.remaining;
+      const blink = (1 + Math.cos(shown * w.blinkPerSecond * Math.PI * 2)) / 2;
+      text.setPosition(x, y).setAlpha(w.blinkMinAlpha + (1 - w.blinkMinAlpha) * blink).setVisible(true);
+    });
   }
 
   private updateAnnouncement(announcement: HudState['announcement']): void {

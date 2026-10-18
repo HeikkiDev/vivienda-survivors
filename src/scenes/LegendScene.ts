@@ -1,18 +1,18 @@
 import Phaser from 'phaser';
 import { EVOLUTION_IDS, EVOLUTIONS, MAX_UPGRADE_LEVEL, PASSIVE_IDS, UI, WEAPON_IDS } from '../config';
 import { TEXTS } from '../texts';
-import type { EvolutionId, IconId } from '../types';
+import type { EntityVisualId, EvolutionId, IconId } from '../types';
 import { addBaseOverlay, centerOnBaseArea } from '../utils/layout';
 import { createVisual } from '../visuals';
 import type { UIScene } from './UIScene';
 
-type LegendTab = 'weapons' | 'passives' | 'evolutions';
-const TABS: readonly LegendTab[] = ['weapons', 'passives', 'evolutions'];
+type LegendTab = 'weapons' | 'passives' | 'evolutions' | 'hazards';
+const TABS: readonly LegendTab[] = ['weapons', 'passives', 'evolutions', 'hazards'];
 
 type TextStyle = Phaser.Types.GameObjects.Text.TextStyle;
 
 /**
- * Leyenda "?" con pestañas (armas, pasivas, evoluciones). GameScene está en pausa mientras está abierta;
+ * Leyenda "?" con pestañas (armas, pasivas, evoluciones y peligros). GameScene está en pausa mientras está abierta;
  * la abre y la cierra UIScene (botón "?", H, Esc/P). Se cierra también con su botón o tocando fuera del panel.
  */
 export class LegendScene extends Phaser.Scene {
@@ -170,8 +170,10 @@ export class LegendScene extends Phaser.Scene {
       for (const id of WEAPON_IDS) y = this.addSimpleRow(y, `icon_${id}`, TEXTS.weapons[id]);
     } else if (this.tab === 'passives') {
       for (const id of PASSIVE_IDS) y = this.addSimpleRow(y, `icon_${id}`, TEXTS.passives[id]);
-    } else {
+    } else if (this.tab === 'evolutions') {
       for (const id of EVOLUTION_IDS) y = this.addEvolutionRow(y, id);
+    } else {
+      y = this.addSimpleRow(y, 'missile', TEXTS.missile);
     }
     this.contentHeight = Math.max(0, y - UI.legend.rowGap);
     this.setScroll(0);
@@ -220,10 +222,12 @@ export class LegendScene extends Phaser.Scene {
     return { rowTop: y, rowHeight, next: y + rowHeight + L.rowGap };
   }
 
-  private addSimpleRow(y: number, iconId: IconId, texts: { name: string; effect: string }): number {
+  private addSimpleRow(y: number, iconId: EntityVisualId, texts: { name: string; effect: string }): number {
     const L = UI.legend;
     const icon = createVisual(this, iconId, 0, 0);
-    icon.setScale(icon.scaleX * L.iconScale);
+    // Los iconos alargados (misil) se reducen para caber en la columna del icono.
+    const scale = Math.min(L.iconScale, (L.iconX * 2) / icon.displayWidth);
+    icon.setScale(icon.scaleX * scale);
     const row = this.addRow(y, L.iconX * 2, icon.displayHeight, texts, false);
     icon.setPosition(L.panelX + L.contentPadX + L.iconX, row.rowTop + row.rowHeight / 2);
     this.content.add(icon);
