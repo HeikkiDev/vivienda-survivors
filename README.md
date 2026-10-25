@@ -85,7 +85,9 @@ npm run build    # build de producción en dist/
 npm run zip      # zip listo para itch.io
 ```
 
-Cada push a `main` se publica automáticamente en GitHub Pages.
+Cada push a `main` se publica automáticamente en GitHub Pages (rama `gh-pages`).
+
+Cada PR abierta desde este repositorio tiene su propia preview jugable en `https://heikkidev.github.io/vivienda-survivors/pr-preview/pr-<número>/`; el enlace aparece como comentario en la PR y la preview se borra al cerrarla. Las PR desde forks no generan preview.
 
 Parámetros de URL para probar (las partidas con `min`, `win`, `evo`, `elite` o `missile` no guardan récord):
 | Parámetro | Qué hace |
