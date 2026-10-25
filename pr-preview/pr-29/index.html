@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="theme-color" content="#000000" />
+    <title>Vivienda Survivors</title>
+    <meta name="description" content="Sobrevive 10 minutos al mercado inmobiliario. Un survivors de humor y gratis en el navegador: caseros, fondos buitre e IPC contra tu currículum." />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Vivienda Survivors" />
+    <meta property="og:title" content="Vivienda Survivors" />
+    <meta property="og:description" content="Sobrevive 10 minutos al mercado inmobiliario. Gratis en el navegador." />
+    <meta property="og:url" content="https://heikkidev.github.io/vivienda-survivors/" />
+    <meta property="og:image" content="https://heikkidev.github.io/vivienda-survivors/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content="es_ES" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Vivienda Survivors" />
+    <meta name="twitter:description" content="Sobrevive 10 minutos al mercado inmobiliario. Gratis en el navegador." />
+    <meta name="twitter:image" content="https://heikkidev.github.io/vivienda-survivors/og-image.jpg" />
+    <link rel="icon" href="./icons/icon-192.png" />
+    <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+    <link rel="manifest" href="./manifest.json" />
+    <style>
+      html, body {
+        margin: 0;
+        width: 100vw;
+        height: 100vh;
+        height: 100dvh;
+        background: #000;
+        overflow: hidden;
+        overscroll-behavior: none;
+        touch-action: none;
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-touch-callout: none;
+        -webkit-tap-highlight-color: transparent;
+      }
+      body {
+        box-sizing: border-box;
+        padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      }
+      /* #game ocupa el área segura de body (100vw × 100dvh menos los insets). */
+      #game { width: 100%; height: 100%; overflow: hidden; touch-action: none; }
+      #rotate-overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background: #1a1a1a;
+        color: #ffd447;
+        font: bold 28px sans-serif;
+        text-align: center;
+      }
+      #rotate-overlay[hidden] { display: none; }
+    </style>
+    <script type="module" crossorigin src="./js/index-CGOENwbI.js"></script>
+  </head>
+  <body>
+    <div id="game"></div>
+    <div id="rotate-overlay" hidden></div>
+  </body>
+</html>
