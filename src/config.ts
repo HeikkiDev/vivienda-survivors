@@ -115,6 +115,8 @@ export const DEPTH = {
 // Sección 4 — Jugador
 export const PLAYER = {
   hitboxRadius: 14,
+  /** Multiplicador del tamaño visual del jugador (la hitbox no cambia). */
+  visualScale: 3,
   maxHp: 100,
   speed: 200,
   invulnerabilitySeconds: 0.5,
@@ -130,7 +132,7 @@ export const PLAYER = {
 export const HEALTH_BAR = {
   width: 40,
   height: 5,
-  offsetY: 24,
+  offsetY: 56,
   bgColor: 0xcc2222,
   fgColor: 0x33cc33,
 } as const;

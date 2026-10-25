@@ -242,3 +242,6 @@
 - Los élites salen en X:15 (`ELITE.firstAtSeconds + ELITE.offsetSeconds`, luego cada `intervalSeconds`) para no coincidir con los tipos nuevos de enemigo del cambio de minuto. `?elite=1` mantiene 5 s / 20 s sin desfase.
 - Si al tocar un élite hay otro anuncio en pantalla (cualquier `announce(...)`), espera a que termine y sale `ELITE.announceGapSeconds` después; si aparece otro anuncio durante el hueco, vuelve a esperar. El retraso no mueve el calendario (el siguiente sigue en su X:15). Se aplica también con `?elite=1`. La tarjeta de enemigo nuevo no cuenta como anuncio.
 - Si el boss está vivo cuando toca (o aparece mientras el élite espera), ese élite se salta como antes.
+
+## Jugador 3× más grande (issue #28)
+- Solo crece el visual (`PLAYER.visualScale`, aplicado al sprite y al emoji de fallback en `visuals.ts`); la hitbox (`PLAYER.hitboxRadius`) no cambia para no alterar el equilibrio. La barra de vida baja (`HEALTH_BAR.offsetY`) para quedar bajo el sprite.

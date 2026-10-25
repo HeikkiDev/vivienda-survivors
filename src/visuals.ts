@@ -1,7 +1,7 @@
 // TODAS las definiciones visuales del juego (sección 3.1 del GDD).
 // Cambiar el arte = editar solo este archivo + añadir archivos en public/assets/.
 import Phaser from 'phaser';
-import { ELITE, REGEN_FEEDBACK } from './config';
+import { ELITE, PLAYER, REGEN_FEEDBACK } from './config';
 import { TEXTS } from './texts';
 import type {
   BackgroundVisual,
@@ -24,7 +24,7 @@ const EMOJI_HEADING_OFFSET: Partial<Record<EntityVisualId, number>> = { missile:
 
 /** Emoji por defecto de cada entidad. También se usa como fallback si un asset no carga. */
 export const FALLBACK_EMOJI: Record<EntityVisualId, EmojiVisual> = {
-  player: { kind: 'emoji', char: '🧑', size: 32 },
+  player: { kind: 'emoji', char: '🧑', size: 32 * PLAYER.visualScale },
   ipc: { kind: 'emoji', char: '📈', size: 24 },
   casero: { kind: 'emoji', char: '🤑', size: 28 },
   agencia: { kind: 'emoji', char: '🏢', size: 30 },
@@ -98,7 +98,7 @@ const CUSTOM_ART: Partial<VisualsTable> = {
     kind: 'sprite',
     key: 'art_player',
     path: 'assets/player.png',
-    scale: ART_SCALE,
+    scale: ART_SCALE * PLAYER.visualScale,
     frameWidth: 64,
     frameHeight: 64,
     anim: { frames: [0, 1, 2, 3], frameRate: 6, repeat: -1, idleFrame: 4 },
