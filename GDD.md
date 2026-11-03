@@ -254,6 +254,14 @@ Los efectos se aplican como multiplicadores temporales en un objeto `modifiers` 
 - **Derrota:** HP ≤ 0. Texto: **"Has vuelto a casa de tus padres."** Subtexto: *"Tu habitación sigue igual que a los 15."* Mismas estadísticas + tiempo sobrevivido. Botón "Reintentar".
 - Récord (mejor tiempo) en `localStorage` clave `viviendaSurvivors.best`.
 
+### 11.1 Anuncios y revivir (petición del usuario, issue #30)
+- Dominio `viviendasurvivors.es` (GitHub Pages, `public/CNAME`). Juego gratis con Google AdSense **H5 Games Ads** (`adBreak`), en `src/systems/ads.ts`; valores en `ADS` y `REVIVE` de `config.ts`.
+- Con `ADS.publisherId` vacío no se carga ningún script de anuncios ni de consentimiento y el juego es idéntico al de siempre.
+- Consentimiento: CMP certificada de Google (Privacy & messaging); los anuncios no se cargan hasta que hay datos de consentimiento. El menú enlaza "Privacidad", "Acerca de" (páginas estáticas ES + EN en `public/`) y, con anuncios configurados, "Preferencias de privacidad".
+- **Intersticial** (`type: 'next'`) solo al pasar de Game Over a una partida nueva, como mucho uno cada `ADS.interstitialMinGapSeconds`. Nunca durante la partida.
+- **Revivir** (`type: 'reward'`): en la primera muerte de la partida, si hay anuncio listo (`beforeReward`), overlay `ReviveScene` con "Ver anuncio para revivir" / "No, gracias". Solo si el anuncio se ve entero (`adViewed`) se sigue la misma partida (tiempo, armas y nivel) con `REVIVE.hpRatio` de vida y `REVIVE.invulnerabilitySeconds` de invulnerabilidad. Una vez por partida: la segunda muerte es derrota normal.
+- Durante un anuncio el juego se pausa y se silencia. Si los anuncios fallan, están bloqueados o no están listos, se sigue sin ellos.
+
 ---
 
 ## 12. HUD
@@ -269,9 +277,9 @@ Los efectos se aplican como multiplicadores temporales en un objeto `modifiers` 
 
 ## 13. Escenas
 1. `BootScene` → pasa directo a `MenuScene`.
-2. `MenuScene`: título **"VIVIENDA SURVIVORS"**, subtítulo *"Sobrevive 10 minutos al mercado inmobiliario"*, botón "Buscar piso" (Enter/clic), récord. Pie: *"Parodia. Cualquier parecido con la realidad es pura coincidencia (no)."*
+2. `MenuScene`: título **"VIVIENDA SURVIVORS"**, subtítulo *"Sobrevive 10 minutos al mercado inmobiliario"*, botón "Buscar piso" (Enter/clic), récord. Pie: *"Parodia. Cualquier parecido con la realidad es pura coincidencia (no)."* y enlaces de privacidad (§11.1).
 3. `GameScene` + `UIScene` (paralela).
-4. `LevelUpScene` (overlay modal). `ChestScene` (cofre) y `LegendScene` (leyenda "?") también son overlays modales.
+4. `LevelUpScene` (overlay modal). `ChestScene` (cofre), `LegendScene` (leyenda "?") y `ReviveScene` (revivir con anuncio, §11.1) también son overlays modales.
 5. `GameOverScene` (victoria/derrota, recibe datos).
 
 ---

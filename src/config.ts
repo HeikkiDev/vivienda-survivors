@@ -55,7 +55,7 @@ export const DEFAULT_LANGUAGE: Language = 'es';
 export const LANGUAGE_STORAGE_KEY = 'viviendaSurvivors.lang';
 
 /** Enlace que acompaña al texto de compartir (GDD H12). */
-export const SHARE_URL = 'https://heikkidev.github.io/vivienda-survivors/';
+export const SHARE_URL = 'https://viviendasurvivors.es/';
 
 /** Imagen para compartir: captura del final de la partida + resultado (1200×630, formato de vista previa en redes). */
 export const SHARE_CARD = {
@@ -94,6 +94,45 @@ export const AUDIO = {
   musicRateTweenMs: 1500,
   mutedStorageKey: 'viviendaSurvivors.muted',
 };
+
+/**
+ * Anuncios de Google AdSense (H5 Games Ads, API `adBreak`). Ver README.
+ * Con `publisherId` vacío no se carga ningún script de anuncios ni de consentimiento.
+ */
+export const ADS = {
+  /** ID de editor de AdSense, p. ej. 'ca-pub-1234567890123456'. */
+  publisherId: '' as string,
+  /**
+   * Anuncios de prueba (`data-adbreak-test="on"`) para todos. Déjalo en false: para probar, abre el juego con
+   * `?adtest=1` (ver `testUrlParam`), así producción nunca sirve anuncios de prueba por despiste.
+   */
+  testMode: false as boolean,
+  /** `?adtest=1` en la URL activa los anuncios de prueba solo en esa visita. */
+  testUrlParam: 'adtest',
+  testUrlValue: '1',
+  /** Separación mínima entre anuncios (el primero, como pronto, a esta distancia de la carga de la página). */
+  interstitialMinGapSeconds: 180,
+  /** Si el SDK no responde en este tiempo (anuncio listo o empezando), se sigue sin anuncio. */
+  responseTimeoutMs: 2000,
+  /** Tras pulsar "Ver anuncio para revivir", si el anuncio no empieza (beforeAd) en este tiempo, cuenta como no visto. */
+  rewardStartTimeoutMs: 8000,
+  scriptUrl: 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js',
+  /** CMP certificada de Google (Privacy & messaging / Funding Choices); se le añade el ID "pub-…". */
+  consentScriptUrl: 'https://fundingchoicesmessages.google.com/i/',
+};
+
+/** Revivir viendo un anuncio con recompensa (una vez por partida). */
+export const REVIVE = {
+  /** Vida al revivir (fracción de la vida máxima). */
+  hpRatio: 0.5,
+  invulnerabilitySeconds: 5,
+} as const;
+
+/** Páginas estáticas de `public/` enlazadas desde el menú (la sección del idioma va en el ancla: `#es` / `#en`). */
+export const INFO_PAGES = {
+  privacy: 'privacidad.html',
+  about: 'acerca.html',
+} as const;
 
 export const DEPTH = {
   background: -1000,
@@ -658,9 +697,15 @@ export const UI = {
     bestY: 380,
     bestSize: 20,
     bestColor: '#aaaaaa',
-    footerMarginBottom: 24,
+    footerMarginBottom: 44,
     footerSize: 14,
     footerColor: '#888888',
+    /** Enlaces del pie (privacidad, acerca de, preferencias de privacidad). */
+    linksMarginBottom: 18,
+    linksSize: 14,
+    linksGap: 24,
+    linksColor: '#aaaaaa',
+    linksHoverColor: '#ffd447',
     langY: 440,
     langSize: 18,
     langGap: 16,
@@ -672,7 +717,7 @@ export const UI = {
     langActiveBg: '#ffd447',
     langPadX: 12,
     langPadY: 6,
-    iosHintY: 478,
+    iosHintY: 470,
     iosHintSize: 14,
     iosHintColor: '#ffd447',
   },
@@ -1015,6 +1060,33 @@ export const UI = {
     sharePadY: 8,
     /** Tiempo que el botón muestra "¡Copiado!". */
     copiedMs: 2000,
+  },
+  revive: {
+    overlayColor: 0x000000,
+    overlayAlpha: 0.7,
+    titleY: 150,
+    titleSize: 36,
+    titleColor: '#ffffff',
+    subtitleY: 205,
+    subtitleSize: 20,
+    subtitleColor: '#cccccc',
+    buttonY: 300,
+    buttonSize: 28,
+    buttonColor: '#1a1a1a',
+    buttonBg: '#ffd447',
+    buttonBgHover: '#ffe680',
+    buttonPadX: 24,
+    buttonPadY: 10,
+    declineY: 375,
+    declineSize: 20,
+    declineColor: '#ffffff',
+    declineBg: '#3a3a4a',
+    declineBgHover: '#55556a',
+    declinePadX: 18,
+    declinePadY: 8,
+    statusY: 440,
+    statusSize: 18,
+    statusColor: '#dddddd',
   },
 } as const;
 
