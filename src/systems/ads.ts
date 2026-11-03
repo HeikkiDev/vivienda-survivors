@@ -126,6 +126,7 @@ class AdsImpl {
       window.clearTimeout(timer);
       done();
     };
+    // Red de seguridad por si el SDK no responde. Si aun así el anuncio empieza tarde, beforeAd pausa el juego entero.
     const timer = window.setTimeout(finish, ADS.responseTimeoutMs);
     window.adBreak!({
       type: 'next',
@@ -170,10 +171,9 @@ class AdsImpl {
       beforeReward: (showAdFn) => {
         if (settled) return;
         window.clearTimeout(timer);
+        // Con el anuncio ya cargado no hay tiempo de espera: el SDK siempre acaba llamando a adBreakDone.
         offer.onOffer(() => {
-          if (settled) return;
-          timer = window.setTimeout(() => settle(false), ADS.responseTimeoutMs);
-          showAdFn();
+          if (!settled) showAdFn();
         });
       },
       adViewed: () => {
