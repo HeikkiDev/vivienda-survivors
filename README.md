@@ -98,6 +98,7 @@ Parámetros de URL para probar (las partidas con `min`, `win`, `evo`, `elite` o 
 | `?elite=1` | Sale un enemigo premium a los 5 s y luego cada 20 s (para probar los cofres). |
 | `?missile=1` | La primera tanda de Euríbor disparado sale a los 5 s. |
 | `?debug=1` | Muestra las hitboxes de la física. |
+| `?adtest=1` | Anuncios de prueba de AdSense (solo con `ADS.publisherId` puesto). |
 
 ## 💸 Anuncios (Google AdSense)
 El juego es gratis y está preparado para **H5 Games Ads** de AdSense (API `adBreak`). Todo vive en [`src/systems/ads.ts`](src/systems/ads.ts) y se configura en `ADS` de [`src/config.ts`](src/config.ts):
@@ -105,13 +106,14 @@ El juego es gratis y está preparado para **H5 Games Ads** de AdSense (API `adBr
 | Campo | Qué hace |
 |---|---|
 | `publisherId` | Tu ID de editor (`'ca-pub-1234567890123456'`). **Vacío (por defecto): no se carga ningún script de anuncios ni de consentimiento** y el juego funciona como siempre. |
-| `testMode` | `true`: anuncios de prueba (`data-adbreak-test="on"`). Ponlo a `false` cuando AdSense apruebe el sitio. |
+| `testMode` | `false` (por defecto): anuncios reales. **Déjalo así**: para ver anuncios de prueba (`data-adbreak-test="on"`) abre el juego con **`?adtest=1`** (p. ej. `https://viviendasurvivors.es/?adtest=1`); solo afecta a esa visita, así producción nunca sirve anuncios de prueba por despiste. |
 | `interstitialMinGapSeconds` | Separación mínima entre anuncios (180 s). |
+| `rewardStartTimeoutMs` | Tras pulsar "Ver anuncio para revivir", si el anuncio no empieza en este tiempo (8000 ms), cuenta como no visto y sigue la derrota. |
 
 Con el ID puesto:
 1. Se carga la CMP certificada de Google (Privacy & messaging) y, **solo cuando hay datos de consentimiento**, `adsbygoogle.js`. Configura el mensaje europeo en AdSense → *Privacidad y mensajes*. El menú muestra "Preferencias de privacidad" para reabrirlo.
 2. **Intersticial** (`adBreak({type: 'next'})`) al pasar de Game Over a una partida nueva, como mucho uno cada `interstitialMinGapSeconds`. Nunca durante la partida ni antes de la primera.
-3. **Revivir con anuncio** (`adBreak({type: 'reward'})`): al morir por primera vez en la partida, si hay un anuncio listo, aparece "Ver anuncio para revivir". Si se ve entero, sigues la misma partida con el 50% de vida y 3 s de invulnerabilidad (`REVIVE` en `config.ts`). Una vez por partida.
+3. **Revivir con anuncio** (`adBreak({type: 'reward'})`): al morir por primera vez en la partida, si hay un anuncio listo, aparece "Ver anuncio para revivir". Si se ve entero, sigues la misma partida con el 50% de vida y 5 s de invulnerabilidad (`REVIVE` en `config.ts`). Una vez por partida.
 4. Mientras se ve un anuncio el juego se pausa y se silencia. Si los anuncios están bloqueados, fallan o no están listos, el juego sigue sin ellos.
 
 Cuando AdSense apruebe el sitio, completa también [`public/ads.txt`](public/ads.txt) con tu línea `google.com, pub-…, DIRECT, f08c47fec0942fa0`.

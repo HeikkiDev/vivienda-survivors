@@ -17,7 +17,7 @@ No implementes nada de la sección "Fuera de alcance" del GDD.
 Anuncios (AdSense H5 Games Ads)
 Todo el código de anuncios y consentimiento está en src/systems/ads.ts; sus valores en ADS y REVIVE de src/config.ts.
 ADS.publisherId vacío (por defecto): no se carga ningún script de anuncios ni de consentimiento y el juego funciona igual que sin anuncios. Para activarlos, pon el ID de editor ('ca-pub-…').
-ADS.testMode true añade data-adbreak-test="on" (anuncios de prueba). Pásalo a false solo cuando AdSense apruebe el sitio.
+ADS.testMode se queda en false. Los anuncios de prueba (data-adbreak-test="on") se activan solo abriendo el juego con ?adtest=1 en la URL, para que producción nunca sirva anuncios de prueba por despiste.
 Nunca muestres anuncios durante la partida: el intersticial solo va de Game Over a una partida nueva y el anuncio para revivir solo se ofrece una vez por partida, al morir. Si los anuncios fallan, el juego sigue sin ellos.
 Forma de trabajar
 Trabaja de hito en hito (H1 a H9 del GDD) y solo el hito que te pida.

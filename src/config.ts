@@ -102,12 +102,20 @@ export const AUDIO = {
 export const ADS = {
   /** ID de editor de AdSense, p. ej. 'ca-pub-1234567890123456'. */
   publisherId: '' as string,
-  /** Anuncios de prueba (`data-adbreak-test="on"`). Pásalo a false cuando AdSense apruebe el sitio. */
-  testMode: true as boolean,
+  /**
+   * Anuncios de prueba (`data-adbreak-test="on"`) para todos. Déjalo en false: para probar, abre el juego con
+   * `?adtest=1` (ver `testUrlParam`), así producción nunca sirve anuncios de prueba por despiste.
+   */
+  testMode: false as boolean,
+  /** `?adtest=1` en la URL activa los anuncios de prueba solo en esa visita. */
+  testUrlParam: 'adtest',
+  testUrlValue: '1',
   /** Separación mínima entre anuncios (el primero, como pronto, a esta distancia de la carga de la página). */
   interstitialMinGapSeconds: 180,
   /** Si el SDK no responde en este tiempo (anuncio listo o empezando), se sigue sin anuncio. */
   responseTimeoutMs: 2000,
+  /** Tras pulsar "Ver anuncio para revivir", si el anuncio no empieza (beforeAd) en este tiempo, cuenta como no visto. */
+  rewardStartTimeoutMs: 8000,
   scriptUrl: 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js',
   /** CMP certificada de Google (Privacy & messaging / Funding Choices); se le añade el ID "pub-…". */
   consentScriptUrl: 'https://fundingchoicesmessages.google.com/i/',
@@ -117,7 +125,7 @@ export const ADS = {
 export const REVIVE = {
   /** Vida al revivir (fracción de la vida máxima). */
   hpRatio: 0.5,
-  invulnerabilitySeconds: 3,
+  invulnerabilitySeconds: 5,
 } as const;
 
 /** Páginas estáticas de `public/` enlazadas desde el menú (la sección del idioma va en el ancla: `#es` / `#en`). */

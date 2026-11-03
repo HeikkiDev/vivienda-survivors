@@ -171,9 +171,11 @@ class AdsImpl {
       beforeReward: (showAdFn) => {
         if (settled) return;
         window.clearTimeout(timer);
-        // Con el anuncio ya cargado no hay tiempo de espera: el SDK siempre acaba llamando a adBreakDone.
         offer.onOffer(() => {
-          if (!settled) showAdFn();
+          if (settled) return;
+          // Red de seguridad: si el anuncio no empieza (beforeAd), cuenta como no visto y sigue la derrota.
+          timer = window.setTimeout(() => settle(false), ADS.rewardStartTimeoutMs);
+          showAdFn();
         });
       },
       adViewed: () => {
@@ -234,7 +236,7 @@ class AdsImpl {
       s.crossOrigin = 'anonymous';
       s.dataset.adClient = client;
       s.dataset.adFrequencyHint = `${ADS.interstitialMinGapSeconds}s`;
-      if (ADS.testMode) s.dataset.adbreakTest = 'on';
+      if (AdsImpl.testAds()) s.dataset.adbreakTest = 'on';
       s.onerror = () => console.warn('[ads] No se pudo cargar adsbygoogle.js (¿bloqueador?); se juega sin anuncios.');
     });
     window.adConfig({
@@ -244,6 +246,12 @@ class AdsImpl {
         this.ready = true;
       },
     });
+  }
+
+  /** Anuncios de prueba: `ADS.testMode` o `?adtest=1` en la URL. */
+  private static testAds(): boolean {
+    if (ADS.testMode) return true;
+    return new URLSearchParams(window.location.search).get(ADS.testUrlParam) === ADS.testUrlValue;
   }
 
   private static addScript(src: string, setup: (script: HTMLScriptElement) => void): void {
