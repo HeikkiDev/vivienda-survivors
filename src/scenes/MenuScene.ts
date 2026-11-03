@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
-import { BEST_TIME_STORAGE_KEY, GAME_HEIGHT, GAME_WIDTH, LANGUAGES, UI } from '../config';
+import { BEST_TIME_STORAGE_KEY, GAME_HEIGHT, GAME_WIDTH, INFO_PAGES, LANGUAGES, UI } from '../config';
 import { enterFullscreenLandscape, shouldShowIOSInstallHint } from '../mobile';
+import { Ads } from '../systems/ads';
 import { AudioManager } from '../systems/AudioManager';
 import { getLanguage, LANGUAGE_NAMES, setLanguage, TEXTS } from '../texts';
 import { centerOnBaseArea } from '../utils/layout';
@@ -70,6 +71,7 @@ export class MenuScene extends Phaser.Scene {
       .setOrigin(0.5);
 
     this.createLanguageSelector(cx);
+    this.createFooterLinks(cx);
 
     if (shouldShowIOSInstallHint()) {
       this.add
@@ -123,6 +125,42 @@ export class MenuScene extends Phaser.Scene {
       item.setOrigin(0, 0.5).setX(x);
       x += item.width + m.langGap;
     }
+  }
+
+  /** Privacidad, Acerca de y, si hay CMP (anuncios configurados), Preferencias de privacidad. */
+  private createFooterLinks(cx: number): void {
+    const m = UI.menu;
+    const y = GAME_HEIGHT - m.linksMarginBottom;
+    const links: Array<[string, () => void]> = [
+      [TEXTS.menu.privacy, () => MenuScene.openPage(INFO_PAGES.privacy)],
+      [TEXTS.menu.about, () => MenuScene.openPage(INFO_PAGES.about)],
+    ];
+    if (Ads.hasConsentManager) links.push([TEXTS.menu.privacySettings, () => Ads.showPrivacyOptions()]);
+
+    const items = links.map(([label, onClick]) => {
+      const link = this.add
+        .text(0, y, label, { fontFamily: UI.fontFamily, fontSize: `${m.linksSize}px`, color: m.linksColor })
+        .setOrigin(0, 0.5)
+        .setInteractive({ useHandCursor: true });
+      link.on('pointerover', () => link.setColor(m.linksHoverColor));
+      link.on('pointerout', () => link.setColor(m.linksColor));
+      link.on('pointerup', onClick);
+      return link;
+    });
+    const totalWidth = items.reduce((sum, t) => sum + t.width, 0) + m.linksGap * (items.length - 1);
+    let x = cx - totalWidth / 2;
+    for (const item of items) {
+      item.setX(x);
+      x += item.width + m.linksGap;
+    }
+  }
+
+  /** Abre una página de `public/` en otra pestaña, en la sección del idioma activo (o en esta si se bloquea). */
+  private static openPage(page: string): void {
+    const url = new URL(`${page}#${getLanguage()}`, document.baseURI).href;
+    const opened = window.open(url, '_blank');
+    if (opened) opened.opener = null;
+    else window.location.assign(url);
   }
 
   private bestText(): string {

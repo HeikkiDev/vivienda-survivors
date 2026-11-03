@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { DEFEAT_ANIM, type FallingPiecesConfig, MISSILE, PROMISES, UI, VICTORY_ANIM } from '../config';
 import { AudioManager } from '../systems/AudioManager';
+import { Ads } from '../systems/ads';
 import { TEXTS } from '../texts';
 import { onGameResize } from '../utils/layout';
 import { formatTime } from '../utils/math';
@@ -177,6 +178,7 @@ export class UIScene extends Phaser.Scene {
 
   private toggleMute(): void {
     AudioManager.toggleMute();
+    Ads.syncSound();
     this.refreshMuteButton();
   }
 

@@ -1,6 +1,6 @@
 # 🏠 Vivienda Survivors
 
-[![▶ Jugar ahora](https://img.shields.io/badge/%E2%96%B6%20Jugar%20ahora-heikkidev.github.io-ffd447?style=for-the-badge&labelColor=2a2a3a)](https://heikkidev.github.io/vivienda-survivors/)
+[![▶ Jugar ahora](https://img.shields.io/badge/%E2%96%B6%20Jugar%20ahora-viviendasurvivors.es-ffd447?style=for-the-badge&labelColor=2a2a3a)](https://viviendasurvivors.es/)
 
 > Tienes 30 años, buscas piso y te persigue el mercado inmobiliario.
 > Aguanta **10 minutos** y conseguirás… firmar una hipoteca a 40 años.
@@ -85,9 +85,9 @@ npm run build    # build de producción en dist/
 npm run zip      # zip listo para itch.io
 ```
 
-Cada push a `main` se publica automáticamente en GitHub Pages (rama `gh-pages`).
+Cada push a `main` se publica automáticamente en GitHub Pages (rama `gh-pages`) con el dominio propio `viviendasurvivors.es` ([`public/CNAME`](public/CNAME)).
 
-Cada PR abierta desde este repositorio tiene su propia preview jugable en `https://heikkidev.github.io/vivienda-survivors/pr-preview/pr-<número>/`; el enlace aparece como comentario en la PR y la preview se borra al cerrarla. Las PR desde forks no generan preview.
+Cada PR abierta desde este repositorio tiene su propia preview jugable en `https://viviendasurvivors.es/pr-preview/pr-<número>/`; el enlace aparece como comentario en la PR y la preview se borra al cerrarla. Las PR desde forks no generan preview.
 
 Parámetros de URL para probar (las partidas con `min`, `win`, `evo`, `elite` o `missile` no guardan récord):
 | Parámetro | Qué hace |
@@ -98,6 +98,25 @@ Parámetros de URL para probar (las partidas con `min`, `win`, `evo`, `elite` o 
 | `?elite=1` | Sale un enemigo premium a los 5 s y luego cada 20 s (para probar los cofres). |
 | `?missile=1` | La primera tanda de Euríbor disparado sale a los 5 s. |
 | `?debug=1` | Muestra las hitboxes de la física. |
+
+## 💸 Anuncios (Google AdSense)
+El juego es gratis y está preparado para **H5 Games Ads** de AdSense (API `adBreak`). Todo vive en [`src/systems/ads.ts`](src/systems/ads.ts) y se configura en `ADS` de [`src/config.ts`](src/config.ts):
+
+| Campo | Qué hace |
+|---|---|
+| `publisherId` | Tu ID de editor (`'ca-pub-1234567890123456'`). **Vacío (por defecto): no se carga ningún script de anuncios ni de consentimiento** y el juego funciona como siempre. |
+| `testMode` | `true`: anuncios de prueba (`data-adbreak-test="on"`). Ponlo a `false` cuando AdSense apruebe el sitio. |
+| `interstitialMinGapSeconds` | Separación mínima entre anuncios (180 s). |
+
+Con el ID puesto:
+1. Se carga la CMP certificada de Google (Privacy & messaging) y, **solo cuando hay datos de consentimiento**, `adsbygoogle.js`. Configura el mensaje europeo en AdSense → *Privacidad y mensajes*. El menú muestra "Preferencias de privacidad" para reabrirlo.
+2. **Intersticial** (`adBreak({type: 'next'})`) al pasar de Game Over a una partida nueva, como mucho uno cada `interstitialMinGapSeconds`. Nunca durante la partida ni antes de la primera.
+3. **Revivir con anuncio** (`adBreak({type: 'reward'})`): al morir por primera vez en la partida, si hay un anuncio listo, aparece "Ver anuncio para revivir". Si se ve entero, sigues la misma partida con el 50% de vida y 3 s de invulnerabilidad (`REVIVE` en `config.ts`). Una vez por partida.
+4. Mientras se ve un anuncio el juego se pausa y se silencia. Si los anuncios están bloqueados, fallan o no están listos, el juego sigue sin ellos.
+
+Cuando AdSense apruebe el sitio, completa también [`public/ads.txt`](public/ads.txt) con tu línea `google.com, pub-…, DIRECT, f08c47fec0942fa0`.
+
+La [política de privacidad](public/privacidad.html) y la página [Acerca de](public/acerca.html) (ES + EN) se enlazan desde el pie del menú.
 
 ## 🎨 Cambiar el arte
 Todo lo visible está en [`src/visuals.ts`](src/visuals.ts):
