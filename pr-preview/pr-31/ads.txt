@@ -1,0 +1,4 @@
+# ads.txt de viviendasurvivors.es
+# Cuando AdSense apruebe el sitio, sustituye esta línea por la tuya (sin el "#" inicial),
+# con tu ID de editor (el mismo de ADS.publisherId en src/config.ts, sin "ca-"):
+# google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0
