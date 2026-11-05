@@ -178,8 +178,6 @@ export class MenuScene extends Phaser.Scene {
   private startGame(): void {
     if (this.starting) return;
     this.starting = true;
-    // La guía estática está bajo el juego: se vuelve arriba para jugar con la pantalla entera.
-    window.scrollTo(0, 0);
     void enterFullscreenLandscape();
     // Dentro del gesto del usuario: necesario para que iOS permita el audio.
     AudioManager.startMusic();

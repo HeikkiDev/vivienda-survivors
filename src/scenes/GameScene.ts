@@ -213,6 +213,8 @@ export class GameScene extends Phaser.Scene {
   }
 
   create(): void {
+    // La guía estática está bajo el juego: cada partida (desde el menú o al reintentar) empieza con la pantalla entera.
+    window.scrollTo(0, 0);
     const startMinute = GameScene.debugStartMinute();
     const params = new URLSearchParams(window.location.search);
     this.debugWin = params.has(DEBUG_WIN_PARAM);

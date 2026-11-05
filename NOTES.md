@@ -255,7 +255,7 @@
 
 ## Contenido estático, guía, robots y sitemap (issue #32)
 - La guía de la portada va en `index.html` bajo `#game` (que ocupa 100dvh), con las dos lenguas visibles a la vez (`#es` / `#en`, como `acerca.html`): es lo más simple y así un rastreador ve todo el texto sin JavaScript. Un solo `h1` y `h2`/`h3` por sección.
-- `html`/`body` ya no tienen `overflow: hidden` ni `touch-action: none` (pasan a `#game`) para poder hacer scroll hasta la guía. Durante la partida no se mueve la página: Phaser ya bloquea la rueda y los toques sobre el canvas y captura las flechas; `Input.ts` captura además Espacio, RePág, AvPág, Inicio y Fin mientras existe `GameScene`. "Buscar piso" hace `scrollTo(0, 0)` antes de empezar.
+- `html`/`body` ya no tienen `overflow: hidden` ni `touch-action: none` (pasan a `#game`) para poder hacer scroll hasta la guía. Durante la partida no se mueve la página: Phaser ya bloquea la rueda y los toques sobre el canvas y captura las flechas; `Input.ts` captura además Espacio, RePág, AvPág, Inicio y Fin mientras existe `GameScene`. Cada partida (`GameScene.create`, desde el menú o al reintentar) hace `scrollTo(0, 0)`, y también al volver a horizontal si hay una partida en curso.
 - El aviso de girar el móvil pasa de `fixed` a `absolute` (cubre solo la zona del juego): en vertical se puede bajar a leer la guía.
 - En las páginas estáticas la mecánica de promesas se describe sin mencionar elecciones ni urnas (requisito de la issue para anuncios). Los textos del juego (`texts.ts`) no se tocan en esta issue.
 - Contacto en `acerca.html`: incidencias de GitHub (no hay correo público).

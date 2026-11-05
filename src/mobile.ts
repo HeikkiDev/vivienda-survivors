@@ -4,6 +4,7 @@ import { MOBILE } from './config';
 import { TEXTS } from './texts';
 
 const OVERLAY_ID = 'rotate-overlay';
+const GAME_SCENE_KEY = 'GameScene';
 
 /** Pausa las escenas en marcha mientras el móvil está en vertical y las reanuda al volver a horizontal. */
 export function setupMobile(game: Phaser.Game): void {
@@ -20,6 +21,8 @@ export function setupMobile(game: Phaser.Game): void {
   };
 
   const resumePausedScenes = (): void => {
+    // Si en vertical se bajó a leer la guía, al volver a horizontal la partida se ve entera.
+    if (game.scene.isActive(GAME_SCENE_KEY) || game.scene.isPaused(GAME_SCENE_KEY)) window.scrollTo(0, 0);
     for (const key of pausedByOrientation) {
       if (game.scene.isPaused(key)) game.scene.resume(key);
     }
