@@ -19,6 +19,10 @@ Todo el código de anuncios y consentimiento está en src/systems/ads.ts; sus va
 ADS.publisherId vacío (por defecto): no se carga ningún script de anuncios ni de consentimiento y el juego funciona igual que sin anuncios. Para activarlos, pon el ID de editor ('ca-pub-…').
 ADS.testMode se queda en false. Los anuncios de prueba (data-adbreak-test="on") se activan solo abriendo el juego con ?adtest=1 en la URL, para que producción nunca sirva anuncios de prueba por despiste.
 Nunca muestres anuncios durante la partida: el intersticial solo va de Game Over a una partida nueva y el anuncio para revivir solo se ofrece una vez por partida, al morir. Si los anuncios fallan, el juego sigue sin ellos.
+Páginas estáticas (contenido para buscadores)
+index.html lleva bajo el juego una guía en HTML plano ES + EN; public/guia.html, public/acerca.html y public/privacidad.html son páginas estáticas ES + EN; public/robots.txt y public/sitemap.xml las listan.
+Estas páginas deben describir el juego actual: si cambias una mecánica, un número o un nombre, actualiza también index.html y public/guia.html. Si añades una página, añádela a sitemap.xml.
+En ellas no se mencionan elecciones, votaciones ni partidos políticos (política de anuncios).
 Forma de trabajar
 Trabaja de hito en hito (H1 a H9 del GDD) y solo el hito que te pida.
 Al terminar cada hito: npm run build sin errores, comprueba cada criterio de aceptación, haz commit con "H<n>: <título>", resume lo hecho y espera mi confirmación.

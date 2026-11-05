@@ -118,7 +118,13 @@ Con el ID puesto:
 
 Cuando AdSense apruebe el sitio, completa también [`public/ads.txt`](public/ads.txt) con tu línea `google.com, pub-…, DIRECT, f08c47fec0942fa0`.
 
-La [política de privacidad](public/privacidad.html) y la página [Acerca de](public/acerca.html) (ES + EN) se enlazan desde el pie del menú.
+La [guía](public/guia.html), la [política de privacidad](public/privacidad.html) y la página [Acerca de](public/acerca.html) (ES + EN) se enlazan desde el pie del menú.
+
+## 📄 Contenido estático y buscadores
+- [`index.html`](index.html) lleva bajo el juego (que sigue a pantalla completa) una guía en HTML plano en español e inglés, más un `<noscript>` con un resumen, para que la portada tenga contenido legible sin JavaScript.
+- [`public/guia.html`](public/guia.html): guía completa (enemigos, armas, pasivas, evoluciones, promesas y consejos).
+- [`public/robots.txt`](public/robots.txt) y [`public/sitemap.xml`](public/sitemap.xml) (portada, guía, acerca de y privacidad).
+- **Si cambias el juego** (mecánicas, números o nombres), actualiza también `index.html` y `public/guia.html` para que digan lo mismo que el juego.
 
 ## 🎨 Cambiar el arte
 Todo lo visible está en [`src/visuals.ts`](src/visuals.ts):

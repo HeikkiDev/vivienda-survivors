@@ -252,3 +252,10 @@
 - Revivir: la partida se congela (como al morir) mientras se espera `beforeReward` (máx. `ADS.responseTimeoutMs`); si no llega, derrota normal. `ReviveScene` acepta clic, Enter (ver anuncio) y Esc (rechazar). Tras pulsar "Ver anuncio" hay una red de seguridad de `ADS.rewardStartTimeoutMs` (8 s) que se cancela en `beforeAd`: si el anuncio no empieza a tiempo cuenta como no visto y sigue la derrota normal (nunca se queda en "Cargando anuncio…"). Un anuncio que empiece después ya no revive. Se decide en `adBreakDone`: solo con `adViewed` se revive.
 - El silencio durante el anuncio no cambia la preferencia guardada (`AudioManager.setAdMuted`); el estado de sonido se comunica al SDK con `adConfig({ sound })` al iniciar y al pulsar 🔊/🔇.
 - `public/ads.txt` lleva la línea de Google comentada como plantilla. El flujo de PR previews no se toca: GitHub redirige `heikkidev.github.io/vivienda-survivors/…` al dominio propio.
+
+## Contenido estático, guía, robots y sitemap (issue #32)
+- La guía de la portada va en `index.html` bajo `#game` (que ocupa 100dvh), con las dos lenguas visibles a la vez (`#es` / `#en`, como `acerca.html`): es lo más simple y así un rastreador ve todo el texto sin JavaScript. Un solo `h1` y `h2`/`h3` por sección.
+- `html`/`body` ya no tienen `overflow: hidden` ni `touch-action: none` (pasan a `#game`) para poder hacer scroll hasta la guía. Durante la partida no se mueve la página: Phaser ya bloquea la rueda y los toques sobre el canvas y captura las flechas; `Input.ts` captura además Espacio, RePág, AvPág, Inicio y Fin mientras existe `GameScene`. "Buscar piso" hace `scrollTo(0, 0)` antes de empezar.
+- El aviso de girar el móvil pasa de `fixed` a `absolute` (cubre solo la zona del juego): en vertical se puede bajar a leer la guía.
+- En las páginas estáticas la mecánica de promesas se describe sin mencionar elecciones ni urnas (requisito de la issue para anuncios). Los textos del juego (`texts.ts`) no se tocan en esta issue.
+- Contacto en `acerca.html`: incidencias de GitHub (no hay correo público).
