@@ -33,6 +33,8 @@ export const MOBILE = {
   standaloneQuery: '(display-mode: standalone), (display-mode: fullscreen)',
   rescaleDelayMs: 250,
   iosTouchPoints: 1,
+  /** Clase de <html> durante la partida: el marco del juego pasa a ocupar toda la pantalla (ver index.html). */
+  playingClass: 'playing',
 } as const;
 /** Parámetro de URL para empezar el reloj en un minuto concreto: `?min=7`. */
 export const DEBUG_START_MINUTE_PARAM = 'min';

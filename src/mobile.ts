@@ -69,6 +69,16 @@ export function setupMobile(game: Phaser.Game): void {
   applyOrientation();
 }
 
+/**
+ * En la portada el juego va en un marco con borde (la guía estática queda debajo); durante la partida
+ * ocupa toda la pantalla y la página vuelve arriba. Reescala Phaser al nuevo tamaño del contenedor.
+ */
+export function setPlayingLayout(game: Phaser.Game, playing: boolean): void {
+  document.documentElement.classList.toggle(MOBILE.playingClass, playing);
+  if (playing) window.scrollTo(0, 0);
+  game.scale.refresh();
+}
+
 type LockableOrientation = ScreenOrientation & { lock?: (orientation: string) => Promise<void> };
 
 /** Pantalla completa + bloqueo en horizontal. Falla en silencio si el navegador no lo soporta (p. ej. iOS). */

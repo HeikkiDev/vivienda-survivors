@@ -121,7 +121,7 @@ Cuando AdSense apruebe el sitio, completa también [`public/ads.txt`](public/ads
 La [guía](public/guia.html), la [política de privacidad](public/privacidad.html) y la página [Acerca de](public/acerca.html) (ES + EN) se enlazan desde el pie del menú.
 
 ## 📄 Contenido estático y buscadores
-- [`index.html`](index.html) lleva bajo el juego (que sigue a pantalla completa) una guía en HTML plano en español e inglés, más un `<noscript>` con un resumen, para que la portada tenga contenido legible sin JavaScript.
+- [`index.html`](index.html) lleva bajo el juego una guía en HTML plano en español e inglés, más un `<noscript>` con un resumen, para que la portada tenga contenido legible sin JavaScript. En el menú y en Game Over el juego va en un marco con borde amarillo para que se vea que hay contenido debajo; durante la partida ocupa toda la pantalla.
 - [`public/guia.html`](public/guia.html): guía completa (enemigos, armas, pasivas, evoluciones, promesas y consejos).
 - [`public/robots.txt`](public/robots.txt) y [`public/sitemap.xml`](public/sitemap.xml) (portada, guía, acerca de y privacidad).
 - **Si cambias el juego** (mecánicas, números o nombres), actualiza también `index.html` y `public/guia.html` para que digan lo mismo que el juego.
