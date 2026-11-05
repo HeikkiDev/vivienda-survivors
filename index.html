@@ -24,33 +24,58 @@
     <meta name="twitter:description" content="Sobrevive 10 minutos al mercado inmobiliario. Gratis en el navegador." />
     <meta name="twitter:image" content="https://viviendasurvivors.es/og-image.jpg" />
     <link rel="icon" href="./icons/icon-192.png" />
+    <link rel="canonical" href="https://viviendasurvivors.es/" />
     <link rel="apple-touch-icon" href="./icons/icon-192.png" />
     <link rel="manifest" href="./manifest.json" />
     <style>
       html, body {
         margin: 0;
-        width: 100vw;
-        height: 100vh;
-        height: 100dvh;
-        background: #000;
-        overflow: hidden;
+        background: #1a1a1a;
         overscroll-behavior: none;
-        touch-action: none;
-        -webkit-user-select: none;
-        user-select: none;
-        -webkit-touch-callout: none;
         -webkit-tap-highlight-color: transparent;
       }
+      html { overflow-x: hidden; }
       body {
         box-sizing: border-box;
         padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
       }
-      /* #game ocupa el área segura de body (100vw × 100dvh menos los insets). */
-      #game { width: 100%; height: 100%; overflow: hidden; touch-action: none; }
+      /*
+       * Portada: el juego va en un marco amarillo algo más pequeño que la pantalla, con margen alrededor (ahí la rueda y
+       * el dedo desplazan la página) y el enlace a la guía visible debajo. Durante la partida (html.playing, ver
+       * setPlayingLayout en src/mobile.ts) y en pantalla completa ocupa toda la pantalla, sin borde.
+       */
+      #game-frame {
+        box-sizing: border-box;
+        width: calc(100% - 32px);
+        height: calc(100vh - 88px);
+        height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 88px);
+        min-height: 240px;
+        margin: 16px auto 0;
+        border: 3px solid #ffd447;
+        border-radius: 8px;
+        background: #000;
+        overflow: hidden;
+      }
+      /* Phaser mide el contenedor con su borde incluido: el borde va en #game-frame y #game es solo el interior. */
+      #game {
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        touch-action: none;
+        -webkit-user-select: none;
+        user-select: none;
+        -webkit-touch-callout: none;
+      }
+      /* Cubre solo la zona del juego: en vertical se puede bajar a leer la guía. */
       #rotate-overlay {
-        position: fixed;
-        inset: 0;
+        position: absolute;
+        top: 0;
+        left: 0;
         z-index: 10;
+        box-sizing: border-box;
+        width: 100%;
+        height: 100vh;
+        height: 100dvh;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -59,13 +84,272 @@
         color: #ffd447;
         font: bold 28px sans-serif;
         text-align: center;
+        -webkit-user-select: none;
+        user-select: none;
+      }
+      html.playing #game-frame {
+        width: 100%;
+        height: 100vh;
+        height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+        min-height: 0;
+        margin: 0;
+        border: 0;
+        border-radius: 0;
+      }
+      :root:fullscreen #game-frame {
+        width: 100%;
+        height: 100vh;
+        height: 100dvh;
+        min-height: 0;
+        margin: 0;
+        border: 0;
+        border-radius: 0;
+      }
+      .scroll-hint {
+        display: block;
+        padding: 14px 16px;
+        color: #ffd447;
+        font: 600 15px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        text-align: center;
+        text-decoration: none;
       }
       #rotate-overlay[hidden] { display: none; }
+      .info { background: #1a1a1a; color: #dddddd; font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+      .info-inner { max-width: 760px; margin: 0 auto; padding: 24px 20px 48px; }
+      .info h1, .info h2 { color: #ffd447; line-height: 1.25; }
+      .info h3 { color: #ffffff; margin-bottom: 4px; }
+      .info a { color: #ffd447; }
+      .info nav { display: flex; gap: 16px; flex-wrap: wrap; font-size: 14px; }
+      .info section + section { margin-top: 48px; padding-top: 24px; border-top: 1px solid #333333; }
+      .info footer { margin-top: 48px; padding-top: 24px; border-top: 1px solid #333333; font-size: 14px; color: #888888; }
     </style>
-    <script type="module" crossorigin src="./js/index-BF2eGhl-.js"></script>
+    <script type="module" crossorigin src="./js/index-Ca4ZxrQc.js"></script>
   </head>
   <body>
-    <div id="game"></div>
+    <div id="game-frame"><div id="game"></div></div>
     <div id="rotate-overlay" hidden></div>
+    <a class="scroll-hint" href="#guia">▼ Guía, controles y preguntas frecuentes · Guide, controls &amp; FAQ</a>
+    <noscript>
+      <div class="info">
+        <div class="info-inner">
+          <p lang="es">
+            <strong>Vivienda Survivors</strong> es un juego gratuito para el navegador al estilo de Vampire Survivors y una
+            sátira de la crisis de la vivienda en España. Necesita JavaScript para jugarse. Te mueves con WASD, las flechas o
+            un joystick táctil; tus armas disparan solas. Esquiva subidas del IPC, caseros, agencias, fondos buitre y el
+            Euríbor disparado, recoge euros para subir de nivel y aguanta 10 minutos. Lee la <a href="guia.html#es">guía
+            completa</a>, la página <a href="acerca.html#es">Acerca de</a> y la <a href="privacidad.html#es">política de
+            privacidad</a>.
+          </p>
+          <p lang="en">
+            <strong>Vivienda Survivors</strong> is a free browser game in the style of Vampire Survivors and a satire of the
+            housing crisis in Spain. It needs JavaScript to play. Move with WASD, the arrow keys or a touch joystick; your
+            weapons fire on their own. Dodge inflation spikes, landlords, agencies, vulture funds and the soaring Euribor,
+            collect euros to level up and survive for 10 minutes. Read the <a href="guia.html#en">full guide</a>, the
+            <a href="acerca.html#en">About</a> page and the <a href="privacidad.html#en">privacy policy</a>.
+          </p>
+        </div>
+      </div>
+    </noscript>
+    <main id="guia" class="info">
+      <div class="info-inner">
+        <h1>Vivienda Survivors</h1>
+        <nav>
+          <a href="#es">Español</a>
+          <a href="#en">English</a>
+          <a href="guia.html">Guía completa / Full guide</a>
+          <a href="acerca.html">Acerca de / About</a>
+          <a href="privacidad.html">Privacidad / Privacy</a>
+        </nav>
+
+        <section id="es" lang="es">
+          <h2>Qué es Vivienda Survivors</h2>
+          <p>
+            Vivienda Survivors es un juego gratuito para el navegador al estilo de <em>Vampire Survivors</em> y, a la vez, una
+            sátira de la crisis de la vivienda en España. Tienes 30 años, buscas piso y te persigue todo el mercado
+            inmobiliario: subidas del IPC, caseros, agencias, fondos buitre y un Euríbor desbocado. Tú solo te mueves; tus
+            armas disparan solas. No hay que instalar nada ni registrarse, y se juega igual en ordenador que en móvil.
+          </p>
+
+          <h2>Cómo se juega</h2>
+          <h3>En ordenador</h3>
+          <p>
+            Muévete con <strong>WASD</strong> o con las <strong>flechas</strong>. No hay botón de ataque. Pausa con
+            <strong>Esc</strong> o <strong>P</strong>, abre la leyenda de armas, pasivas, evoluciones y peligros con
+            <strong>H</strong> y silencia el sonido con <strong>M</strong>. Al subir de nivel eliges una de tres mejoras con
+            el ratón o con las teclas <strong>1</strong>, <strong>2</strong> y <strong>3</strong>.
+          </p>
+          <h3>En el móvil</h3>
+          <p>
+            Pon el móvil en horizontal. Toca en cualquier punto de la mitad inferior de la pantalla y arrastra: ahí mismo
+            aparece un joystick virtual. Arriba a la derecha tienes los botones de pausa, sonido y leyenda. Si tu navegador lo
+            permite, el juego pasa a pantalla completa; en iPhone puedes añadirlo a la pantalla de inicio para jugar sin barras.
+          </p>
+          <h3>El objetivo</h3>
+          <p>
+            Cada enemigo derrotado suelta euros, que son tu experiencia. Recógelos para subir de nivel y mejorar tu
+            equipo. Si aguantas <strong>10 minutos</strong>, ganas… y firmas una hipoteca a 40 años. Si tu vida llega a cero,
+            vuelves a casa de tus padres. Tu mejor tiempo se guarda como récord.
+          </p>
+
+          <h2>Enemigos y peligros</h2>
+          <p>Todos van a por ti y hacen daño al tocarte. Cada minuto tienen más vida y pegan un poco más fuerte.</p>
+          <ul>
+            <li><strong>Subida del IPC</strong> (desde el principio): débil pero numerosa. Sube poco a poco y nunca para.</li>
+            <li><strong>Casero de contrato de 11 meses</strong> (minuto 1): lento, aguanta más golpes y te renueva cada año subiendo el precio.</li>
+            <li><strong>Agencia con honorarios</strong> (minuto 2): la más rápida. En el minuto 5 llega la «temporada turística»: 40 agencias te rodean.</li>
+            <li><strong>Euríbor disparado</strong> (minuto 3): un misil que no se puede destruir, solo esquivar. Un «!» rojo avisa por qué borde entrará y cruza la pantalla en línea recta hacia donde estabas.</li>
+            <li><strong>Fondo buitre</strong> (minuto 4): grande, lento y muy duro; es el enemigo normal que más daño hace.</li>
+            <li><strong>Burbuja 2.0</strong> (minuto 8): el jefe final. Tiene muchísima vida y cada 3 segundos dispara un anillo de billetes. No hace falta pincharla para ganar.</li>
+          </ul>
+
+          <h2>Armas, pasivas y evoluciones</h2>
+          <p>
+            Empiezas con el <strong>Lanzador de currículums</strong>, que dispara al enemigo más cercano. Al subir de nivel
+            puedes conseguir el <strong>Escudo Ley de Vivienda</strong> (un aura que daña a quien se acerque), el
+            <strong>Grito «¡Eso es un trastero!»</strong> (una onda que daña y empuja) y el <strong>Sindicato de
+            inquilinos</strong> (puños que orbitan a tu alrededor). Las pasivas mejoran a tu personaje: el Aval de tus padres
+            da vida, el Piso compartido reduce la recarga, el Bono Alquiler Joven amplía el imán y la velocidad, el Segundo
+            trabajo sube el daño y el Teletrabajo regenera vida. Armas y pasivas llegan hasta el <strong>nivel 5</strong>.
+          </p>
+          <p>
+            Un arma a nivel 5 junto con su pasiva compañera puede <strong>evolucionar</strong>: los currículums se convierten
+            en LinkedIn Premium, el escudo en Escudo Antidesahucios, el grito en Manifestación y el sindicato en Huelga general.
+            Las recetas están en la <a href="guia.html#es">guía completa</a> y en la leyenda del juego.
+          </p>
+          <h3>Enemigos premium, cofres y promesas</h3>
+          <p>
+            Cada minuto, a partir del 1:15, aparece un enemigo <strong>premium</strong> dorado y con corona: aguanta muchísimo,
+            pero suelta un <strong>cofre</strong> con 1, 3 o 5 mejoras. En los minutos 2, 4, 6 y 8 aparece además una
+            <strong>promesa</strong> en el mapa: te da una ventaja durante 20 segundos y luego, a cara o cruz, se cumple o se
+            incumple y te penaliza un rato.
+          </p>
+          <h3>Revivir</h3>
+          <p>
+            La primera vez que caes en una partida, si hay un anuncio disponible, puedes elegir verlo para revivir con la
+            mitad de la vida. Es totalmente voluntario y solo funciona una vez por partida.
+          </p>
+
+          <h2>Preguntas frecuentes</h2>
+          <h3>¿Es gratis?</h3>
+          <p>Sí. No hay compras, ni cuentas, ni registro.</p>
+          <h3>¿Qué datos recogéis?</h3>
+          <p>
+            El juego solo guarda en tu navegador tu récord, el idioma y si has silenciado el sonido. Si se muestran anuncios,
+            Google puede usar cookies según tu consentimiento. Todo está en la <a href="privacidad.html#es">política de
+            privacidad</a>.
+          </p>
+          <h3>¿Por qué hay anuncios?</h3>
+          <p>
+            Para que el juego siga siendo gratis. Nunca aparecen durante la partida: como mucho uno al empezar una partida
+            nueva tras el Game Over y el voluntario para revivir. Si los anuncios fallan o están bloqueados, se juega igual.
+          </p>
+          <h3>¿Cómo aviso de un fallo?</h3>
+          <p>
+            Abre una incidencia en <a href="https://github.com/HeikkiDev/vivienda-survivors/issues">GitHub</a> contando qué
+            pasó, en qué dispositivo y con qué navegador.
+          </p>
+          <p>
+            Más información en <a href="acerca.html#es">Acerca de</a> y <a href="privacidad.html#es">Privacidad</a>.
+          </p>
+        </section>
+
+        <section id="en" lang="en">
+          <h2>What is Vivienda Survivors</h2>
+          <p>
+            Vivienda Survivors is a free browser game in the style of <em>Vampire Survivors</em> and, at the same time, a
+            satire of the housing crisis in Spain. You are 30, you are looking for a flat and the whole housing market is
+            chasing you: inflation spikes, landlords, agencies, vulture funds and a runaway Euribor. You only move; your
+            weapons fire on their own. There is nothing to install and no sign-up, and it plays the same on desktop and mobile.
+          </p>
+
+          <h2>How to play</h2>
+          <h3>On desktop</h3>
+          <p>
+            Move with <strong>WASD</strong> or the <strong>arrow keys</strong>. There is no attack button. Pause with
+            <strong>Esc</strong> or <strong>P</strong>, open the legend of weapons, passives, evolutions and hazards with
+            <strong>H</strong> and mute the sound with <strong>M</strong>. When you level up, pick one of three upgrades with
+            the mouse or the <strong>1</strong>, <strong>2</strong> and <strong>3</strong> keys.
+          </p>
+          <h3>On mobile</h3>
+          <p>
+            Hold your phone in landscape. Touch anywhere in the bottom half of the screen and drag: a virtual joystick appears
+            right there. The pause, sound and legend buttons are in the top right corner. If your browser allows it, the game
+            goes fullscreen; on iPhone you can add it to your home screen to play without browser bars.
+          </p>
+          <h3>The goal</h3>
+          <p>
+            Every enemy you defeat drops euros, which are your experience. Collect them to level up and improve your gear. If
+            you survive for <strong>10 minutes</strong>, you win… and sign a 40-year mortgage. If your health reaches zero,
+            you move back in with your parents. Your best time is saved as your record.
+          </p>
+
+          <h2>Enemies and hazards</h2>
+          <p>All of them come for you and hurt you on contact. Every minute they get more health and hit a little harder.</p>
+          <ul>
+            <li><strong>Inflation Spike</strong> (from the start): weak but numerous. It rises slowly and never stops.</li>
+            <li><strong>11-Month-Lease Landlord</strong> (minute 1): slow, takes more hits and renews your contract every year at a higher price.</li>
+            <li><strong>Agency with Fees</strong> (minute 2): the fastest one. At minute 5 the “tourist season” arrives: 40 agencies surround you.</li>
+            <li><strong>Soaring Euribor</strong> (minute 3): a missile that cannot be destroyed, only dodged. A red “!” warns which edge it will come from, and it crosses the screen in a straight line towards where you were.</li>
+            <li><strong>Vulture Fund</strong> (minute 4): big, slow and very tough; it is the normal enemy that deals the most damage.</li>
+            <li><strong>Bubble 2.0</strong> (minute 8): the final boss. It has a huge amount of health and fires a ring of banknotes every 3 seconds. You do not need to pop it to win.</li>
+          </ul>
+
+          <h2>Weapons, passives and evolutions</h2>
+          <p>
+            You start with the <strong>CV Launcher</strong>, which shoots the nearest enemy. When you level up you can get the
+            <strong>Housing Law Shield</strong> (an aura that hurts anyone who gets close), the <strong>“That's a storage
+            room!” Shout</strong> (a wave that damages and pushes back) and the <strong>Tenants' Union</strong> (fists that
+            orbit around you). Passives improve your character: Parents as Guarantors adds health, Shared Flat reduces
+            cooldowns, Youth Rent Allowance widens your magnet and speeds you up, Second Job raises damage and Remote Work
+            regenerates health. Weapons and passives go up to <strong>level 5</strong>.
+          </p>
+          <p>
+            A level 5 weapon together with its partner passive can <strong>evolve</strong>: the CVs become LinkedIn Premium, the
+            shield becomes the Anti-Eviction Shield, the shout becomes a Mass Protest and the union becomes a General Strike.
+            The recipes are in the <a href="guia.html#en">full guide</a> and in the in-game legend.
+          </p>
+          <h3>Premium enemies, chests and promises</h3>
+          <p>
+            Every minute from 1:15, a golden, crowned <strong>premium</strong> enemy appears: it is very tough, but it drops a
+            <strong>chest</strong> with 1, 3 or 5 upgrades. At minutes 2, 4, 6 and 8 a <strong>promise</strong> also appears
+            on the map: it gives you a bonus for 20 seconds and then, on a coin flip, it is either kept or broken and
+            penalises you for a while.
+          </p>
+          <h3>Reviving</h3>
+          <p>
+            The first time you fall in a run, if an ad is available, you can choose to watch it to revive with half your
+            health. It is completely optional and only works once per run.
+          </p>
+
+          <h2>Frequently asked questions</h2>
+          <h3>Is it free?</h3>
+          <p>Yes. There are no purchases, no accounts and no sign-up.</p>
+          <h3>What data do you collect?</h3>
+          <p>
+            The game only stores your record, your language and whether you muted the sound in your browser. If ads are shown,
+            Google may use cookies according to your consent. Everything is explained in the <a href="privacidad.html#en">privacy
+            policy</a>.
+          </p>
+          <h3>Why are there ads?</h3>
+          <p>
+            To keep the game free. They never appear during a run: at most one when you start a new run after Game Over, plus
+            the optional one to revive. If ads fail or are blocked, you can still play normally.
+          </p>
+          <h3>How do I report a bug?</h3>
+          <p>
+            Open an issue on <a href="https://github.com/HeikkiDev/vivienda-survivors/issues">GitHub</a> describing what
+            happened, on which device and with which browser.
+          </p>
+          <p>
+            More information in <a href="acerca.html#en">About</a> and <a href="privacidad.html#en">Privacy</a>.
+          </p>
+        </section>
+
+        <footer>
+          Parodia genérica: no representa a ninguna persona, empresa ni organización real. /
+          Generic parody: it does not depict any real person, company or organisation.
+        </footer>
+      </div>
+    </main>
   </body>
 </html>
