@@ -4,6 +4,7 @@ import { MOBILE } from './config';
 import { TEXTS } from './texts';
 
 const OVERLAY_ID = 'rotate-overlay';
+const GAME_SCENE_KEY = 'GameScene';
 
 /** Pausa las escenas en marcha mientras el móvil está en vertical y las reanuda al volver a horizontal. */
 export function setupMobile(game: Phaser.Game): void {
@@ -20,6 +21,8 @@ export function setupMobile(game: Phaser.Game): void {
   };
 
   const resumePausedScenes = (): void => {
+    // Si en vertical se bajó a leer la guía, al volver a horizontal la partida se ve entera.
+    if (game.scene.isActive(GAME_SCENE_KEY) || game.scene.isPaused(GAME_SCENE_KEY)) window.scrollTo(0, 0);
     for (const key of pausedByOrientation) {
       if (game.scene.isPaused(key)) game.scene.resume(key);
     }
@@ -64,6 +67,16 @@ export function setupMobile(game: Phaser.Game): void {
 
   game.events.once(Phaser.Core.Events.READY, onViewportChange);
   applyOrientation();
+}
+
+/**
+ * En la portada el juego va en un marco con borde (la guía estática queda debajo); durante la partida
+ * ocupa toda la pantalla y la página vuelve arriba. Reescala Phaser al nuevo tamaño del contenedor.
+ */
+export function setPlayingLayout(game: Phaser.Game, playing: boolean): void {
+  document.documentElement.classList.toggle(MOBILE.playingClass, playing);
+  if (playing) window.scrollTo(0, 0);
+  game.scale.refresh();
 }
 
 type LockableOrientation = ScreenOrientation & { lock?: (orientation: string) => Promise<void> };

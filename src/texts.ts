@@ -88,6 +88,7 @@ const ES = {
     language: 'Idioma:',
     privacy: 'Privacidad',
     about: 'Acerca de',
+    guide: 'Guía',
     privacySettings: 'Preferencias de privacidad',
   },
   mobile: {
@@ -246,6 +247,7 @@ const EN: Texts = {
     language: 'Language:',
     privacy: 'Privacy',
     about: 'About',
+    guide: 'Guide',
     privacySettings: 'Privacy settings',
   },
   mobile: {

@@ -45,6 +45,7 @@ import type { Enemy } from '../entities/Enemy';
 import type { Missile } from '../entities/Missile';
 import { Player } from '../entities/Player';
 import { XpGemPool } from '../entities/XpGem';
+import { setPlayingLayout } from '../mobile';
 import { Ads } from '../systems/ads';
 import { AudioManager } from '../systems/AudioManager';
 import { Elections, type PromiseStatus } from '../systems/Elections';
@@ -213,6 +214,8 @@ export class GameScene extends Phaser.Scene {
   }
 
   create(): void {
+    // Cada partida (desde el menú o al reintentar) se juega a pantalla entera, sin el marco de la portada.
+    setPlayingLayout(this.game, true);
     const startMinute = GameScene.debugStartMinute();
     const params = new URLSearchParams(window.location.search);
     this.debugWin = params.has(DEBUG_WIN_PARAM);
@@ -326,6 +329,7 @@ export class GameScene extends Phaser.Scene {
       this.scene.stop('ReviveScene');
       this.cancelReviveOffer?.();
       this.cancelReviveOffer = null;
+      setPlayingLayout(this.game, false);
     });
   }
 

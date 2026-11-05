@@ -257,10 +257,15 @@ Los efectos se aplican como multiplicadores temporales en un objeto `modifiers` 
 ### 11.1 Anuncios y revivir (petición del usuario, issue #30)
 - Dominio `viviendasurvivors.es` (GitHub Pages, `public/CNAME`). Juego gratis con Google AdSense **H5 Games Ads** (`adBreak`), en `src/systems/ads.ts`; valores en `ADS` y `REVIVE` de `config.ts`.
 - Con `ADS.publisherId` vacío no se carga ningún script de anuncios ni de consentimiento y el juego es idéntico al de siempre.
-- Consentimiento: CMP certificada de Google (Privacy & messaging); los anuncios no se cargan hasta que hay datos de consentimiento. El menú enlaza "Privacidad", "Acerca de" (páginas estáticas ES + EN en `public/`) y, con anuncios configurados, "Preferencias de privacidad".
+- Consentimiento: CMP certificada de Google (Privacy & messaging); los anuncios no se cargan hasta que hay datos de consentimiento. El menú enlaza "Guía", "Privacidad", "Acerca de" (páginas estáticas ES + EN en `public/`, §11.2) y, con anuncios configurados, "Preferencias de privacidad".
 - **Intersticial** (`type: 'next'`) solo al pasar de Game Over a una partida nueva, como mucho uno cada `ADS.interstitialMinGapSeconds`. Nunca durante la partida.
 - **Revivir** (`type: 'reward'`): en la primera muerte de la partida, si hay anuncio listo (`beforeReward`), overlay `ReviveScene` con "Ver anuncio para revivir" / "No, gracias". Solo si el anuncio se ve entero (`adViewed`) se sigue la misma partida (tiempo, armas y nivel) con `REVIVE.hpRatio` de vida y `REVIVE.invulnerabilitySeconds` de invulnerabilidad. Una vez por partida: la segunda muerte es derrota normal.
 - Durante un anuncio el juego se pausa y se silencia. Si los anuncios fallan, están bloqueados o no están listos, se sigue sin ellos.
+
+### 11.2 Contenido estático para buscadores (issue #32)
+- `index.html` lleva bajo el juego una guía en HTML plano ES + EN (`#es` / `#en`): qué es el juego, controles de PC y móvil, objetivo, enemigos, armas, pasivas, evoluciones, élites/cofres, promesas, revivir y preguntas frecuentes, con enlaces a las páginas estáticas. Más un `<noscript>` con un resumen. Se llega haciendo scroll (en vertical el aviso de girar el móvil solo tapa el juego); durante la partida la página no se desplaza (el canvas bloquea rueda y toques y `Input.ts` captura Espacio/RePág/AvPág/Inicio/Fin) y cada partida empieza con la página arriba (también al volver a horizontal). En el menú y en Game Over el juego va en un marco algo más pequeño con borde amarillo y un enlace "▼ Guía" debajo; durante la partida y en pantalla completa ocupa toda la pantalla.
+- Páginas de `public/`: `guia.html` (guía completa con tablas de enemigos, armas, pasivas, evoluciones y promesas, y consejos), `acerca.html` (incluye contacto por incidencias de GitHub y cómo está hecho) y `privacidad.html`. `robots.txt` lo permite todo y apunta a `sitemap.xml` (las cuatro URL).
+- **Regla:** estas páginas describen el juego real. Si cambia una mecánica, un número o un nombre (GDD, `config.ts`, `texts.ts`), se actualizan también `index.html` y `public/guia.html`. En ellas no se mencionan elecciones, votaciones ni partidos (política de anuncios).
 
 ---
 
@@ -277,7 +282,7 @@ Los efectos se aplican como multiplicadores temporales en un objeto `modifiers` 
 
 ## 13. Escenas
 1. `BootScene` → pasa directo a `MenuScene`.
-2. `MenuScene`: título **"VIVIENDA SURVIVORS"**, subtítulo *"Sobrevive 10 minutos al mercado inmobiliario"*, botón "Buscar piso" (Enter/clic), récord. Pie: *"Parodia. Cualquier parecido con la realidad es pura coincidencia (no)."* y enlaces de privacidad (§11.1).
+2. `MenuScene`: título **"VIVIENDA SURVIVORS"**, subtítulo *"Sobrevive 10 minutos al mercado inmobiliario"*, botón "Buscar piso" (Enter/clic), récord. Pie: *"Parodia. Cualquier parecido con la realidad es pura coincidencia (no)."* y enlaces a la guía y de privacidad (§11.1, §11.2).
 3. `GameScene` + `UIScene` (paralela).
 4. `LevelUpScene` (overlay modal). `ChestScene` (cofre), `LegendScene` (leyenda "?") y `ReviveScene` (revivir con anuncio, §11.1) también son overlays modales.
 5. `GameOverScene` (victoria/derrota, recibe datos).
@@ -287,12 +292,14 @@ Los efectos se aplican como multiplicadores temporales en un objeto `modifiers` 
 ## 14. Estructura de archivos
 ```
 vivienda-survivors/
-├─ index.html
+├─ index.html              # juego + guía estática ES/EN (§11.2)
 ├─ package.json
 ├─ tsconfig.json
 ├─ vite.config.ts          # base: './' (necesario para itch.io)
 ├─ NOTES.md                # decisiones del agente
 ├─ public/
+│  ├─ guia.html, acerca.html, privacidad.html   # páginas estáticas ES/EN (§11.1, §11.2)
+│  ├─ robots.txt, sitemap.xml
 │  └─ assets/              # PNG/spritesheets opcionales (vacío al inicio, .gitkeep)
 ├─ src/
 │  ├─ main.ts              # config Phaser y registro de escenas
