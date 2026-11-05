@@ -3,6 +3,10 @@ import { DEPTH, JOYSTICK } from '../config';
 
 type MoveKeys = Record<'up' | 'down' | 'left' | 'right' | 'w' | 'a' | 's' | 'd', Phaser.Input.Keyboard.Key>;
 
+const K = Phaser.Input.Keyboard.KeyCodes;
+/** Teclas que desplazan la página (la guía estática está bajo el juego): durante la partida no hacen scroll. */
+const PAGE_SCROLL_KEYS = [K.SPACE, K.PAGE_UP, K.PAGE_DOWN, K.HOME, K.END];
+
 /** Teclado (WASD + flechas) y joystick virtual táctil. Devuelve una dirección de longitud ≤ 1. */
 export class InputSystem {
   private readonly keys?: MoveKeys;
@@ -13,7 +17,6 @@ export class InputSystem {
   private readonly knob = new Phaser.Math.Vector2();
 
   constructor(private readonly scene: Phaser.Scene) {
-    const K = Phaser.Input.Keyboard.KeyCodes;
     this.keys = scene.input.keyboard?.addKeys({
       up: K.UP,
       down: K.DOWN,
@@ -24,6 +27,7 @@ export class InputSystem {
       s: K.S,
       d: K.D,
     }) as MoveKeys | undefined;
+    scene.input.keyboard?.addCapture(PAGE_SCROLL_KEYS);
 
     this.graphics = scene.add.graphics().setScrollFactor(0).setDepth(DEPTH.joystick).setVisible(false);
 
@@ -97,6 +101,7 @@ export class InputSystem {
   }
 
   private destroy(): void {
+    this.scene.input.keyboard?.removeCapture(PAGE_SCROLL_KEYS);
     this.scene.events.off(Phaser.Scenes.Events.RESUME, this.reset, this);
     this.scene.input.off(Phaser.Input.Events.POINTER_DOWN, this.onDown, this);
     this.scene.input.off(Phaser.Input.Events.POINTER_MOVE, this.onMove, this);

@@ -132,6 +132,7 @@ export const REVIVE = {
 export const INFO_PAGES = {
   privacy: 'privacidad.html',
   about: 'acerca.html',
+  guide: 'guia.html',
 } as const;
 
 export const DEPTH = {

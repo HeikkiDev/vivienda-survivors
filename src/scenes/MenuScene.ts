@@ -127,11 +127,12 @@ export class MenuScene extends Phaser.Scene {
     }
   }
 
-  /** Privacidad, Acerca de y, si hay CMP (anuncios configurados), Preferencias de privacidad. */
+  /** Guía, Privacidad, Acerca de y, si hay CMP (anuncios configurados), Preferencias de privacidad. */
   private createFooterLinks(cx: number): void {
     const m = UI.menu;
     const y = GAME_HEIGHT - m.linksMarginBottom;
     const links: Array<[string, () => void]> = [
+      [TEXTS.menu.guide, () => MenuScene.openPage(INFO_PAGES.guide)],
       [TEXTS.menu.privacy, () => MenuScene.openPage(INFO_PAGES.privacy)],
       [TEXTS.menu.about, () => MenuScene.openPage(INFO_PAGES.about)],
     ];
@@ -177,6 +178,8 @@ export class MenuScene extends Phaser.Scene {
   private startGame(): void {
     if (this.starting) return;
     this.starting = true;
+    // La guía estática está bajo el juego: se vuelve arriba para jugar con la pantalla entera.
+    window.scrollTo(0, 0);
     void enterFullscreenLandscape();
     // Dentro del gesto del usuario: necesario para que iOS permita el audio.
     AudioManager.startMusic();
