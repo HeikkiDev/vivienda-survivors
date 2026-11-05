@@ -1,0 +1,369 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Guía del juego · Vivienda Survivors</title>
+    <meta name="description" content="Guía completa de Vivienda Survivors: controles, enemigos, armas, pasivas, evoluciones, cofres y consejos para aguantar 10 minutos. Full game guide in English." />
+    <link rel="icon" href="icons/icon-192.png" />
+    <link rel="canonical" href="https://viviendasurvivors.es/guia.html" />
+    <style>
+      body { margin: 0; background: #1a1a1a; color: #dddddd; font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+      main { max-width: 760px; margin: 0 auto; padding: 24px 20px 48px; }
+      h1, h2 { color: #ffd447; line-height: 1.25; }
+      h3 { color: #ffffff; margin-bottom: 4px; }
+      a { color: #ffd447; }
+      nav { display: flex; gap: 16px; flex-wrap: wrap; font-size: 14px; }
+      section + section { margin-top: 48px; padding-top: 24px; border-top: 1px solid #333333; }
+      .table-wrap { overflow-x: auto; }
+      table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 8px 0 16px; }
+      th, td { text-align: left; vertical-align: top; padding: 6px 8px; border-bottom: 1px solid #333333; }
+      th { color: #ffd447; }
+      footer { margin-top: 48px; padding-top: 24px; border-top: 1px solid #333333; font-size: 14px; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <nav>
+        <a href="./">▶ Volver al juego / Back to the game</a>
+        <a href="#es">Español</a>
+        <a href="#en">English</a>
+        <a href="acerca.html">Acerca de / About</a>
+        <a href="privacidad.html">Privacidad / Privacy</a>
+      </nav>
+
+      <section id="es" lang="es">
+        <h1>Guía de Vivienda Survivors</h1>
+        <p>
+          Todo lo que necesitas saber para aguantar 10 minutos en el mercado inmobiliario: controles, enemigos, armas,
+          pasivas, evoluciones, cofres y algunos consejos. Los números son los valores base del juego.
+        </p>
+
+        <h2>Lo básico</h2>
+        <p>
+          Empiezas con 100 de vida y el Lanzador de currículums. Te mueves y tus armas atacan solas. Cada enemigo derrotado
+          suelta euros: son tu experiencia y no desaparecen del suelo. Para pasar del nivel <em>n</em> al siguiente necesitas
+          5 + (<em>n</em> − 1) × 6 euros (5 para el nivel 2, 11 para el 3, 17 para el 4…). Al subir de nivel el juego se
+          pausa y eliges una de tres mejoras. Si quedan menos de tres mejoras posibles, se añade la
+          <strong>Caña con los colegas</strong>, que cura 30 de vida. Tras recibir un golpe tienes medio segundo de invulnerabilidad.
+        </p>
+        <h3>Controles</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Acción</th><th>Ordenador</th><th>Móvil</th></tr></thead>
+            <tbody>
+              <tr><td>Moverse</td><td>WASD o flechas</td><td>Toca y arrastra en la mitad inferior (joystick virtual)</td></tr>
+              <tr><td>Elegir mejora</td><td>Clic o teclas 1, 2, 3</td><td>Toca la tarjeta</td></tr>
+              <tr><td>Pausa</td><td>Esc o P</td><td>Botón ⏸ arriba a la derecha</td></tr>
+              <tr><td>Leyenda</td><td>H</td><td>Botón ❓</td></tr>
+              <tr><td>Sonido</td><td>M</td><td>Botón 🔊</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Cronología de una partida</h2>
+        <ul>
+          <li><strong>0:00</strong> — Solo subidas del IPC.</li>
+          <li><strong>1:00</strong> — Llegan los caseros. A partir de 1:15, un enemigo premium cada minuto.</li>
+          <li><strong>2:00</strong> — Llegan las agencias y la primera promesa.</li>
+          <li><strong>3:00</strong> — Empiezan las tandas del Euríbor disparado.</li>
+          <li><strong>4:00</strong> — Aparecen los fondos buitre. Segunda promesa.</li>
+          <li><strong>5:00</strong> — Temporada turística: un anillo de 40 agencias te rodea de golpe.</li>
+          <li><strong>6:00</strong> — Tercera promesa.</li>
+          <li><strong>8:00</strong> — La Burbuja 2.0 (aviso 3 segundos antes) y la última promesa.</li>
+          <li><strong>10:00</strong> — Victoria: firmas la hipoteca a 40 años.</li>
+        </ul>
+
+        <h2>Enemigos</h2>
+        <p>
+          Todos avanzan en línea recta hacia ti y hacen daño al tocarte. Cada minuto ganan un 20 % de vida y un 5 % de daño.
+          Cada evolución que consigas les da además un 60 % más de vida y un 10 % más de enemigos por tanda.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Enemigo</th><th>Desde</th><th>Vida</th><th>Daño</th><th>Euros</th><th>Cómo es</th></tr></thead>
+            <tbody>
+              <tr><td>Subida del IPC</td><td>0:00</td><td>10</td><td>5</td><td>1</td><td>Débil y numerosa; velocidad media.</td></tr>
+              <tr><td>Casero de contrato de 11 meses</td><td>1:00</td><td>30</td><td>10</td><td>3</td><td>Lento, pero aguanta más.</td></tr>
+              <tr><td>Agencia con honorarios</td><td>2:00</td><td>20</td><td>8</td><td>2</td><td>La más rápida: llega la primera.</td></tr>
+              <tr><td>Fondo buitre</td><td>4:00</td><td>120</td><td>20</td><td>10</td><td>Grande, muy lento y el que más pega. Cada minuto hay más.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h3>Euríbor disparado</h3>
+        <p>
+          Un misil que no se puede destruir: tus armas no le afectan y solo se puede esquivar. Un «!» rojo parpadea un
+          segundo antes en el borde por el que entrará; después cruza la pantalla en línea recta hacia el punto donde
+          estabas y hace 25 de daño. Desde el minuto 3 sale una tanda cada 8 segundos, que pasan a ser 3 al final, con 1 a 3
+          misiles (y uno más por cada evolución).
+        </p>
+        <h3>Burbuja 2.0 (jefe final)</h3>
+        <p>
+          Aparece en el minuto 8 con 8000 de vida (un 30 % más por evolución), no se deja empujar y hace 30 de daño al
+          tocarte. Cada 3 segundos dispara un anillo de 12 billetes de 10 de daño. Si la pinchas suelta 50 euros, pero no
+          hace falta derrotarla para ganar.
+        </p>
+        <h3>Enemigos premium y cofres</h3>
+        <p>
+          Desde el 1:15, cada minuto aparece un casero, una agencia o un fondo buitre <strong>premium</strong>: dorado, con
+          corona, 20 veces más vida, más grande, un 50 % más de daño y una velocidad fija mayor que la de cualquier enemigo
+          normal, aunque menor que la tuya. Una flecha amarilla indica dónde está. No salen mientras la Burbuja está viva.
+          Al caer sueltan un <strong>cofre</strong> con 1 mejora (60 %), 3 (30 %) o 5 (10 %). Los cofres pueden darte
+          también evoluciones.
+        </p>
+
+        <h2>Armas</h2>
+        <p>Todas suben hasta el nivel 5. La tabla muestra el nivel 1 → nivel 5.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Arma</th><th>Qué hace</th><th>Nivel 1 → 5</th></tr></thead>
+            <tbody>
+              <tr><td>Lanzador de currículums (inicial)</td><td>Dispara al enemigo más cercano.</td><td>Daño 10 → 20, recarga 1 s → 0,7 s, 1 → 3 proyectiles que golpean a 1 → 2 enemigos cada uno.</td></tr>
+              <tr><td>Escudo Ley de Vivienda</td><td>Aura permanente que daña a todo lo que tengas cerca.</td><td>Daño 4 → 10 cada 0,5 s → 0,35 s; radio 70 → 115.</td></tr>
+              <tr><td>Grito «¡Eso es un trastero!»</td><td>Onda periódica a tu alrededor que daña y empuja.</td><td>Daño 25 → 60, cada 4 s → 2,5 s; radio 140 → 200.</td></tr>
+              <tr><td>Sindicato de inquilinos</td><td>Puños que orbitan y golpean al pasar.</td><td>Daño 8 → 18; 2 → 5 puños.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Pasivas</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Pasiva</th><th>Por nivel</th><th>A nivel 5</th></tr></thead>
+            <tbody>
+              <tr><td>Aval de tus padres</td><td>+20 de vida máxima y cura 20</td><td>+100 de vida máxima</td></tr>
+              <tr><td>Piso compartido</td><td>−8 % de recarga de todas las armas</td><td>−40 %</td></tr>
+              <tr><td>Bono Alquiler Joven</td><td>+15 % de radio de recogida y +5 % de velocidad</td><td>+75 % y +25 %</td></tr>
+              <tr><td>Segundo trabajo</td><td>+10 % de daño de todas las armas</td><td>+50 %</td></tr>
+              <tr><td>Teletrabajo</td><td>Regenera 0,3 de vida por segundo</td><td>1,5 por segundo</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Evoluciones</h2>
+        <p>
+          Con un arma a nivel 5 y su pasiva compañera (a cualquier nivel), la evolución aparece como mejora al subir de nivel
+          o en un cofre. La leyenda del juego (tecla H o botón ❓) muestra estas recetas.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Receta</th><th>Evolución</th><th>Efecto</th></tr></thead>
+            <tbody>
+              <tr><td>Lanzador de currículums + Segundo trabajo</td><td>LinkedIn Premium</td><td>Dispara en 8 direcciones, atraviesa a todos y +50 % de daño.</td></tr>
+              <tr><td>Escudo Ley de Vivienda + Aval de tus padres</td><td>Escudo Antidesahucios</td><td>Aura +60 % de radio y +50 % de daño; cura 1 por enemigo abatido (máx. 5 por segundo).</td></tr>
+              <tr><td>Grito + Piso compartido</td><td>Manifestación</td><td>Radio ×2 y gran empuje; 1 de cada 5 ondas llena la pantalla.</td></tr>
+              <tr><td>Sindicato de inquilinos + Bono Alquiler Joven</td><td>Huelga general</td><td>8 puños, órbita +50 %, +60 % de daño y puños más grandes.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Promesas</h2>
+        <p>
+          En los minutos 2, 4, 6 y 8 aparece una promesa en el mapa, a poca distancia; una flecha indica dónde y desaparece
+          a los 30 segundos si no la coges. Al cogerla te toca una al azar con una ventaja de 20 segundos. Después, al 50 %, se
+          cumple (no pasa nada más) o se incumple y sufres una penalización durante 15 segundos.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Promesa</th><th>Ventaja (20 s)</th><th>Si se incumple (15 s)</th></tr></thead>
+            <tbody>
+              <tr><td>¡Un millón de viviendas públicas!</td><td>Daño ×2</td><td>Daño ×0,6</td></tr>
+              <tr><td>¡Bajaremos el alquiler por decreto!</td><td>Enemigos a mitad de velocidad</td><td>Enemigos ×1,3 más rápidos</td></tr>
+              <tr><td>¡Ayudas directas a la juventud!</td><td>Imán ×4 y experiencia ×2</td><td>Experiencia ×0,5</td></tr>
+              <tr><td>¡Acabaremos con la especulación!</td><td>Recargas ×0,5</td><td>Recargas ×1,5</td></tr>
+              <tr><td>¡Vivienda digna para todos!</td><td>Invulnerable</td><td>Te mueves ×0,6</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Revivir y anuncios</h2>
+        <p>
+          La primera vez que caes en una partida, si hay un anuncio listo, puedes elegir verlo para seguir la misma partida con
+          el 50 % de la vida y 5 segundos de invulnerabilidad. Es voluntario y solo una vez por partida. Los anuncios nunca
+          aparecen mientras juegas; como mucho hay uno al empezar una partida nueva tras el Game Over.
+        </p>
+
+        <h2>Consejos</h2>
+        <ul>
+          <li>No te quedes quieto: los enemigos van en línea recta hacia ti, así que moverte en círculos amplios los agrupa detrás.</li>
+          <li>Cuando veas un «!» rojo, muévete en perpendicular: el misil va hacia donde estabas, no te persigue.</li>
+          <li>Ve a por los premium cuando puedas: sus cofres son la forma más rápida de completar armas y evoluciones.</li>
+          <li>Planea las recetas: coger pronto la pasiva compañera de tu arma principal acelera su evolución.</li>
+          <li>Cada evolución endurece a los enemigos y añade misiles: compensa, pero no bajes la guardia.</li>
+          <li>Prepárate para el minuto 5: el Grito y el Escudo ayudan a abrir hueco en el anillo de agencias.</li>
+          <li>Con la Burbuja en pantalla, mantén la distancia y busca los huecos entre sus billetes; para ganar basta con sobrevivir.</li>
+          <li>Recoge las promesas en un momento tranquilo: si se incumplen, la penalización llega 20 segundos después.</li>
+        </ul>
+      </section>
+
+      <section id="en" lang="en">
+        <h1>Vivienda Survivors guide</h1>
+        <p>
+          Everything you need to know to survive 10 minutes in the housing market: controls, enemies, weapons, passives,
+          evolutions, chests and a few tips. The numbers are the game's base values.
+        </p>
+
+        <h2>The basics</h2>
+        <p>
+          You start with 100 health and the CV Launcher. You move and your weapons attack on their own. Every enemy you defeat
+          drops euros: they are your experience and they never disappear from the ground. To go from level <em>n</em> to the
+          next one you need 5 + (<em>n</em> − 1) × 6 euros (5 for level 2, 11 for level 3, 17 for level 4…). When you level
+          up the game pauses and you pick one of three upgrades. If fewer than three upgrades are left, a
+          <strong>Beer with Friends</strong> card is added, which heals 30 health. After taking a hit you are invulnerable for half a second.
+        </p>
+        <h3>Controls</h3>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Action</th><th>Desktop</th><th>Mobile</th></tr></thead>
+            <tbody>
+              <tr><td>Move</td><td>WASD or arrow keys</td><td>Touch and drag in the bottom half (virtual joystick)</td></tr>
+              <tr><td>Pick upgrade</td><td>Click or keys 1, 2, 3</td><td>Tap the card</td></tr>
+              <tr><td>Pause</td><td>Esc or P</td><td>⏸ button, top right</td></tr>
+              <tr><td>Legend</td><td>H</td><td>❓ button</td></tr>
+              <tr><td>Sound</td><td>M</td><td>🔊 button</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Timeline of a run</h2>
+        <ul>
+          <li><strong>0:00</strong> — Only inflation spikes.</li>
+          <li><strong>1:00</strong> — Landlords arrive. From 1:15, one premium enemy every minute.</li>
+          <li><strong>2:00</strong> — Agencies arrive, along with the first promise.</li>
+          <li><strong>3:00</strong> — The Soaring Euribor volleys begin.</li>
+          <li><strong>4:00</strong> — Vulture funds show up. Second promise.</li>
+          <li><strong>5:00</strong> — Tourist season: a ring of 40 agencies suddenly surrounds you.</li>
+          <li><strong>6:00</strong> — Third promise.</li>
+          <li><strong>8:00</strong> — Bubble 2.0 (warned 3 seconds earlier) and the last promise.</li>
+          <li><strong>10:00</strong> — Victory: you sign the 40-year mortgage.</li>
+        </ul>
+
+        <h2>Enemies</h2>
+        <p>
+          They all walk straight at you and hurt you on contact. Every minute they gain 20% health and 5% damage. Each
+          evolution you get also gives them 60% more health and 10% more enemies per wave.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Enemy</th><th>From</th><th>Health</th><th>Damage</th><th>Euros</th><th>What it is like</th></tr></thead>
+            <tbody>
+              <tr><td>Inflation Spike</td><td>0:00</td><td>10</td><td>5</td><td>1</td><td>Weak and numerous; medium speed.</td></tr>
+              <tr><td>11-Month-Lease Landlord</td><td>1:00</td><td>30</td><td>10</td><td>3</td><td>Slow, but tougher.</td></tr>
+              <tr><td>Agency with Fees</td><td>2:00</td><td>20</td><td>8</td><td>2</td><td>The fastest: always gets there first.</td></tr>
+              <tr><td>Vulture Fund</td><td>4:00</td><td>120</td><td>20</td><td>10</td><td>Big, very slow and the hardest hitter. More of them every minute.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h3>Soaring Euribor</h3>
+        <p>
+          A missile that cannot be destroyed: your weapons do not affect it and you can only dodge it. A red “!” blinks for one
+          second on the edge it will come from; then it crosses the screen in a straight line towards the spot where you were
+          and deals 25 damage. From minute 3 there is a volley every 8 seconds, down to every 3 seconds by the end, with 1 to 3
+          missiles (plus one more per evolution).
+        </p>
+        <h3>Bubble 2.0 (final boss)</h3>
+        <p>
+          It appears at minute 8 with 8000 health (30% more per evolution), cannot be knocked back and deals 30 damage on
+          contact. Every 3 seconds it fires a ring of 12 banknotes that deal 10 damage each. Popping it drops 50 euros, but
+          you do not need to defeat it to win.
+        </p>
+        <h3>Premium enemies and chests</h3>
+        <p>
+          From 1:15, every minute a <strong>premium</strong> landlord, agency or vulture fund appears: golden, crowned, with
+          20 times the health, bigger, 50% more damage and a fixed speed higher than any normal enemy, although lower than
+          yours. A yellow arrow shows where it is. They do not appear while the Bubble is alive. When defeated they drop a
+          <strong>chest</strong> with 1 upgrade (60%), 3 (30%) or 5 (10%). Chests can also give you evolutions.
+        </p>
+
+        <h2>Weapons</h2>
+        <p>All of them go up to level 5. The table shows level 1 → level 5.</p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Weapon</th><th>What it does</th><th>Level 1 → 5</th></tr></thead>
+            <tbody>
+              <tr><td>CV Launcher (starting weapon)</td><td>Shoots the nearest enemy.</td><td>Damage 10 → 20, cooldown 1 s → 0.7 s, 1 → 3 projectiles that hit 1 → 2 enemies each.</td></tr>
+              <tr><td>Housing Law Shield</td><td>Permanent aura that damages everything near you.</td><td>Damage 4 → 10 every 0.5 s → 0.35 s; radius 70 → 115.</td></tr>
+              <tr><td>Shout “That's a storage room!”</td><td>Periodic wave around you that damages and knocks back.</td><td>Damage 25 → 60, every 4 s → 2.5 s; radius 140 → 200.</td></tr>
+              <tr><td>Tenants' Union</td><td>Fists that orbit you and hit on contact.</td><td>Damage 8 → 18; 2 → 5 fists.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Passives</h2>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Passive</th><th>Per level</th><th>At level 5</th></tr></thead>
+            <tbody>
+              <tr><td>Parents as Guarantors</td><td>+20 max health and heals 20</td><td>+100 max health</td></tr>
+              <tr><td>Shared Flat</td><td>−8% cooldown on all weapons</td><td>−40%</td></tr>
+              <tr><td>Youth Rent Allowance</td><td>+15% pickup radius and +5% speed</td><td>+75% and +25%</td></tr>
+              <tr><td>Second Job</td><td>+10% damage on all weapons</td><td>+50%</td></tr>
+              <tr><td>Remote Work</td><td>Regenerates 0.3 health per second</td><td>1.5 per second</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Evolutions</h2>
+        <p>
+          With a level 5 weapon and its partner passive (at any level), the evolution shows up as an upgrade when you level up
+          or in a chest. The in-game legend (H key or ❓ button) lists these recipes.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Recipe</th><th>Evolution</th><th>Effect</th></tr></thead>
+            <tbody>
+              <tr><td>CV Launcher + Second Job</td><td>LinkedIn Premium</td><td>Shoots in 8 directions, pierces everything and +50% damage.</td></tr>
+              <tr><td>Housing Law Shield + Parents as Guarantors</td><td>Anti-Eviction Shield</td><td>Aura +60% radius and +50% damage; heals 1 per enemy killed (max 5 per second).</td></tr>
+              <tr><td>Shout + Shared Flat</td><td>Mass Protest</td><td>Radius ×2 and strong knockback; 1 in 5 waves fills the screen.</td></tr>
+              <tr><td>Tenants' Union + Youth Rent Allowance</td><td>General Strike</td><td>8 fists, orbit +50%, +60% damage and bigger fists.</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Promises</h2>
+        <p>
+          At minutes 2, 4, 6 and 8 a promise appears on the map, not far from you; an arrow shows where it is and it vanishes
+          after 30 seconds if you do not grab it. When you pick it up you get a random one with a 20-second bonus. Then, on a
+          50% chance, it is kept (nothing else happens) or broken and you suffer a 15-second penalty.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Promise</th><th>Bonus (20 s)</th><th>If broken (15 s)</th></tr></thead>
+            <tbody>
+              <tr><td>A million public homes!</td><td>Damage ×2</td><td>Damage ×0.6</td></tr>
+              <tr><td>We'll lower rents by decree!</td><td>Enemies at half speed</td><td>Enemies ×1.3 faster</td></tr>
+              <tr><td>Direct aid for young people!</td><td>Magnet ×4 and experience ×2</td><td>Experience ×0.5</td></tr>
+              <tr><td>We'll end speculation!</td><td>Cooldowns ×0.5</td><td>Cooldowns ×1.5</td></tr>
+              <tr><td>Decent housing for everyone!</td><td>Invulnerable</td><td>You move ×0.6</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2>Reviving and ads</h2>
+        <p>
+          The first time you fall in a run, if an ad is ready, you can choose to watch it to continue the same run with 50%
+          health and 5 seconds of invulnerability. It is optional and only once per run. Ads never appear while you play; at
+          most there is one when you start a new run after Game Over.
+        </p>
+
+        <h2>Tips</h2>
+        <ul>
+          <li>Keep moving: enemies walk straight at you, so moving in wide circles bunches them up behind you.</li>
+          <li>When you see a red “!”, move sideways: the missile flies towards where you were, it does not chase you.</li>
+          <li>Go after premium enemies when you can: their chests are the fastest way to max out weapons and evolve them.</li>
+          <li>Plan your recipes: picking your main weapon's partner passive early speeds up its evolution.</li>
+          <li>Every evolution makes enemies tougher and adds missiles: it pays off, but do not let your guard down.</li>
+          <li>Get ready for minute 5: the Shout and the Shield help you break through the ring of agencies.</li>
+          <li>With the Bubble on screen, keep your distance and look for the gaps between its banknotes; surviving is enough to win.</li>
+          <li>Grab promises at a quiet moment: if they are broken, the penalty arrives 20 seconds later.</li>
+        </ul>
+      </section>
+
+      <footer>
+        <a href="./">▶ Jugar ahora / Play now</a> ·
+        <a href="acerca.html">Acerca de / About</a> ·
+        <a href="privacidad.html">Privacidad / Privacy</a>
+      </footer>
+    </main>
+  </body>
+</html>
