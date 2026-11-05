@@ -29,7 +29,7 @@
     <style>
       html, body {
         margin: 0;
-        background: #000;
+        background: #1a1a1a;
         overscroll-behavior: none;
         -webkit-tap-highlight-color: transparent;
       }
@@ -38,11 +38,27 @@
         box-sizing: border-box;
         padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
       }
-      /* #game ocupa toda la pantalla (100vw × 100dvh menos los insets); la guía queda debajo, al hacer scroll. */
+      /*
+       * Portada: el juego va en un marco amarillo algo más pequeño que la pantalla, con margen alrededor (ahí la rueda y
+       * el dedo desplazan la página) y el enlace a la guía visible debajo. Durante la partida (html.playing, ver
+       * setPlayingLayout en src/mobile.ts) y en pantalla completa ocupa toda la pantalla, sin borde.
+       */
+      #game-frame {
+        box-sizing: border-box;
+        width: calc(100% - 32px);
+        height: calc(100vh - 88px);
+        height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 88px);
+        min-height: 240px;
+        margin: 16px auto 0;
+        border: 3px solid #ffd447;
+        border-radius: 8px;
+        background: #000;
+        overflow: hidden;
+      }
+      /* Phaser mide el contenedor con su borde incluido: el borde va en #game-frame y #game es solo el interior. */
       #game {
         width: 100%;
-        height: 100vh;
-        height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+        height: 100%;
         overflow: hidden;
         touch-action: none;
         -webkit-user-select: none;
@@ -70,6 +86,32 @@
         -webkit-user-select: none;
         user-select: none;
       }
+      html.playing #game-frame {
+        width: 100%;
+        height: 100vh;
+        height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+        min-height: 0;
+        margin: 0;
+        border: 0;
+        border-radius: 0;
+      }
+      :root:fullscreen #game-frame {
+        width: 100%;
+        height: 100vh;
+        height: 100dvh;
+        min-height: 0;
+        margin: 0;
+        border: 0;
+        border-radius: 0;
+      }
+      .scroll-hint {
+        display: block;
+        padding: 14px 16px;
+        color: #ffd447;
+        font: 600 15px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+        text-align: center;
+        text-decoration: none;
+      }
       #rotate-overlay[hidden] { display: none; }
       .info { background: #1a1a1a; color: #dddddd; font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
       .info-inner { max-width: 760px; margin: 0 auto; padding: 24px 20px 48px; }
@@ -80,11 +122,12 @@
       .info section + section { margin-top: 48px; padding-top: 24px; border-top: 1px solid #333333; }
       .info footer { margin-top: 48px; padding-top: 24px; border-top: 1px solid #333333; font-size: 14px; color: #888888; }
     </style>
-    <script type="module" crossorigin src="./js/index-C4fqLgnC.js"></script>
+    <script type="module" crossorigin src="./js/index-Ca4ZxrQc.js"></script>
   </head>
   <body>
-    <div id="game"></div>
+    <div id="game-frame"><div id="game"></div></div>
     <div id="rotate-overlay" hidden></div>
+    <a class="scroll-hint" href="#guia">▼ Guía, controles y preguntas frecuentes · Guide, controls &amp; FAQ</a>
     <noscript>
       <div class="info">
         <div class="info-inner">
