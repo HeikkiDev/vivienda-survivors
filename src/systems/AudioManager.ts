@@ -12,8 +12,6 @@ class AudioManagerImpl {
   private rateTween: Phaser.Tweens.Tween | null = null;
   // Estado propio: en Web Audio, sound.mute se lee de un nodo de ganancia y no cambia al instante.
   private isMuted = false;
-  /** Silencio temporal mientras se ve un anuncio (no cambia la preferencia guardada). */
-  private adMuted = false;
   private readonly lastPlayed = new Map<SfxKey, number>();
   private readonly warned = new Set<string>();
 
@@ -30,19 +28,13 @@ class AudioManagerImpl {
   toggleMute(): boolean {
     const muted = !this.isMuted;
     this.isMuted = muted;
-    if (this.game) this.game.sound.mute = muted || this.adMuted;
+    if (this.game) this.game.sound.mute = muted;
     try {
       localStorage.setItem(AUDIO.mutedStorageKey, muted ? '1' : '0');
     } catch {
       // localStorage no disponible: la preferencia dura solo esta sesión.
     }
     return muted;
-  }
-
-  /** Silencia todo durante un anuncio y, al acabar, vuelve a la preferencia del jugador. */
-  setAdMuted(adMuted: boolean): void {
-    this.adMuted = adMuted;
-    if (this.game) this.game.sound.mute = this.isMuted || adMuted;
   }
 
   /** Máx. N instancias a la vez y una cada X ms por efecto, con un pequeño cambio de tono. */

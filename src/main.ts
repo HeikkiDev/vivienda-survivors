@@ -16,9 +16,7 @@ import { GameScene } from './scenes/GameScene';
 import { LegendScene } from './scenes/LegendScene';
 import { LevelUpScene } from './scenes/LevelUpScene';
 import { MenuScene } from './scenes/MenuScene';
-import { ReviveScene } from './scenes/ReviveScene';
 import { UIScene } from './scenes/UIScene';
-import { Ads } from './systems/ads';
 
 const debug = PHYSICS_DEBUG || new URLSearchParams(window.location.search).has(DEBUG_URL_PARAM);
 
@@ -40,8 +38,7 @@ const game = new Phaser.Game({
     arcade: { gravity: { x: 0, y: 0 }, debug },
   },
   input: { activePointers: 3 },
-  scene: [BootScene, MenuScene, GameScene, UIScene, LevelUpScene, ChestScene, LegendScene, ReviveScene, GameOverScene],
+  scene: [BootScene, MenuScene, GameScene, UIScene, LevelUpScene, ChestScene, LegendScene, GameOverScene],
 });
 
 setupMobile(game);
-Ads.init(game);

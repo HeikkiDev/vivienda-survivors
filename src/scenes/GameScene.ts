@@ -26,7 +26,6 @@ import {
   PLAYER,
   PROMESA,
   REGEN_FEEDBACK,
-  REVIVE,
   SECONDS_PER_MINUTE,
   SPAWN,
   SPAWN_TABLE,
@@ -45,8 +44,6 @@ import type { Enemy } from '../entities/Enemy';
 import type { Missile } from '../entities/Missile';
 import { Player } from '../entities/Player';
 import { XpGemPool } from '../entities/XpGem';
-import { setPlayingLayout } from '../mobile';
-import { Ads } from '../systems/ads';
 import { AudioManager } from '../systems/AudioManager';
 import { Elections, type PromiseStatus } from '../systems/Elections';
 import { InputSystem } from '../systems/Input';
@@ -75,7 +72,6 @@ import type { Weapon, WeaponContext } from '../weapons/Weapon';
 import type { ChestData } from './ChestScene';
 import type { GameOverData } from './GameOverScene';
 import type { LevelUpData } from './LevelUpScene';
-import type { ReviveData } from './ReviveScene';
 
 export interface HudState {
   elapsed: number;
@@ -168,12 +164,6 @@ export class GameScene extends Phaser.Scene {
   private evolutions = 0;
   private ended = false;
   private ending: EndingKind | null = null;
-  /** Ya se ofreció revivir con anuncio en esta partida (solo una vez). */
-  private reviveOffered = false;
-  /** Oferta de revivir en curso (partida congelada a la espera del anuncio o del jugador). */
-  private reviveOfferOpen = false;
-  /** Retira la oferta de anuncio con recompensa pendiente. */
-  private cancelReviveOffer: (() => void) | null = null;
   private debugStart = false;
   private debugWin = false;
   /** Captura del último momento de la partida, para la imagen de compartir. */
@@ -214,8 +204,6 @@ export class GameScene extends Phaser.Scene {
   }
 
   create(): void {
-    // Cada partida (desde el menú o al reintentar) se juega a pantalla entera, sin el marco de la portada.
-    setPlayingLayout(this.game, true);
     const startMinute = GameScene.debugStartMinute();
     const params = new URLSearchParams(window.location.search);
     this.debugWin = params.has(DEBUG_WIN_PARAM);
@@ -247,9 +235,6 @@ export class GameScene extends Phaser.Scene {
     this.evolutions = 0;
     this.ended = false;
     this.ending = null;
-    this.reviveOffered = false;
-    this.reviveOfferOpen = false;
-    this.cancelReviveOffer = null;
     this.endSnapshot = null;
     this.modifiers = new Modifiers();
     AudioManager.resetMusicRate();
@@ -326,10 +311,6 @@ export class GameScene extends Phaser.Scene {
       this.scene.stop('LevelUpScene');
       this.scene.stop('ChestScene');
       this.scene.stop('LegendScene');
-      this.scene.stop('ReviveScene');
-      this.cancelReviveOffer?.();
-      this.cancelReviveOffer = null;
-      setPlayingLayout(this.game, false);
     });
   }
 
@@ -749,50 +730,7 @@ export class GameScene extends Phaser.Scene {
     if (this.modifiers.invulnerable || !this.player.takeHit(damage)) return;
     if (!this.player.isDead) AudioManager.playSfx('hurt');
     this.cameras.main.shake(CAMERA_SHAKE.durationMs, CAMERA_SHAKE.intensity);
-    if (this.player.isDead) this.onPlayerDeath();
-  }
-
-  /**
-   * Primera muerte de la partida con un anuncio con recompensa listo: se congela la partida y se ofrece
-   * revivir. Si no hay anuncio (o ya se ofreció), derrota como siempre.
-   */
-  private onPlayerDeath(): void {
-    if (this.ended) return;
-    if (this.reviveOffered || !Ads.canOfferReward) {
-      this.endGame(false);
-      return;
-    }
-    this.reviveOffered = true;
-    this.freeze();
-    AudioManager.setMusicDucked(true);
-    this.reviveOfferOpen = true;
-    const cancel = Ads.offerReward({
-      onOffer: (watch) => {
-        this.scene.pause();
-        this.scene.launch('ReviveScene', { watch, decline: () => this.finishRevive(false) } satisfies ReviveData);
-      },
-      onDone: (viewed) => this.finishRevive(viewed),
-    });
-    // El SDK podría responder dentro de la propia llamada.
-    if (this.reviveOfferOpen) this.cancelReviveOffer = cancel;
-  }
-
-  /** Cierra la oferta: revive (anuncio visto entero) y sigue la misma partida, o pasa a la derrota. */
-  private finishRevive(revived: boolean): void {
-    if (!this.reviveOfferOpen) return;
-    this.reviveOfferOpen = false;
-    this.cancelReviveOffer?.();
-    this.cancelReviveOffer = null;
-    this.scene.stop('ReviveScene');
-    this.scene.resume();
-    AudioManager.setMusicDucked(false);
-    if (!revived) {
-      this.playEnding(false);
-      return;
-    }
-    this.ended = false;
-    this.physics.resume();
-    this.player.revive(REVIVE.hpRatio, REVIVE.invulnerabilitySeconds);
+    if (this.player.isDead) this.endGame(false);
   }
 
   /** Pausa manual (Esc/P/botón) solo si no hay menú de nivel abierto ni la partida ha terminado. */
@@ -802,19 +740,10 @@ export class GameScene extends Phaser.Scene {
 
   private endGame(victory: boolean): void {
     if (this.ended) return;
-    this.freeze();
-    this.playEnding(victory);
-  }
-
-  /** Detiene la partida (update, contactos y física) y al jugador. */
-  private freeze(): void {
     this.ended = true;
+    this.ending = victory ? 'victory' : 'defeat';
     this.physics.pause();
     this.player.move(Phaser.Math.Vector2.ZERO, 0);
-  }
-
-  private playEnding(victory: boolean): void {
-    this.ending = victory ? 'victory' : 'defeat';
     AudioManager.stopMusic();
     AudioManager.playSfx(victory ? 'levelup' : 'death');
     // La captura se toma en el siguiente render, antes del flash y el zoom de la animación final.

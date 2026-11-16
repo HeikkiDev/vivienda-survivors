@@ -67,14 +67,6 @@ export class Player extends Phaser.GameObjects.Zone {
     return true;
   }
 
-  /** Vuelve a la vida (anuncio con recompensa) con una fracción de la vida máxima y un rato de invulnerabilidad. */
-  revive(hpRatio: number, invulnerableSeconds: number): void {
-    this.hp = this.maxHp * hpRatio;
-    this.invulnerableTime = invulnerableSeconds;
-    this.visual.setAlpha(PLAYER.invulnerabilityAlpha);
-    this.drawHealthBar();
-  }
-
   /** Llamar después del paso de física para que el visual no vaya un frame por detrás. */
   syncVisual(): void {
     this.visual.setPosition(this.x, this.y);
