@@ -1,6 +1,5 @@
 import Phaser from 'phaser';
 import { BEST_TIME_STORAGE_KEY, GAME_WIDTH, SHARE_CARD, SHARE_URL, UI } from '../config';
-import { Ads } from '../systems/ads';
 import { AudioManager } from '../systems/AudioManager';
 import { TEXTS } from '../texts';
 import { addBaseOverlay, centerOnBaseArea } from '../utils/layout';
@@ -160,10 +159,7 @@ export class GameOverScene extends Phaser.Scene {
   private restart(): void {
     if (this.leaving) return;
     this.leaving = true;
-    // Intersticial solo entre partidas (si toca); sin anuncio, se empieza al instante.
-    Ads.showInterstitial(() => {
-      AudioManager.startMusic();
-      this.scene.start('GameScene');
-    });
+    AudioManager.startMusic();
+    this.scene.start('GameScene');
   }
 }

@@ -6,7 +6,6 @@ import {
   EVOLUTIONS,
   LANGUAGE_STORAGE_KEY,
   PASSIVES,
-  REVIVE,
   VICTORY_MINUTE,
   type Language,
   type PromiseEffect,
@@ -86,10 +85,6 @@ const ES = {
     noBest: 'Récord: --:--',
     footer: 'Parodia. Cualquier parecido con la realidad es pura coincidencia (no).',
     language: 'Idioma:',
-    privacy: 'Privacidad',
-    about: 'Acerca de',
-    guide: 'Guía',
-    privacySettings: 'Preferencias de privacidad',
   },
   mobile: {
     rotate: 'Gira el móvil 📱↻',
@@ -197,13 +192,6 @@ const ES = {
     title: 'DERROTA',
     subtitle: 'El mercado inmobiliario ha podido contigo.',
   },
-  revive: {
-    title: '¿Vuelves ya a casa de tus padres?',
-    subtitle: `Mira un anuncio y sigue con el ${pct(REVIVE.hpRatio)}% de vida. Solo una vez por partida.`,
-    watch: '▶ Ver anuncio para revivir',
-    decline: 'No, gracias',
-    loading: 'Cargando anuncio…',
-  },
   gameOver: {
     victoryTitle: '🏠 Has firmado la hipoteca… a 40 años.',
     victorySubtitle: 'Euribor + 1,5%. Enhorabuena (?)',
@@ -245,10 +233,6 @@ const EN: Texts = {
     noBest: 'Best: --:--',
     footer: 'Parody. Any resemblance to reality is purely coincidental (not).',
     language: 'Language:',
-    privacy: 'Privacy',
-    about: 'About',
-    guide: 'Guide',
-    privacySettings: 'Privacy settings',
   },
   mobile: {
     rotate: 'Rotate your phone 📱↻',
@@ -355,13 +339,6 @@ const EN: Texts = {
   defeat: {
     title: 'DEFEAT',
     subtitle: 'The housing market got the better of you.',
-  },
-  revive: {
-    title: 'Moving back in with your parents already?',
-    subtitle: `Watch an ad and keep going with ${pct(REVIVE.hpRatio)}% HP. Only once per run.`,
-    watch: '▶ Watch an ad to revive',
-    decline: 'No, thanks',
-    loading: 'Loading ad…',
   },
   gameOver: {
     victoryTitle: '🏠 You signed the mortgage… for 40 years.',
